@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Dynamic title -->
+    <title>{% block title %} Kurti Shop {% endblock %}</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    {% block extra_css %}
+    {% endblock %}
+</head>
+<body class="font-[Poppins] bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    {% include 'includes/navbar.html' %}
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto mt-4 px-4">
+            {% for message in messages %}
+                <div class="mb-3 p-3 rounded-lg
+                        {% if message.tags == 'success' %}
+                            bg-green-100 text-green-700
+                        {% elif message.tags == 'error' %}
+                            bg-red-100 text-green-700
+                        {% else %}
+                            bg-blue-100 text-blue-700
+                        {% endif %} 
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main content -->
+    <main class="flex-grow">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer  -->
+    {% includes 'includes/footer.html'}
+
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>
