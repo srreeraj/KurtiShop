@@ -1,0 +1,38 @@
+/* Google Font Fallback */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Remove Horizontal Overflow */
+body {
+    overflow-x: hidden;
+}
+
+/* Selection Color */
+::selection {
+    background: #ec4899;
+    color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f3f4f6;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ec4899;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #db2777;
+}
