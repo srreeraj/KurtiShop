@@ -10,7 +10,7 @@ def product_list(request):
     )
 
     context = {
-        'product' : products
+        'products' : products
     }
 
     return render(
