@@ -4,7 +4,7 @@ from .models import Product
 # Create your views here.
 
 def product_list(request):
-    products = Product.object.filter(
+    products = Product.objects.filter(
         is_active=True,
         is_deleted=False
     )
