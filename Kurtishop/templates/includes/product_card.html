@@ -1,0 +1,51 @@
+<a 
+    href="{% url 'product_detail' product.slug %}"
+    class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 block"
+>
+    <div class="relative overflow-hidden">
+        {% if product.images.first %}
+            <img 
+                src="{{ product.images.first.image.url }}" 
+                alt="{{ product.name }}"
+                class="w-full h-80 object-cover group-hover:scale-105 transition duration-500"
+            >
+        {% endif %}
+
+        {% if product.is_new_arrival %}
+        <span class="absolute top-3 left-3 bg-pink-600 text-white text-xs px-3 py-1 rounded-full">
+            New
+        </span>
+        {% endif %}
+    </div>
+    <div class="p-5">
+        <h3 class="font-semibold text-lg text-gray-800">
+            {{ product.name }}
+        </h3>
+
+        <p class="text-sm text-gray-500 mt-1">
+            {{ product.category.name }}
+        </p>
+
+        {% with variant=product.variant.first %}
+        {% if variant %}
+
+        <div class="mt-3 flex items-center gap-2">
+            <span class="text-xl font-bold text-pink-600">
+                ₹{{ variant.discounted_price }}
+            </span>
+
+            {% if variant.discount_percentage > 0 %}
+            <span class="text-gray-400 line-through">
+                ₹{{ variant.price }}
+            </span>
+            {% endif %}
+        </div>
+
+        {% endif %}
+        {% endwith %}
+
+        <div class="mt-5 text-center bg-pink-600 tex-white py-3 rounded-xl hover:bg-pink-700 transition">
+            View Details
+        </div>
+    </div>
+</a>
