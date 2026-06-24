@@ -14,6 +14,7 @@ class Category(models.Model):
 
     description = models.TextField(blank=True)
     is_active = models.BooleanField(blank=True)
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
