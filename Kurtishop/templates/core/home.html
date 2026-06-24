@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Home | Kurti Shop
@@ -45,7 +46,7 @@ Home | Kurti Shop
 
             <div>
                 <img
-                    src="{% static 'hero/hero1.png' %}"
+                    src="{% static 'images/hero/hero1.png' %}"
                     alt="Hero Image"
                     class="rounded-3xl shadow-lg">
             </div>
@@ -227,3 +228,5 @@ Home | Kurti Shop
 <!-- Instgram Gallery -->
 
 <!-- Newsletter -->
+
+{% endblock %}
