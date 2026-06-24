@@ -15,7 +15,7 @@ def product_list(request):
 
     return render(
         request,
-        'product/product_list.html',
+        'products/product_list.html',
         context
     )
 
