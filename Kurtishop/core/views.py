@@ -28,4 +28,4 @@ def home(request):
         'featured_products' : featured_products,
         'new_arrivals' : new_arrivals
     }
-    return render(request, 'core/home.html')
+    return render(request, 'core/home.html', context)
