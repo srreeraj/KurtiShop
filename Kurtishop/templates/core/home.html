@@ -138,7 +138,33 @@ Home | Kurti Shop
 
 </section>
 
-<!-- Best Sellers -->
+<!-- Feature Products -->
+
+<section class="py-20">
+
+    <div class="max-w-7xl mx-auto px-5">
+
+        <h2 class="text-4xl font-bold text-center">
+            Featured Collection
+        </h2>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+
+            {% for product in featured_products %}
+
+                {% include 'includes/product_card.html' %}
+
+            {% empty %}
+
+                <p>No Featured Products.</p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
 
 <!-- Promo Banner -->
 <section class="py-20">
