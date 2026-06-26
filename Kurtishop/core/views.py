@@ -1,9 +1,16 @@
 from django.shortcuts import render
 from products.models import Product
+from categories.models import Category
 
 # Create your views here.
 
 def home(request):
+
+    categories = Category.objects.filter(
+        is_active = True,
+        is_deleted = False,
+    )
+
     featured_products = Product.objects.filter(
         is_featured = True,
         is_active = True,
@@ -17,6 +24,7 @@ def home(request):
     )[:8]
 
     context = {
+        'categories' : categories,
         'featured_products' : featured_products,
         'new_arrivals' : new_arrivals
     }
