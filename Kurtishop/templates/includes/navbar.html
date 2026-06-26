@@ -1,90 +1,245 @@
-<nav class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-5">
-        <div class="flex justify-between items-center h-16">
+{% load static %}
 
-            <!-- Logo -->
-            <a href="{% url 'home' %}"
-               class="text-2xl font-bold text-pink-600">
-                Kurti Shop
-            </a>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex items-center space-x-8">
+<style>
+  :root {
+    --brand: #C1121F;
+    --brand-hover: #9B0D17;
+  }
 
-                <a href="{% url 'home' %}"
-                   class="text-gray-700 hover:text-pink-600 transition">
-                    Home
-                </a>
+  #main-navbar {
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
 
-                <a href="#"
-                   class="text-gray-700 hover:text-pink-600 transition">
-                    Shop
-                </a>
+  /* Default State (Transparent + White) */
+  .nav-logo {
+    color: #ffffff;
+    transition: color 0.4s ease;
+  }
 
-                <a href="#"
-                   class="text-gray-700 hover:text-pink-600 transition">
-                    Categories
-                </a>
+  .nav-link {
+    position: relative;
+    padding-bottom: 3px;
+    color: rgba(255, 255, 255, 0.9);
+    transition: color 0.4s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--brand);
+    transition: width 0.3s ease;
+  }
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100%;
+  }
 
-                <a href="#"
-                   class="text-gray-700 hover:text-pink-600 transition">
-                    Contact
-                </a>
+  /* Hamburger - Improved Visibility */
+  #hamburger-btn {
+    color: #ffffff;           /* Important for initial state */
+    transition: color 0.4s ease;
+  }
+  #hamburger-btn .bar {
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: currentColor;   /* Use currentColor for better sync */
+    transition: all 0.4s ease;
+  }
 
-                <!-- Cart -->
-                <a href="#"
-                   class="relative text-gray-700 hover:text-pink-600">
+  /* Search Icon */
+  #search-btn svg {
+    stroke: #ffffff;
+    transition: stroke 0.4s ease;
+  }
 
-                    🛒
+  /* Scrolled State */
+  #main-navbar.scrolled {
+    background: #ffffff !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.08);
+  }
 
-                    <span class="absolute -top-2 -right-3
-                                 bg-pink-600 text-white
-                                 text-xs rounded-full
-                                 w-5 h-5 flex items-center
-                                 justify-center">
-                        0
-                    </span>
-                </a>
+  #main-navbar.scrolled .nav-logo,
+  #main-navbar.scrolled #hamburger-btn,
+  #main-navbar.scrolled #search-btn svg {
+    color: var(--brand);
+    stroke: var(--brand);
+  }
 
-            </div>
+  #main-navbar.scrolled .nav-link {
+    color: #333;
+  }
 
-            <!-- Mobile Menu Button -->
-            <button id="menu-btn"
-                    class="md:hidden text-2xl">
-                ☰
-            </button>
+  #main-navbar.scrolled .nav-link:hover,
+  #main-navbar.scrolled .nav-link.active {
+    color: var(--brand);
+  }
 
-        </div>
+  /* Search Input */
+  .search-input {
+    width: 0;
+    opacity: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    transition: width 0.4s ease, opacity 0.3s ease;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .search-input.open {
+    width: 160px;
+    opacity: 1;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0;
+  }
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu"
-             class="hidden md:hidden py-4">
+  /* Mobile */
+  @media (max-width: 1024px) {
+    .desktop-nav { display: none; }
+  }
 
-            <a href="{% url 'home' %}"
-               class="block py-2 text-gray-700">
-                Home
-            </a>
+  /* Mobile Nav Links */
+  .mobile-nav-link {
+    display: block;
+    padding: 16px 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--brand);
+    text-decoration: none;
+    border-bottom: 0.5px solid #f0f0f0;
+  }
+</style>
 
-            <a href="#"
-               class="block py-2 text-gray-700">
-                Shop
-            </a>
+<!-- ===================== NAVBAR ===================== -->
+<nav id="main-navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent" style="height: 88px;">
 
-            <a href="#"
-               class="block py-2 text-gray-700">
-                Categories
-            </a>
+  <div class="max-w-screen-2xl mx-auto h-full flex items-center justify-between px-5 md:px-8 lg:px-16">
 
-            <a href="#"
-               class="block py-2 text-gray-700">
-                Contact
-            </a>
+    <!-- Left: Hamburger -->
+    <button id="hamburger-btn" class="lg:hidden flex flex-col justify-center items-center gap-[5px] p-2"
+            aria-label="Open menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
 
-            <a href="#"
-               class="block py-2 text-gray-700">
-                Cart
-            </a>
+    <!-- Center: Logo -->
+    <a href="{% url 'home' %}" class="nav-logo flex-shrink-0 mx-auto lg:mx-0"
+       style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
+      Élégance
+    </a>
 
-        </div>
+    <!-- Desktop Navigation -->
+    <ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
+      <li><a href="{% url 'home' %}" class="nav-link active">Home</a></li>
+      <li><a href="#" class="nav-link">New Arrivals</a></li>
+      <li><a href="#" class="nav-link">Wedding</a></li>
+      <li><a href="#" class="nav-link">Office Wear</a></li>
+      <li><a href="#" class="nav-link">Ethnic</a></li>
+      <li><a href="#" class="nav-link">Western</a></li>
+      <li><a href="#" class="nav-link sale">Sale</a></li>
+      <li><a href="#" class="nav-link">Contact</a></li>
+    </ul>
+
+    <!-- Right: Search -->
+    <div class="flex items-center">
+      <div class="flex items-center" id="search-wrap">
+        <input type="text" id="search-input" class="search-input" placeholder="Search...">
+        <button id="search-btn" class="p-2" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </div>
     </div>
+  </div>
 </nav>
+
+<!-- ============== MOBILE DRAWER ============== -->
+<div id="drawer-overlay" class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity z-40 lg:hidden"></div>
+
+<div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[300px] bg-white translate-x-full transition-transform duration-300 z-50 lg:hidden"
+     style="padding: 80px 30px 40px;">
+
+  <span style="position: absolute; top: 28px; left: 30px; font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; color: var(--brand);">
+    Élégance
+  </span>
+
+  <button id="drawer-close-btn" style="position: absolute; top: 24px; right: 28px; font-size: 28px; color: #333;">&times;</button>
+
+  <nav class="flex flex-col">
+    <a href="{% url 'home' %}" class="mobile-nav-link">Home</a>
+    <a href="#" class="mobile-nav-link">New Arrivals</a>
+    <a href="#" class="mobile-nav-link">Wedding Collection</a>
+    <a href="#" class="mobile-nav-link">Office Wear</a>
+    <a href="#" class="mobile-nav-link">Ethnic Wear</a>
+    <a href="#" class="mobile-nav-link">Western Wear</a>
+    <a href="#" class="mobile-nav-link">Sale</a>
+    <a href="#" class="mobile-nav-link">Contact</a>
+  </nav>
+</div>
+
+<script>
+  (function () {
+    const navbar = document.getElementById('main-navbar');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const drawer = document.getElementById('mobile-drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    const closeBtn = document.getElementById('drawer-close-btn');
+    const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('search-input');
+
+    function handleScroll() {
+      if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Mobile Drawer
+    function openDrawer() {
+      drawer.classList.add('!translate-x-0');
+      overlay.classList.add('opacity-100', 'pointer-events-auto');
+      hamburgerBtn.classList.add('open');
+    }
+    function closeDrawer() {
+      drawer.classList.remove('!translate-x-0');
+      overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      hamburgerBtn.classList.remove('open');
+    }
+
+    hamburgerBtn.addEventListener('click', openDrawer);
+    closeBtn.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+
+    // Search
+    searchBtn.addEventListener('click', () => {
+      searchInput.classList.toggle('open');
+      if (searchInput.classList.contains('open')) searchInput.focus();
+    });
+
+    // Escape Key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDrawer();
+        searchInput.classList.remove('open');
+      }
+    });
+
+    handleScroll(); // Initial check
+  })();
+</script>
