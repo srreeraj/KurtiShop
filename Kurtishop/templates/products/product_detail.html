@@ -1,145 +1,149 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
-{{ product.name }}
+{{ product.name }} | Kurti Shop
 {% endblock %}
 
 {% block content %}
 
-<section class="py-16">
+<!-- Breadcrumb -->
+<section class="bg-white py-6 border-b">
+    <div class="max-w-7xl mx-auto px-5">
+        <nav class="flex text-sm text-gray-500">
+            <a href="{% url 'home' %}" class="hover:text-red-600">Home</a>
+            <span class="mx-3">›</span>
+            <a href="{% url 'product_list' %}" class="hover:text-red-600">Shop</a>
+            <span class="mx-3">›</span>
+            <span class="text-gray-900 font-medium">{{ product.category.name }}</span>
+        </nav>
+    </div>
+</section>
 
+<section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-5">
 
-        <div class="grid lg:grid-cols-2 gap-12">
+        <div class="grid lg:grid-cols-2 gap-12 xl:gap-16">
 
-            <!-- Images -->
-
+            <!-- ===================== LEFT: IMAGES ===================== -->
             <div>
-
-                {% if product.images.first %}
-                <img
-                    src="{{ product.images.first.image.url }}"
-                    alt="{{ product.name }}"
-                    class="w-full rounded-3xl shadow-lg">
-                {% endif %}
-
-                <div class="grid grid-cols-4 gap-4 mt-4">
-
-                    {% for image in product.images.all %}
-
-                    <img
-                        src="{{ image.image.url }}"
-                        class="rounded-xl cursor-pointer border">
-
-                    {% endfor %}
-
+                <!-- Main Image -->
+                <div class="relative rounded-3xl overflow-hidden shadow-xl bg-gray-50">
+                    {% if product.images.first %}
+                        <img id="main-image"
+                            src="{{ product.images.first.image.url }}"
+                            alt="{{ product.name }}"
+                            class="w-full h-auto object-cover">
+                    {% else %}
+                        <div class="aspect-square flex items-center justify-center bg-gray-100">
+                            <span class="text-8xl opacity-20">👗</span>
+                        </div>
+                    {% endif %}
                 </div>
 
+                <!-- Thumbnail Gallery -->
+                <div class="grid grid-cols-5 gap-4 mt-6">
+                    {% for image in product.images.all %}
+                    <div onclick="changeImage(this)" 
+                         class="thumbnail cursor-pointer rounded-2xl overflow-hidden border-2 border-transparent hover:border-red-300 transition-all {% if forloop.first %}border-red-600{% endif %}">
+                        <img src="{{ image.image.url }}" 
+                             alt="{{ product.name }}"
+                             class="w-full h-full object-cover">
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
 
-            <!-- Product Info -->
-
+            <!-- ===================== RIGHT: PRODUCT INFO ===================== -->
             <div>
 
-                <h1 class="text-4xl font-bold">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
                     {{ product.name }}
                 </h1>
 
-                <p class="mt-4 text-gray-600">
-                    {{ product.category.name }}
-                </p>
+                <p class="text-red-600 font-medium mt-2">{{ product.category.name }}</p>
 
+                <!-- Price -->
                 {% with variant=product.variants.first %}
-
-                <div class="mt-6 flex items-center gap-3">
-
-                    <span class="text-4xl font-bold text-pink-600">
-                        ₹{{ variant.discounted_price }}
+                <div class="mt-6 flex items-end gap-4">
+                    <span class="text-4xl font-bold text-red-600">
+                        ₹{{ variant.discounted_price|floatformat:0 }}
                     </span>
-
                     {% if variant.discount_percentage > 0 %}
-                    <span class="line-through text-gray-400 text-xl">
-                        ₹{{ variant.price }}
+                    <span class="text-2xl text-gray-400 line-through">
+                        ₹{{ variant.price|floatformat:0 }}
+                    </span>
+                    <span class="bg-red-100 text-red-600 text-sm font-semibold px-4 py-1 rounded-2xl">
+                        -{{ variant.discount_percentage }}% OFF
                     </span>
                     {% endif %}
-
                 </div>
-
                 {% endwith %}
 
+                <hr class="my-8">
+
                 <!-- Sizes -->
-
-                <div class="mt-8">
-
-                    <h3 class="font-semibold mb-3">
-                        Available Sizes
-                    </h3>
-
-                    <div class="flex flex-wrap gap-3">
-
-                        {% for variant in product.variants.all %}
-
-                        <span class="border px-4 py-2 rounded-lg">
-                            {{ variant.size.name }}
-                        </span>
-
-                        {% endfor %}
-
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-semibold text-lg">Select Size</h3>
+                        <a href="#" class="text-red-600 text-sm hover:underline">Size Guide</a>
                     </div>
-
+                    <div class="flex flex-wrap gap-3" id="size-options">
+                        {% for variant in product.variants.all|dictsort:"size.name" %}
+                        <button onclick="selectSize(this, '{{ variant.size.name }}', {{ variant.id }})"
+                                class="size-btn border-2 border-gray-200 hover:border-red-300 px-6 py-3 rounded-2xl font-medium transition-all">
+                            {{ variant.size.name }}
+                        </button>
+                        {% endfor %}
+                    </div>
                 </div>
 
                 <!-- Colors -->
-
-                <div class="mt-8">
-
-                    <h3 class="font-semibold mb-3">
-                        Available Colors
-                    </h3>
-
-                    <div class="flex flex-wrap gap-3">
-
-                        {% for variant in product.variants.all %}
-
-                        <span class="border px-4 py-2 rounded-lg">
-                            {{ variant.color.name }}
-                        </span>
-
-                        {% endfor %}
-
+                <div class="mb-10">
+                    <h3 class="font-semibold text-lg mb-3">Select Color</h3>
+                    <div class="flex flex-wrap gap-4">
+                    {% for color in unique_colors %}
+                        <button onclick="selectColor(this)" 
+                            class="w-10 h-10 rounded-2xl border-2 border-white shadow-sm hover:scale-110 transition-all"
+                            style="background-color: {{ color.color__name|lower }};"
+                            title="{{ color.color__name }}">
+                        </button>
+                    {% endfor %}
                     </div>
-
+                </div>
+                <!-- Quantity -->
+                <div class="mb-8">
+                    <h3 class="font-semibold text-lg mb-3">Quantity</h3>
+                    <div class="flex items-center gap-4 w-40">
+                        <button onclick="changeQty(-1)" 
+                                class="w-12 h-12 border border-gray-300 hover:bg-gray-100 rounded-2xl text-2xl font-light">-</button>
+                        <input id="quantity" type="number" value="1" 
+                               class="w-16 text-center text-xl font-semibold border-0 focus:outline-none">
+                        <button onclick="changeQty(1)" 
+                                class="w-12 h-12 border border-gray-300 hover:bg-gray-100 rounded-2xl text-2xl font-light">+</button>
+                    </div>
                 </div>
 
-                <!-- Description -->
-
-                <div class="mt-8">
-
-                    <h3 class="font-semibold text-xl mb-3">
-                        Description
-                    </h3>
-
-                    <p class="text-gray-600 leading-relaxed">
-                        {{ product.description }}
-                    </p>
-
-                </div>
-
-                <!-- Button -->
-
-                <button
-                    class="mt-10 w-full bg-pink-600 text-white py-4 rounded-xl text-lg hover:bg-pink-700">
-
-                    Add To Cart
-
+                <!-- Add to Cart -->
+                <button onclick="addToCartDetail({{ product.id }})"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-3xl text-lg font-semibold tracking-widest transition-all duration-200 flex items-center justify-center gap-3 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    ADD TO CART
                 </button>
 
+                <!-- Description -->
+                <div class="mt-12">
+                    <h3 class="font-semibold text-xl mb-4">Description</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        {{ product.description|linebreaks }}
+                    </p>
+                </div>
+
             </div>
-
         </div>
-
     </div>
-
 </section>
 
 {% endblock %}
