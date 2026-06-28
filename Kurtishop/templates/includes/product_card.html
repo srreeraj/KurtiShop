@@ -1,51 +1,76 @@
-<a 
-    href="{% url 'product_detail' product.slug %}"
-    class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 block"
->
-    <div class="relative overflow-hidden">
-        {% if product.images.first %}
-            <img 
-                src="{{ product.images.first.image.url }}" 
-                alt="{{ product.name }}"
-                class="w-full h-80 object-cover group-hover:scale-105 transition duration-500"
-            >
-        {% endif %}
+<!-- includes/product_card.html -->
+<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-red-100 flex flex-col h-full">
 
-        {% if product.is_new_arrival %}
-        <span class="absolute top-3 left-3 bg-pink-600 text-white text-xs px-3 py-1 rounded-full">
-            New
-        </span>
-        {% endif %}
-    </div>
-    <div class="p-5">
-        <h3 class="font-semibold text-lg text-gray-800">
-            {{ product.name }}
-        </h3>
-
-        <p class="text-sm text-gray-500 mt-1">
-            {{ product.category.name }}
-        </p>
-
-        {% with variant=product.variant.first %}
-        {% if variant %}
-
-        <div class="mt-3 flex items-center gap-2">
-            <span class="text-xl font-bold text-pink-600">
-                ₹{{ variant.discounted_price }}
-            </span>
-
-            {% if variant.discount_percentage > 0 %}
-            <span class="text-gray-400 line-through">
-                ₹{{ variant.price }}
-            </span>
+    <!-- Image Container -->
+    <div class="relative overflow-hidden" style="height: 280px;">
+        <a href="{% url 'product_detail' product.slug %}" class="block h-full">
+            {% if product.images.first %}
+                <img 
+                    src="{{ product.images.first.image.url }}" 
+                    alt="{{ product.name }}"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+            {% else %}
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                    <span class="text-7xl opacity-20">👗</span>
+                </div>
             {% endif %}
+        </a>
+
+        <!-- New Badge -->
+        {% if product.is_new_arrival %}
+        <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold tracking-widest px-4 py-1.5 rounded-2xl shadow-md">
+            NEW
         </div>
-
         {% endif %}
-        {% endwith %}
 
-        <div class="mt-5 text-center bg-pink-600 tex-white py-3 rounded-xl hover:bg-pink-700 transition">
-            View Details
+        <!-- Quick Add to Cart (Hover) -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <button onclick="addToCart(event, {{ product.id }})"
+                    class="bg-gray-900 hover:bg-red-600 text-white text-sm font-semibold tracking-widest px-6 py-3 rounded-2xl flex items-center gap-2 shadow-lg transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Add to Cart
+            </button>
         </div>
     </div>
-</a>
+
+    <!-- Content -->
+    <div class="p-5 flex-1 flex flex-col">
+        <a href="{% url 'product_detail' product.slug %}" class="flex-1">
+            <p class="text-xs uppercase tracking-widest text-gray-500">{{ product.category.name }}</p>
+            
+            <h3 class="font-semibold text-gray-900 mt-2 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors">
+                {{ product.name }}
+            </h3>
+        </a>
+
+        <!-- Price -->
+        <div class="mt-auto pt-6">
+            {% with variant=product.variants.first %}
+            {% if variant %}
+                <div class="flex items-baseline gap-3">
+                    <span class="text-2xl font-bold text-red-600">
+                        ₹{{ variant.discounted_price|floatformat:0 }}
+                    </span>
+                    
+                    {% if variant.discount_percentage > 0 %}
+                    <span class="text-sm text-gray-400 line-through">
+                        ₹{{ variant.price|floatformat:0 }}
+                    </span>
+                    <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-lg font-medium">
+                        -{{ variant.discount_percentage }}%
+                    </span>
+                    {% endif %}
+                </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- View Details -->
+            <a href="{% url 'product_detail' product.slug %}"
+               class="mt-5 block text-center border border-gray-300 hover:border-red-600 hover:text-red-600 text-gray-700 font-medium py-3.5 rounded-2xl transition-all duration-200 text-sm tracking-widest">
+                VIEW DETAILS
+            </a>
+        </div>
+    </div>
+</div>
