@@ -7,143 +7,150 @@
 
 {% block content %}
 
-<!-- ===================== HERO BANNER ===================== -->
-<section class="relative h-[320px] flex items-center justify-center overflow-hidden">
-    <!-- Background Image -->
-    <div class="absolute inset-0">
-        <img src="{% static 'images/hero/hero2.png' %}" 
-             alt="Product Detail"
-             class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/50 to-transparent"></div>
-    </div>
+<!-- Breadcrumb -->
+{% include 'includes/breadcrumb.html' with breadcrumbs=breadcrumbs %}
 
-    <div class="relative text-center px-5 max-w-3xl mx-auto">
-        <p class="text-red-400 uppercase tracking-widest text-sm font-semibold mb-3">
-            {{ product.category.name }}
-        </p>
-        <h1 class="text-5xl md:text-6xl font-bold text-white leading-tight">
-            {{ product.name }}
-        </h1>
+<!-- Hero Banner -->
+<section class="relative h-[280px] flex items-center justify-center overflow-hidden">
+    <img src="{% static 'images/hero/hero2.png' %}" alt="Product" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
+    <div class="relative text-center px-5">
+        <p class="text-red-400 uppercase tracking-[2px] text-sm font-semibold">{{ product.category.name }}</p>
+        <h1 class="text-5xl md:text-6xl font-bold text-white mt-2">{{ product.name }}</h1>
     </div>
-
-    <!-- ===================== BREADCRUMB ===================== -->
-    {% include 'includes/breadcrumb.html' with breadcrumbs=breadcrumbs %}
 </section>
 
-<!-- ===================== MAIN PRODUCT SECTION ===================== -->
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-5">
 
-        <div class="grid lg:grid-cols-2 gap-12 xl:gap-16">
+        <div class="grid lg:grid-cols-12 gap-12">
 
-            <!-- ===================== LEFT: IMAGES ===================== -->
-            <div>
-                <!-- Main Image -->
-                <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-50">
-                    {% if product.images.first %}
-                        <img id="main-image"
-                            src="{{ product.images.first.image.url }}"
-                            alt="{{ product.name }}"
-                            class="w-full h-auto object-cover">
-                    {% else %}
-                        <div class="aspect-square flex items-center justify-center bg-gray-100 text-8xl opacity-20">
-                            👗
+            <!-- ===================== LEFT: IMAGE GALLERY ===================== -->
+            <div class="lg:col-span-7">
+                <div class="flex gap-6">
+
+                    <!-- Vertical Thumbnails -->
+                    <div class="flex flex-col gap-4 w-20">
+                        {% for image in product.images.all %}
+                        <div onclick="changeMainImage(this)" 
+                             class="thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all {% if forloop.first %}border-red-600{% endif %}">
+                            <img src="{{ image.image.url }}" 
+                                 class="w-full aspect-square object-cover">
                         </div>
-                    {% endif %}
-                </div>
-
-                <!-- Thumbnail Gallery -->
-                <div class="grid grid-cols-5 gap-4 mt-8">
-                    {% for image in product.images.all %}
-                    <div onclick="changeImage(this)" 
-                         class="thumbnail cursor-pointer rounded-2xl overflow-hidden border-2 border-transparent hover:border-red-300 transition-all {% if forloop.first %}border-red-600{% endif %}">
-                        <img src="{{ image.image.url }}" 
-                             alt="{{ product.name }}"
-                             class="w-full h-full object-cover aspect-square">
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+
+                    <!-- Main Image -->
+                    <div class="flex-1">
+                        <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-50">
+                            <img id="main-image" 
+                                 src="{{ product.images.first.image.url }}"
+                                 alt="{{ product.name }}"
+                                 class="w-full h-auto object-cover">
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- ===================== RIGHT: PRODUCT INFO ===================== -->
-            <div class="pt-4">
+            <div class="lg:col-span-5">
+
+                <h1 class="text-4xl font-bold text-gray-900">{{ product.name }}</h1>
+                <p class="text-red-600 mt-1">{{ product.category.name }}</p>
 
                 <!-- Price -->
                 {% with variant=product.variants.first %}
-                <div class="flex items-end gap-4">
-                    <span class="text-5xl font-bold text-red-600">
-                        ₹{{ variant.discounted_price|floatformat:0 }}
-                    </span>
+                <div class="mt-5 flex items-center gap-4">
+                    <span class="text-4xl font-bold text-red-600">₹{{ variant.discounted_price|floatformat:0 }}</span>
                     {% if variant.discount_percentage > 0 %}
-                    <span class="text-2xl text-gray-400 line-through">
-                        ₹{{ variant.price|floatformat:0 }}
-                    </span>
-                    <span class="bg-red-100 text-red-600 px-4 py-2 rounded-2xl text-sm font-semibold">
-                        -{{ variant.discount_percentage }}% OFF
-                    </span>
+                    <span class="text-xl line-through text-gray-400">₹{{ variant.price|floatformat:0 }}</span>
+                    <span class="bg-red-100 text-red-600 px-3 py-1 rounded-xl text-sm font-medium">-{{ variant.discount_percentage }}%</span>
                     {% endif %}
                 </div>
                 {% endwith %}
 
-                <hr class="my-10">
+                <hr class="my-8">
 
                 <!-- Sizes -->
                 <div class="mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-lg">Select Size</h3>
-                        <a href="#" class="text-red-600 text-sm hover:underline">Size Guide →</a>
+                    <div class="flex justify-between mb-3">
+                        <h3 class="font-semibold">Select Size</h3>
+                        <a href="#" class="text-red-600 text-sm hover:underline">Size Guide</a>
                     </div>
                     <div class="flex flex-wrap gap-3" id="size-options">
                         {% for variant in product.variants.all|dictsort:"size.name" %}
-                        <button onclick="selectSize(this, '{{ variant.size.name }}', {{ variant.id }})"
-                                class="size-btn border-2 border-gray-200 hover:border-red-300 px-7 py-3.5 rounded-2xl font-medium transition-all">
+                        <button onclick="selectSize(this, {{ variant.id }})" 
+                                class="size-btn px-5 py-3 border-2 rounded-2xl font-medium transition-all
+                                       {% if variant.stock > 0 %}border-gray-300 hover:border-red-600{% else %}border-gray-200 text-gray-400 line-through cursor-not-allowed{% endif %}">
                             {{ variant.size.name }}
                         </button>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Colors -->
-                <div class="mb-10">
-                    <h3 class="font-semibold text-lg mb-4">Select Color</h3>
-                    <div class="flex flex-wrap gap-4">
-                        {% for color in unique_colors %}
-                        <button onclick="selectColor(this)" 
-                                class="w-11 h-11 rounded-2xl border-2 border-white shadow-md hover:scale-110 transition-all"
-                                style="background-color: {{ color.color__name|lower }};"
-                                title="{{ color.color__name }}">
-                        </button>
-                        {% endfor %}
+                <!-- Quantity + Add to Cart -->
+                <div class="flex gap-4 items-end mb-8">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-2">Quantity</p>
+                        <div class="flex items-center border border-gray-300 rounded-2xl">
+                            <button onclick="changeQty(-1)" class="w-12 h-12 text-2xl font-light">-</button>
+                            <input id="quantity" type="number" value="1" class="w-16 text-center text-xl font-semibold focus:outline-none">
+                            <button onclick="changeQty(1)" class="w-12 h-12 text-2xl font-light">+</button>
+                        </div>
+                    </div>
+
+                    <button onclick="addToCartDetail()" 
+                            class="flex-1 bg-red-600 hover:bg-red-700 text-white h-14 rounded-2xl font-semibold tracking-widest text-lg transition-all">
+                        ADD TO CART
+                    </button>
+                </div>
+
+                <!-- Trust Info -->
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center gap-3 text-green-600">
+                        <span>✓</span>
+                        <span>Free Delivery on orders above ₹999</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-green-600">
+                        <span>✓</span>
+                        <span>Cash on Delivery Available</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-green-600">
+                        <span>✓</span>
+                        <span>Easy 10 Days Return</span>
                     </div>
                 </div>
 
-                <!-- Quantity -->
-                <div class="mb-10">
-                    <h3 class="font-semibold text-lg mb-4">Quantity</h3>
-                    <div class="flex items-center gap-4 w-44">
-                        <button onclick="changeQty(-1)" 
-                                class="w-12 h-12 border border-gray-300 hover:bg-gray-100 rounded-2xl text-3xl font-light leading-none">-</button>
-                        <input id="quantity" type="number" value="1" 
-                               class="w-20 text-center text-2xl font-semibold border-0 focus:outline-none">
-                        <button onclick="changeQty(1)" 
-                                class="w-12 h-12 border border-gray-300 hover:bg-gray-100 rounded-2xl text-3xl font-light leading-none">+</button>
+                <!-- Accordion -->
+                <div class="mt-12 space-y-4">
+                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-semibold">Product Details</h4>
+                            <span class="text-xl">+</span>
+                        </div>
+                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
+                            {{ product.description|linebreaks }}
+                        </div>
                     </div>
-                </div>
 
-                <!-- Add to Cart -->
-                <button onclick="addToCartDetail({{ product.id }})"
-                        class="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-3xl text-lg font-semibold tracking-widest transition-all duration-200 flex items-center justify-center gap-3 shadow-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    ADD TO CART
-                </button>
+                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-semibold">Know Your Fabric</h4>
+                            <span class="text-xl">+</span>
+                        </div>
+                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
+                            Premium Cotton Blend • Breathable • Soft Touch
+                        </div>
+                    </div>
 
-                <!-- Description -->
-                <div class="mt-14">
-                    <h3 class="font-semibold text-xl mb-5">Description</h3>
-                    <div class="prose text-gray-600 leading-relaxed">
-                        {{ product.description|linebreaks }}
+                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-semibold">Styling Suggestions</h4>
+                            <span class="text-xl">+</span>
+                        </div>
+                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
+                            Pair with leggings, jeans, or palazzos. Perfect for casual and festive wear.
+                        </div>
                     </div>
                 </div>
 
