@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Shop | Kurti Shop
@@ -6,100 +7,150 @@ Shop | Kurti Shop
 
 {% block content %}
 
-<section class="bg-pink-50 py-16">
-
+<!-- ===================== PAGE HEADER ===================== -->
+<section class="bg-white py-10 border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-5">
-
-        <h1 class="text-5xl font-bold">
-            Our Collection
-        </h1>
-
-        <p class="mt-4 text-gray-600">
-            Explore our latest kurti collections.
-        </p>
-
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Our Collection</h1>
+                <p class="text-gray-600 mt-3 text-lg">Discover elegant kurtis for every occasion</p>
+            </div>
+            
+            <div class="flex items-center gap-4 text-sm">
+                <span class="text-gray-500">{{ products.count }} Products</span>
+                
+                <!-- Sort -->
+                <div class="relative">
+                    <select id="sort-select" 
+                            class="bg-white border border-gray-200 rounded-xl px-5 py-3 text-sm focus:outline-none focus:border-red-500 cursor-pointer">
+                        <option value="newest">Newest First</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">A - Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
-
 </section>
 
-<section class="py-16">
+<div class="max-w-7xl mx-auto px-5 py-12">
+    <div class="grid lg:grid-cols-12 gap-10">
 
-    <div class="max-w-7xl mx-auto px-5">
+        <!-- ===================== SIDEBAR - CATEGORIES & FILTERS ===================== -->
+        <div class="lg:col-span-3">
+            <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-6">
 
-        <div class="grid lg:grid-cols-4 gap-10">
-
-            <!-- Sidebar -->
-
-            <div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-sm">
-
-                    <h3 class="font-semibold text-xl mb-5">
-                        Categories
+                <!-- Categories -->
+                <div class="mb-10">
+                    <h3 class="font-bold text-xl text-gray-900 mb-5 flex items-center gap-2">
+                        <span>Categories</span>
                     </h3>
-
-                    <ul class="space-y-3">
-
+                    <ul class="space-y-2">
+                        {% for category in categories %}
                         <li>
-                            <a href="#" class="text-gray-600 hover:text-pink-600">
-                                Casual Kurtis
+                            <a href="{% url 'product_list' %}?category={{ category.slug }}" 
+                               class="flex items-center justify-between py-2 px-4 rounded-xl hover:bg-red-50 group transition-all
+                                      {% if request.GET.category == category.slug %}bg-red-50 text-red-600 font-medium{% endif %}">
+                                <span class="text-gray-700 group-hover:text-red-600 transition-colors">
+                                    {{ category.name }}
+                                </span>
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                                    {{ category.products.count }}
+                                </span>
                             </a>
                         </li>
-
-                        <li>
-                            <a href="#" class="text-gray-600 hover:text-pink-600">
-                                Cotton Kurtis
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="#" class="text-gray-600 hover:text-pink-600">
-                                Party Wear
-                            </a>
-                        </li>
-
+                        {% endfor %}
                     </ul>
-
                 </div>
 
+                <!-- Price Filter (Optional - can be enhanced later) -->
+                <div class="mb-10">
+                    <h3 class="font-bold text-xl text-gray-900 mb-5">Price Range</h3>
+                    <div class="px-2">
+                        <input type="range" min="0" max="5000" value="5000" 
+                               class="w-full accent-red-600">
+                        <div class="flex justify-between text-sm text-gray-500 mt-2">
+                            <span>₹0</span>
+                            <span>₹5000+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Filters -->
+                <a href="{% url 'product_list' %}" 
+                   class="block text-center text-red-600 hover:text-red-700 font-medium text-sm py-3 border border-red-200 rounded-xl hover:bg-red-50 transition-all">
+                    Clear All Filters
+                </a>
             </div>
-
-            <!-- Products -->
-
-            <div class="lg:col-span-3">
-
-                <div class="flex justify-between items-center mb-8">
-
-                    <h2 class="text-2xl font-semibold">
-                        Products
-                    </h2>
-
-                    <p class="text-gray-500">
-                        {{ products.count }} Products
-                    </p>
-
-                </div>
-
-                <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-8">
-
-                    {% for product in products %}
-
-                        {% include 'includes/product_card.html' %}
-
-                    {% empty %}
-
-                        <p>No Products Found</p>
-
-                    {% endfor %}
-
-                </div>
-
-            </div>
-
         </div>
 
-    </div>
+        <!-- ===================== PRODUCTS GRID ===================== -->
+        <div class="lg:col-span-9">
 
-</section>
+            <!-- Active Filters -->
+            {% if request.GET.category %}
+            <div class="mb-6 flex items-center gap-3">
+                <span class="text-sm text-gray-500">Filtered by:</span>
+                <span class="bg-red-100 text-red-700 px-4 py-1.5 rounded-2xl text-sm font-medium flex items-center gap-2">
+                    {{ active_category.name }}
+                    <a href="{% url 'product_list' %}" class="hover:text-red-900">×</a>
+                </span>
+            </div>
+            {% endif %}
+
+            <!-- Products Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
+                {% for product in products %}
+                    {% include 'includes/product_card.html' with product=product %}
+                {% empty %}
+                    <div class="col-span-full text-center py-20">
+                        <div class="text-6xl mb-4">👗</div>
+                        <p class="text-xl text-gray-400">No products found in this category.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- ===================== PAGINATION ===================== -->
+            {% if products.has_other_pages %}
+            <div class="mt-16 flex justify-center">
+                <nav class="flex items-center gap-2">
+                    {% if products.has_previous %}
+                        <a href="?page={{ products.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                           class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 hover:border-red-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </a>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                        {% if products.number == num %}
+                            <span class="w-10 h-10 flex items-center justify-center bg-red-600 text-white font-semibold rounded-xl">
+                                {{ num }}
+                            </span>
+                        {% elif num > products.number|add:"-3" and num < products.number|add:"3" %}
+                            <a href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                               class="w-10 h-10 flex items-center justify-center border border-gray-200 hover:border-red-300 rounded-xl transition-colors">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <a href="?page={{ products.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                           class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 hover:border-red-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    {% endif %}
+                </nav>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
 
 {% endblock %}
