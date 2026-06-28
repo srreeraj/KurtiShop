@@ -43,8 +43,12 @@ def product_detail(request,slug):
         is_deleted=False,
     )
 
+    # Get unique colors
+    unique_colors = product.variants.values('color__id', 'color__name').distinct()
+
     context = {
-        'product' : product
+        'product' : product,
+        'unique_colors' : unique_colors,
     }
 
     return render(
