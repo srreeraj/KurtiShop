@@ -1,0 +1,14 @@
+<!-- includes/product_slider.html -->
+<div class="swiper product-slider">
+    <div class="swiper-wrapper">
+        {% for product in products %}
+        <div class="swiper-slide">
+            {% include 'includes/product_card.html' with product=product %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>
