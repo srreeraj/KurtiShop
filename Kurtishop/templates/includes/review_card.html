@@ -1,0 +1,16 @@
+<!-- includes/review_card.html -->
+<div class="bg-white p-6 rounded-3xl shadow-sm">
+    <div class="flex gap-1 text-yellow-400 mb-4">
+        ★★★★☆
+    </div>
+    <p class="text-gray-600 italic leading-relaxed">
+        "{{ review.comment }}"
+    </p>
+    <div class="mt-6 flex items-center gap-3">
+        <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+        <div>
+            <p class="font-semibold">{{ review.user_name|default:"Customer" }}</p>
+            <p class="text-xs text-gray-500">{{ review.date|date:"d M, Y" }}</p>
+        </div>
+    </div>
+</div>
