@@ -70,7 +70,7 @@ class ColorAdmin(admin.ModelAdmin):
 class MaterialAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
-@admin.register(Occassion)
+@admin.register(Occasion)
 class OccassionAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
