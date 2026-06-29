@@ -40,7 +40,7 @@ class Material(models.Model):
     def __str__(self):
         return self.name
 
-class Occassion(models.Model):
+class Occasion(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
@@ -100,8 +100,8 @@ class Product(models.Model):
         blank=True,
     )
 
-    occassion = models.ForeignKey(
-        Occassion,
+    occasion = models.ForeignKey(
+        Occasion,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

@@ -6,7 +6,7 @@ from .models import (
     Size,
     Color,
     Material,
-    Occassion,
+    Occasion,
     Sleeve,
     Neck,
     Pattern,
