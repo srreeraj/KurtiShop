@@ -36,8 +36,8 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_filter = (
         'category',
-        'materail',
-        'occassion',
+        'material',
+        'occasion',
         'is_featured',
         'is_new_arrival',
         'is_active',
