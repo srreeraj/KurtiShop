@@ -85,6 +85,18 @@ class Fit(models.Model):
     def __str__(self):
         return self.name
 
+class ProductTag(models.Model):
+    name = models.CharField(
+        max_length=150,
+        unique=True,
+    )
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 
 class Product(models.Model):
     category = models.ForeignKey(
@@ -93,6 +105,12 @@ class Product(models.Model):
         related_name='products'
     )
 
+    tags = models.ManyToManyField(
+        ProductTag,
+        blank=True,
+        related_name='products'
+    )
+    
     material = models.ForeignKey(
         Material,
         on_delete=models.SET_NULL,
