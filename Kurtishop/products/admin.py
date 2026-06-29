@@ -4,7 +4,13 @@ from .models import (
     ProductVariant,
     ProductImage,
     Size,
-    Color
+    Color,
+    Material,
+    Occassion,
+    Sleeve,
+    Neck,
+    Pattern,
+    Fit,
 )
 # Register your models here.
 
