@@ -5,39 +5,7 @@ from decimal import Decimal
 from categories.models import Category
 # Create your models here.
 
-class Product(models.Model):
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        related_name='products'
-    )
-
-    name = models.CharField(max_length=200)
-    sku = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
-
-    description = models.TextField(blank=True)
-
-    is_featured = models.BooleanField(default=False)
-    is_new_arrival = models.BooleanField(default=False)
-
-    is_active = models.BooleanField(default=True)
-    is_deleted = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
+# Lookup models
 
 class Size(models.Model):
     name = models.CharField(
@@ -62,6 +30,160 @@ class Color(models.Model):
         ordering = ['name']
     def __str__(self):
         return self.name
+
+class Material(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class Occassion(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class Sleeve(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+class Neck(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class Pattern(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+class Fit(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Product(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='products'
+    )
+
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    occassion = models.ForeignKey(
+        Occassion,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    sleeve = models.ForeignKey(
+        Sleeve,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    neck = models.ForeignKey(
+        Neck,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    pattern = models.ForeignKey(
+        Pattern,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    fit = models.ForeignKey(
+        Fit,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    name = models.CharField(max_length=200)
+    sku = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    description = models.TextField(blank=True)
+
+    length = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="Length in CM"
+    )
+
+    yoke = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    back = models.CharField(
+        max_length=150,
+        blank=True,
+    )
+
+    lining = models.BooleanField(default=False)
+
+    wash_care = models.TextField(True)
+
+    
+
+    is_featured = models.BooleanField(default=False)
+    is_new_arrival = models.BooleanField(default=False)
+
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(
