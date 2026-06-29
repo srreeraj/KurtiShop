@@ -159,9 +159,7 @@ class Product(models.Model):
 
     lining = models.BooleanField(default=False)
 
-    wash_care = models.TextField(True)
-
-    
+    wash_care = models.TextField(blank=True, null=True)
 
     is_featured = models.BooleanField(default=False)
     is_new_arrival = models.BooleanField(default=False)
