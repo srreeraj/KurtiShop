@@ -71,7 +71,7 @@ class MaterialAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 @admin.register(Occasion)
-class OccassionAdmin(admin.ModelAdmin):
+class OccasionAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 @admin.register(Sleeve)
