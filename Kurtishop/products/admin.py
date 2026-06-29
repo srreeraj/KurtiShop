@@ -28,22 +28,28 @@ class ProductAdmin(admin.ModelAdmin):
         'name',
         'sku',
         'category',
+        'material',
+        'is_featured',
+        'is_new_arrival',
         'is_active',
-        'is_featured'
     )
 
     list_filter = (
         'category',
+        'materail',
+        'occassion',
+        'is_featured',
+        'is_new_arrival',
         'is_active',
-        'is_featured'
     )
 
     search_fields = (
         'name',
-        'sku'
+        'sku',
+        'description',
     )
 
-    perpopulated_fields = {
+    prepopulated_fields = {
         'slug' : ('name',)
     }
 
@@ -52,5 +58,34 @@ class ProductAdmin(admin.ModelAdmin):
         ProductImageInline,
     ]
 
-admin.site.register(Size)
-admin.site.register(Color)
+@admin.register(Size)
+class SizeAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Color)
+class ColorAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Material)
+class MaterialAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Occassion)
+class OccassionAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Sleeve)
+class SleeveAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Neck)
+class NeckAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Pattern)
+class PatternAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+@admin.register(Fit)
+class FitAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
