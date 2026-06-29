@@ -6,14 +6,22 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, blank=True)
 
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
+
     image = models.ImageField(
         upload_to='categories/',
-        blank='True',
-        null='True',
+        blank=True,
+        null=True,
     )
 
     description = models.TextField(blank=True)
-    is_active = models.BooleanField(blank=True)
+    is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -29,4 +37,10 @@ class Category(models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} > {self.name}"
         return self.name
+    
+    @property
+    def is_root(self):
+        return self.parent is None
