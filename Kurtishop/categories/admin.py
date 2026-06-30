@@ -7,14 +7,14 @@ from .models import Category
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'slug',
+        'parent',
         'is_active',
         'created_at',
     )
 
     list_filter = (
+        'parent',
         'is_active',
-        'created_at',
     )
 
     search_fields = (
