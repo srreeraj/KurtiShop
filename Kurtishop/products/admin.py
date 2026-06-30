@@ -170,6 +170,27 @@ class ProductImageAdmin(admin.ModelAdmin):
         "product__name"
     )
 
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "product",
+        "size",
+        "color",
+        "price",
+        "stock",
+    )
+
+    list_filter = (
+        "size",
+        "color",
+    )
+
+    search_fields = (
+        "product__name",
+        "variant__sku",
+    )
+
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('name',)
