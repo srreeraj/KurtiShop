@@ -188,7 +188,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
 
     search_fields = (
         "product__name",
-        "variant__sku",
+        "variant_sku",
     )
 
 @admin.register(Size)
