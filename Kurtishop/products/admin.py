@@ -52,6 +52,14 @@ class ProductAdmin(admin.ModelAdmin):
         'is_active',
     )
 
+    list_select_related = (
+        'category',
+        'material',
+        'occasion',
+        'pattern',
+        'fit',
+    )
+
     search_fields = (
         'name',
         'sku',
