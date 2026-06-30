@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from decimal import Decimal
+import os
 
 from categories.models import Category
 # Create your models here.
@@ -280,7 +281,40 @@ class ProductVariant(models.Model):
             f"{self.color.name}"
         )
 
+def product_image_upload_path(instance, filename):
+    """
+    Upload path :
+    products/<category>/<product>/<color>/<view>.<extension>
+    """
+
+    extension = filename.split('.')[-1]
+
+    category = slugify(instance.product.category.name)
+    product = slugify(instance.product.name)
+    color = slugigy(instance.color.name)
+
+    filename = f"{instance.view}.{extension}"
+
+    return os.path.join(
+        "products",
+        category,
+        product,
+        color,
+        filename
+    )
+
 class ProductImage(models.Model):
+
+    class ImageView(models.TextChoices):
+        FRONT = "front","Front"
+        BACK = "back", "Back"
+        LEFT = "left", 'Left Side'
+        RIGHT = "right", 'Right Side'
+        THREE_QUATER = "three-quater", "3/4 View"
+        CLOSEUP = "closeup", "Close Up"
+        DETAIL = "detail", "Detail"
+
+
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -293,14 +327,44 @@ class ProductImage(models.Model):
         related_name='images'
     )
 
+    view = models.CharField(
+        max_length=50,
+        choices=ImageView.choices,
+        default=ImageView.FRONT,
+    )
+
     image = models.ImageField(
-        upload_to='products/'
+        upload_to=product_image_upload_path
+    )
+
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+
+    display_order = models.PositiveIntegerField(
+        default=1
     )
 
     is_primary = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["display_order"]
+
+    def save(self, *args, **kwargs):
+
+        if not self.alt_text:
+            self.alt_text = (
+                f"{self.product.name}"
+                f"{self.color.name}"
+                f"{self.get_view_display()}"
+            )
+        
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return ( 
             f"{self.product.name} - "
-             f"{self.color.name}"
+            f"{self.color.name} - "
+            f"{self.get_view_display()}"
         )
