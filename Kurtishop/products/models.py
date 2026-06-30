@@ -310,7 +310,7 @@ class ProductImage(models.Model):
         BACK = "back", "Back"
         LEFT = "left", 'Left Side'
         RIGHT = "right", 'Right Side'
-        THREE_QUATER = "three-quater", "3/4 View"
+        THREE_QUARTER = "three-quarter", "3/4 View"
         CLOSEUP = "closeup", "Close Up"
         DETAIL = "detail", "Detail"
 
