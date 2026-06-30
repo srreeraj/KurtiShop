@@ -25,3 +25,5 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug' : ('name',)
     }
+
+    ordering = ("name",)
