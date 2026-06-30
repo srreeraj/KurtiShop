@@ -155,7 +155,7 @@ class Product(models.Model):
 
     name = models.CharField(max_length=200)
     sku = models.CharField(max_length=50, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(max_length=300, unique=True, blank=True)
 
     description = models.TextField(blank=True)
 
