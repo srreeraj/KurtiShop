@@ -192,6 +192,20 @@ class Product(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+
+        # SKU auto generation
+        if not self.sku:
+            last_product = Product.objects.order_by('-id').first()
+
+            if last_product:
+                last_number = int(last_product.sku[-6:])
+                next_number = last_number + 1
+            else:
+                next_number = 1
+
+            #should update the after getting real name
+            self.sku = f"WMS{next_number:06d}"
+
         if not self.slug:
             base_slug = slugify(self.name)
             slug = base_slug
