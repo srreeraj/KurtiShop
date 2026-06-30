@@ -19,11 +19,13 @@ class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
     autocomplete_fields = ['size','color']
+    show_change_link = True
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
     autocomplete_fields = ['color']
+    show_change_link = True
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
