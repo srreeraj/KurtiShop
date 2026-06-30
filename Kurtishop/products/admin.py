@@ -167,7 +167,7 @@ class ProductImageAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "product__name"
+        "product__name",
     )
 
 @admin.register(ProductVariant)
