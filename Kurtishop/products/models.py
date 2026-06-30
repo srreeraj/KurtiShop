@@ -291,7 +291,7 @@ def product_image_upload_path(instance, filename):
 
     category = slugify(instance.product.category.name)
     product = slugify(instance.product.name)
-    color = slugigy(instance.color.name)
+    color = slugify(instance.color.name)
 
     filename = f"{instance.view}.{extension}"
 
