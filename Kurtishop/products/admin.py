@@ -75,12 +75,74 @@ class ProductAdmin(admin.ModelAdmin):
         'slug' : ('name',)
     }
 
+    ordering = ('name',)
+
+    fieldsets = (
+        (
+            "Basic Information",
+            {
+                "fields" : (
+                    "category",
+                    "name",
+                    "sku",
+                    "slug",
+                    "description"
+                )
+            },
+        ),
+        (
+            "Product Details",
+            {
+                "fields" : (
+                    "material",
+                    "occasion",
+                    "pattern",
+                    "fit",
+                    "sleeve",
+                    "neck",
+                    "length",
+                    "yoke",
+                    "back",
+                    "lining",
+                    "wash_care"
+                )
+            },
+        ),
+        (
+            "Marketing",
+            {
+                "fields" : (
+                    "tags",
+                    "is_featured",
+                    "is_new_arrival",
+                )
+            },
+        ),
+        (
+            "Status",
+            {
+                "fields" : (
+                    "is_active",
+                    "is_deleted",
+                )
+            },
+        ),
+        (
+            "Timestamps",
+            {
+                "fields" : {
+                    "created_at",
+                    "updated_at",
+                }
+            }
+        )
+    )
+
     inlines = [
         ProductVariantInline,
         ProductImageInline,
     ]
 
-    ordering = ('name',)
 
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
