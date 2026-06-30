@@ -130,10 +130,10 @@ class ProductAdmin(admin.ModelAdmin):
         (
             "Timestamps",
             {
-                "fields" : {
+                "fields" : (
                     "created_at",
                     "updated_at",
-                }
+                )
             }
         )
     )
