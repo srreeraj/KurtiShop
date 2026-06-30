@@ -149,6 +149,27 @@ class ProductAdmin(admin.ModelAdmin):
     ]
 
 
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "product",
+        "color",
+        "view",
+        "display_order",
+        "is_primary",
+    )
+
+    list_filter = (
+        "view",
+        "color",
+        "is_primary",
+    )
+
+    search_fields = (
+        "product__name"
+    )
+
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('name',)
