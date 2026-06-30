@@ -355,8 +355,8 @@ class ProductImage(models.Model):
 
         if not self.alt_text:
             self.alt_text = (
-                f"{self.product.name}"
-                f"{self.color.name}"
+                f"{self.product.name} - "
+                f"{self.color.name} - "
                 f"{self.get_view_display()}"
             )
         
