@@ -92,7 +92,7 @@ class MaterialAdmin(admin.ModelAdmin):
 
 @admin.register(Occasion)
 class OccasionAdmin(admin.ModelAdmin):
-    list_dispaly = ('name',)
+    list_display = ('name',)
     search_fields = ('name',)
     ordering = ('name',)
 
