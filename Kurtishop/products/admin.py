@@ -77,6 +77,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     ordering = ('name',)
 
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+
     fieldsets = (
         (
             "Basic Information",
