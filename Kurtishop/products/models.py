@@ -268,6 +268,11 @@ class ProductVariant(models.Model):
             )
         ]
 
+        ordering = [
+            "size",
+            "color",
+        ]
+
     @property
     def discounted_price(self):
         return self.price - (
