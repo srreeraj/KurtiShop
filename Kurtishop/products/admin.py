@@ -31,7 +31,7 @@ class ProductImageInline(admin.TabularInline):
 
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
-    extra = 1
+    extra = 0
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
