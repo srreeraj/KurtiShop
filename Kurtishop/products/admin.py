@@ -21,6 +21,7 @@ class ProductVariantInline(admin.TabularInline):
     extra = 1
     autocomplete_fields = ['size','color']
     show_change_link = True
+    readonly_fields = ('variant_sku',)
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
