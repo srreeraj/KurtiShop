@@ -349,7 +349,10 @@ class ProductImage(models.Model):
     is_primary = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["display_order"]
+        ordering = [
+            "display_order",
+            "view",
+            ]
 
     def save(self, *args, **kwargs):
 
