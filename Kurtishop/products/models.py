@@ -249,7 +249,7 @@ class ProductVariant(models.Model):
         on_delete=models.CASCADE
     )
 
-    variant_sku = models.CharField(max_length=100, unique=True)
+    variant_sku = models.CharField(max_length=100, unique=True, blank=True)
 
     price = models.DecimalField(
         max_digits=10,
@@ -287,6 +287,16 @@ class ProductVariant(models.Model):
             self.price * Decimal(self.discount_percentage) / Decimal('100')
         )
 
+    def save(self, *args, **kwargs):
+        if not self.variant_sku:
+            self.variant_sku = (
+                f"{self.product.sku}-"
+                f"{self.size.name.upper()}-"
+                f"{slugify(self.color.name).upper()}"
+            )
+
+        super().save(*args, **kwargs)
+        
     def __str__(self):
         return (
             f"{self.product.name} - "
