@@ -84,6 +84,7 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
     readonly_fields = (
+        "sku",
         "created_at",
         "updated_at",
     )
