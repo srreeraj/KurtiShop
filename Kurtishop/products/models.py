@@ -368,3 +368,13 @@ class ProductImage(models.Model):
             f"{self.color.name} - "
             f"{self.get_view_display()}"
         )
+
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='attributes'
+    )
+
+    name = models.CharField(max_length = 100)
+    value = models.CharField(max_length=255)
