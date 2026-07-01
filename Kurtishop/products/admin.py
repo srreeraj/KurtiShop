@@ -197,6 +197,10 @@ class ProductVariantAdmin(admin.ModelAdmin):
         "variant_sku",
     )
 
+    readonly_fields = (
+        'variant_sku',
+    )
+
 @admin.register(Size)
 class SizeAdmin(admin.ModelAdmin):
     list_display = ('name',)
