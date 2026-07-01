@@ -160,10 +160,10 @@ class Product(models.Model):
 
     description = models.TextField(blank=True)
 
-    length = models.PositiveIntegerField(
+    length = models.CharField(
+        max_length=100,
         blank=True,
-        null=True,
-        help_text="Length in CM"
+        help_text="Ankle Length, Calf Length, 100 cm, 42 inches"
     )
 
     yoke = models.CharField(
