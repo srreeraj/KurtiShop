@@ -414,6 +414,13 @@ class ProductAttribute(models.Model):
 
     class Meta:
         ordering = ['name']
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "name"],
+                name="unique_product_attribute"
+            )
+        ]
     
     def __str__(self):
         return f"{self.name} : {self.value}"
