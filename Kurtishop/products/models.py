@@ -367,6 +367,13 @@ class ProductImage(models.Model):
             "view",
             ]
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product','color','view'],
+                name="unique_product_color_view"
+            )
+        ]
+
     def save(self, *args, **kwargs):
 
         if not self.alt_text:
