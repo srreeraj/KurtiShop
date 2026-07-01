@@ -192,6 +192,14 @@ class Product(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+        indexes = [
+            models.Index(fields=["category"]),
+            models.Index(fields=["slug"]),
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["is_featured"]),
+            models.Index(fields=["is_new_arrival"]),
+        ]
+
     def save(self, *args, **kwargs):
 
         # SKU auto generation
