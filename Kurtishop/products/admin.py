@@ -28,6 +28,10 @@ class ProductImageInline(admin.TabularInline):
     autocomplete_fields = ['color']
     show_change_link = True
 
+class ProductAttributeInline(admin.TabularInline):
+    model = ProductAttribute
+    extra = 1
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
@@ -147,6 +151,7 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [
         ProductVariantInline,
         ProductImageInline,
+        ProductAttributeInline,
     ]
 
 
