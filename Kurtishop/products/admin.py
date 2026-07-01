@@ -3,6 +3,7 @@ from .models import (
     Product,
     ProductVariant,
     ProductImage,
+    ProductAttribute,
     ProductTag,
     Size,
     Color,
