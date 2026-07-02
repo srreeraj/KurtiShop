@@ -1,76 +1,106 @@
 <!-- includes/product_card.html -->
-<div class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-red-100 flex flex-col h-full">
+<!-- Parent grid should use: grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 -->
+
+<div class="group bg-white rounded-sm overflow-hidden flex flex-col h-full">
 
     <!-- Image Container -->
-    <div class="relative overflow-hidden" style="height: 280px;">
-        <a href="{% url 'product_detail' product.slug %}" class="block h-full">
+    <div class="relative overflow-hidden aspect-[3/4] bg-gray-100">
+        <a href="{% url 'product_detail' product.slug %}" class="block h-full w-full">
             {% if product.images.first %}
-                <img 
-                    src="{{ product.images.first.image.url }}" 
+                <img
+                    src="{{ product.images.first.image.url }}"
                     alt="{{ product.name }}"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
             {% else %}
                 <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <span class="text-7xl opacity-20">👗</span>
+                    <span class="text-8xl opacity-10">👗</span>
                 </div>
             {% endif %}
         </a>
 
-        <!-- New Badge -->
-        {% if product.is_new_arrival %}
-        <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold tracking-widest px-4 py-1.5 rounded-2xl shadow-md">
-            NEW
-        </div>
-        {% endif %}
+        <!-- Top Left: Material label + New / Featured badge -->
+        <div class="absolute top-4 left-4 flex flex-col items-start gap-2 pointer-events-none">
+            {% if product.material %}
+            <span class="text-[10px] font-medium text-white uppercase tracking-[0.12em]" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+                {{ product.material.name }}
+            </span>
+            {% endif %}
 
-        <!-- Quick Add to Cart (Hover) -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {% if product.is_new_arrival %}
+            <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #d83a3a;">
+                NEW IN
+            </span>
+            {% elif product.is_featured %}
+            <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #111111;">
+                BEST SELLER
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Sizes + Add to Cart: reveal on hover, sit over image bottom -->
+        <div class="absolute bottom-0 left-0 right-0 pb-4 flex flex-col items-center gap-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+
+            {% with product.variants.all as size_variants %}
+            {% if size_variants %}
+            <div class="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full px-2 py-1.5 shadow-sm">
+                {% for variant in size_variants %}
+                <button
+                    type="button"
+                    onclick="event.preventDefault(); selectSize(this, {{ product.id }})"
+                    data-variant-id="{{ variant.id }}"
+                    class="size-option w-9 h-9 flex items-center justify-center rounded-full border text-xs font-medium text-gray-800 transition-colors duration-200 hover:bg-gray-100"
+                    style="border-color: #dcdcdc;">
+                    {{ variant.size }}
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
             <button onclick="addToCart(event, {{ product.id }})"
-                    class="bg-gray-900 hover:bg-red-600 text-white text-sm font-semibold tracking-widest px-6 py-3 rounded-2xl flex items-center gap-2 shadow-lg transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Add to Cart
+                    class="w-[90%] h-[42px] bg-white border text-xs font-semibold tracking-[0.15em] rounded-full transition-colors duration-300 flex items-center justify-center"
+                    style="border-color: #d32f2f; color: #d32f2f;"
+                    onmouseover="this.style.backgroundColor='#d32f2f'; this.style.color='#ffffff';"
+                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.color='#d32f2f';">
+                ADD TO CART
             </button>
         </div>
     </div>
 
-    <!-- Content -->
-    <div class="p-5 flex-1 flex flex-col">
+    <!-- Product Info -->
+    <div class="pt-4 flex-1 flex flex-col">
         <a href="{% url 'product_detail' product.slug %}" class="flex-1">
-            <p class="text-xs uppercase tracking-widest text-gray-500">{{ product.category.name }}</p>
-            
-            <h3 class="font-semibold text-gray-900 mt-2 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors">
+            <h3 class="text-[16px] font-medium leading-snug text-gray-900 line-clamp-2">
                 {{ product.name }}
             </h3>
         </a>
 
         <!-- Price -->
-        <div class="mt-auto pt-6">
+        <div class="mt-2">
             {% with variant=product.variants.first %}
             {% if variant %}
-                <div class="flex items-baseline gap-3">
-                    <span class="text-2xl font-bold text-red-600">
-                        ₹{{ variant.discounted_price|floatformat:0 }}
-                    </span>
-                    
-                    {% if variant.discount_percentage > 0 %}
-                    <span class="text-sm text-gray-400 line-through">
-                        ₹{{ variant.price|floatformat:0 }}
-                    </span>
-                    <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-lg font-medium">
-                        -{{ variant.discount_percentage }}%
-                    </span>
-                    {% endif %}
-                </div>
+                <span class="text-[18px] font-bold text-gray-900">
+                    ₹{{ variant.discounted_price|floatformat:0 }}
+                </span>
+            {% else %}
+                <span class="text-gray-400 text-sm">Price on request</span>
             {% endif %}
             {% endwith %}
-
-            <!-- View Details -->
-            <a href="{% url 'product_detail' product.slug %}"
-               class="mt-5 block text-center border border-gray-300 hover:border-red-600 hover:text-red-600 text-gray-700 font-medium py-3.5 rounded-2xl transition-all duration-200 text-sm tracking-widest">
-                VIEW DETAILS
-            </a>
         </div>
     </div>
 </div>
+
+<script>
+    // Purely visual size selection — does not affect addToCart() logic or backend calls
+    function selectSize(button, productId) {
+        const group = button.closest('.flex');
+        group.querySelectorAll('.size-option').forEach(btn => {
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
+            btn.style.borderColor = '#dcdcdc';
+        });
+        button.style.backgroundColor = '#111111';
+        button.style.color = '#ffffff';
+        button.style.borderColor = '#111111';
+    }
+</script>
