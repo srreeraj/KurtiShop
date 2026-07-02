@@ -7,10 +7,6 @@
 
 {% block content %}
 
-<!-- Breadcrumb -->
-
-
-<!-- Hero Banner -->
 <section class="relative h-[280px] flex items-center justify-center overflow-hidden">
     <img src="{% static 'images/hero/hero2.png' %}" alt="Product" class="absolute inset-0 w-full h-full object-cover">
     <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
@@ -18,25 +14,21 @@
         <p class="text-red-400 uppercase tracking-[2px] text-sm font-semibold">{{ product.category.name }}</p>
         <h1 class="text-5xl md:text-6xl font-bold text-white mt-2">{{ product.name }}</h1>
     </div>
-    {% include 'includes/breadcrumb.html' with breadcrumbs=breadcrumbs %}
 </section>
 
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-5">
-
         <div class="grid lg:grid-cols-12 gap-12">
 
-            <!-- ===================== LEFT: IMAGE GALLERY ===================== -->
+            <!-- Image Gallery -->
             <div class="lg:col-span-7">
                 <div class="flex gap-6">
-
-                    <!-- Vertical Thumbnails -->
-                    <div class="flex flex-col gap-4 w-20">
-                        {% for image in product.images.all %}
+                    <!-- Thumbnails -->
+                    <div class="flex flex-col gap-4 w-20" id="thumbnail-container">
+                        {% for image in default_images %}
                         <div onclick="changeMainImage(this)" 
                              class="thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all {% if forloop.first %}border-red-600{% endif %}">
-                            <img src="{{ image.image.url }}" 
-                                 class="w-full aspect-square object-cover">
+                            <img src="{{ image.image.url }}" class="w-full aspect-square object-cover">
                         </div>
                         {% endfor %}
                     </div>
@@ -53,7 +45,7 @@
                 </div>
             </div>
 
-            <!-- ===================== RIGHT: PRODUCT INFO ===================== -->
+            <!-- Product Info -->
             <div class="lg:col-span-5">
 
                 <h1 class="text-4xl font-bold text-gray-900">{{ product.name }}</h1>
@@ -61,31 +53,42 @@
 
                 <!-- Price -->
                 {% with variant=product.variants.first %}
-                <div class="mt-5 flex items-center gap-4">
+                <div class="mt-6 flex items-center gap-4">
                     <span class="text-4xl font-bold text-red-600">₹{{ variant.discounted_price|floatformat:0 }}</span>
                     {% if variant.discount_percentage > 0 %}
                     <span class="text-xl line-through text-gray-400">₹{{ variant.price|floatformat:0 }}</span>
-                    <span class="bg-red-100 text-red-600 px-3 py-1 rounded-xl text-sm font-medium">-{{ variant.discount_percentage }}%</span>
                     {% endif %}
                 </div>
                 {% endwith %}
 
                 <hr class="my-8">
 
-                <!-- Sizes -->
+                <!-- Color Selection -->
+                <div class="mb-8">
+                    <h3 class="font-semibold mb-3">Select Color</h3>
+                    <div class="flex flex-wrap gap-4" id="color-options">
+                        {% for item in variants_by_color %}
+                        <button onclick="selectColor(this, {{ item.color.id }})" 
+                                data-color-id="{{ item.color.id }}"
+                                class="color-swatch w-12 h-12 rounded-2xl border-2 overflow-hidden hover:border-red-500 transition-all {% if forloop.first %}border-red-600 ring-2 ring-red-200{% endif %}">
+                            {% if item.images.first %}
+                                <img src="{{ item.images.first.image.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full" style="background-color: #ccc;"></div>
+                            {% endif %}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Size Selection -->
                 <div class="mb-8">
                     <div class="flex justify-between mb-3">
                         <h3 class="font-semibold">Select Size</h3>
                         <a href="#" class="text-red-600 text-sm hover:underline">Size Guide</a>
                     </div>
                     <div class="flex flex-wrap gap-3" id="size-options">
-                        {% for variant in product.variants.all|dictsort:"size.name" %}
-                        <button onclick="selectSize(this, {{ variant.id }})" 
-                                class="size-btn px-5 py-3 border-2 rounded-2xl font-medium transition-all
-                                       {% if variant.stock > 0 %}border-gray-300 hover:border-red-600{% else %}border-gray-200 text-gray-400 line-through cursor-not-allowed{% endif %}">
-                            {{ variant.size.name }}
-                        </button>
-                        {% endfor %}
+                        <!-- Dynamically populated by JS -->
                     </div>
                 </div>
 
@@ -106,58 +109,99 @@
                     </button>
                 </div>
 
-                <!-- Trust Info -->
-                <div class="space-y-4 text-sm">
-                    <div class="flex items-center gap-3 text-green-600">
-                        <span>✓</span>
-                        <span>Free Delivery on orders above ₹999</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-green-600">
-                        <span>✓</span>
-                        <span>Cash on Delivery Available</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-green-600">
-                        <span>✓</span>
-                        <span>Easy 10 Days Return</span>
-                    </div>
-                </div>
-
-                <!-- Accordion -->
-                <div class="mt-12 space-y-4">
-                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-semibold">Product Details</h4>
-                            <span class="text-xl">+</span>
-                        </div>
-                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
-                            {{ product.description|linebreaks }}
-                        </div>
-                    </div>
-
-                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-semibold">Know Your Fabric</h4>
-                            <span class="text-xl">+</span>
-                        </div>
-                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
-                            Premium Cotton Blend • Breathable • Soft Touch
-                        </div>
-                    </div>
-
-                    <div onclick="toggleAccordion(this)" class="accordion-item border border-gray-200 rounded-2xl p-5 cursor-pointer">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-semibold">Styling Suggestions</h4>
-                            <span class="text-xl">+</span>
-                        </div>
-                        <div class="accordion-content hidden mt-4 text-gray-600 text-sm">
-                            Pair with leggings, jeans, or palazzos. Perfect for casual and festive wear.
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global Data
+const colorData = {{ variants_by_color|json_script:"color-data" }};
+
+let currentColorId = null;
+
+// Select Color
+function selectColor(btn, colorId) {
+    currentColorId = colorId;
+
+    // Highlight selected color
+    document.querySelectorAll('.color-swatch').forEach(b => {
+        b.classList.remove('border-red-600', 'ring-2', 'ring-red-200');
+    });
+    btn.classList.add('border-red-600', 'ring-2', 'ring-red-200');
+
+    const selected = colorData.find(c => c.color.id === colorId);
+    if (!selected) return;
+
+    // Update main image
+    if (selected.images && selected.images.length > 0) {
+        document.getElementById('main-image').src = selected.images[0].image.url;
+    }
+
+    // Update thumbnails
+    const thumbContainer = document.getElementById('thumbnail-container');
+    thumbContainer.innerHTML = '';
+
+    selected.images.forEach((img, index) => {
+        const div = document.createElement('div');
+        div.className = `thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all ${index === 0 ? 'border-red-600' : ''}`;
+        div.innerHTML = `<img src="${img.image.url}" class="w-full aspect-square object-cover">`;
+        div.onclick = () => changeMainImage(div);
+        thumbContainer.appendChild(div);
+    });
+
+    // Update available sizes for this color
+    updateSizes(selected.variants);
+}
+
+// Update Size Buttons
+function updateSizes(variants) {
+    const container = document.getElementById('size-options');
+    container.innerHTML = '';
+
+    variants.forEach(variant => {
+        const btn = document.createElement('button');
+        btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${variant.stock > 0 ? 'border-gray-300 hover:border-red-600' : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'}`;
+        btn.textContent = variant.size.name;
+        btn.onclick = () => selectSize(btn, variant.id);
+        container.appendChild(btn);
+    });
+}
+
+// Select Size
+function selectSize(btn, variantId) {
+    document.querySelectorAll('#size-options button').forEach(b => {
+        b.classList.remove('border-red-600', 'bg-red-50');
+    });
+    btn.classList.add('border-red-600', 'bg-red-50');
+}
+
+// Change Main Image
+function changeMainImage(thumb) {
+    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('border-red-600'));
+    thumb.classList.add('border-red-600');
+    document.getElementById('main-image').src = thumb.querySelector('img').src;
+}
+
+// Quantity
+function changeQty(change) {
+    const input = document.getElementById('quantity');
+    let val = parseInt(input.value) || 1;
+    input.value = Math.max(1, val + change);
+}
+
+// Add to Cart
+function addToCartDetail() {
+    alert("✅ Added to cart successfully!");
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    const firstBtn = document.querySelector('.color-swatch');
+    if (firstBtn) firstBtn.click();
+});
+</script>
 {% endblock %}
