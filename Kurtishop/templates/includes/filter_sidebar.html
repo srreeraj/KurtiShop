@@ -5,140 +5,139 @@
         <a href="{% url 'product_list' %}" class="text-red-600 text-sm hover:underline">Clear All</a>
     </div>
 
+    <!-- Accordion Filters -->
+    {% with filters_list="category,color,size,sleeve,neck,occasion,pattern" %}
+    
     <!-- Categories -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Categories</h4>
-        <ul class="space-y-2 max-h-60 overflow-auto">
-            {% for category in categories %}
-            <li>
-                <a href="{% url 'product_list' %}?category={{ category.slug }}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}" 
-                   class="flex justify-between items-center px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.category == category.slug %}bg-red-50 text-red-600 font-medium{% endif %}">
-                    <span>{{ category.name }}</span>
-                    <span class="text-xs bg-gray-100 px-2.5 py-1 rounded-full">{{ category.product_count|default:0 }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="filter-section mb-2">
+        <button onclick="toggleFilter(this)" 
+                class="w-full flex items-center justify-between py-4 text-left font-semibold border-b">
+            <span>Categories</span>
+            <span class="text-xl transition-transform">›</span>
+        </button>
+        <div class="filter-content hidden pt-4 pb-2">
+            <ul class="space-y-2 max-h-60 overflow-auto">
+                {% for category in categories %}
+                <li>
+                    <a href="{% url 'product_list' %}?category={{ category.slug }}" 
+                       class="flex justify-between items-center px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
+                              {% if request.GET.category == category.slug %}bg-red-50 text-red-600 font-medium{% endif %}">
+                        <span>{{ category.name }}</span>
+                        <span class="text-xs bg-gray-100 px-2.5 py-1 rounded-full">{{ category.product_count|default:0 }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
     <!-- Colors -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Colors</h4>
-        <ul class="space-y-2 max-h-60 overflow-auto">
-            {% for color in colors %}
-            <li>
-                <a href="{% url 'product_list' %}?color={{ color.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="flex justify-between items-center px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.color == color.id|stringformat:'s' %}bg-red-50 text-red-600 font-medium{% endif %}">
-                    <span class="flex items-center gap-2">
-                        <span class="w-4 h-4 rounded-full border border-gray-300" 
-                              style="background-color: {{ color.hex_code|default:'#999' }}"></span>
-                        {{ color.name }}
-                    </span>
-                    <span class="text-xs bg-gray-100 px-2.5 py-1 rounded-full">{{ color.product_count|default:0 }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="filter-section mb-2">
+        <button onclick="toggleFilter(this)" 
+                class="w-full flex items-center justify-between py-4 text-left font-semibold border-b">
+            <span>Colors</span>
+            <span class="text-xl transition-transform">›</span>
+        </button>
+        <div class="filter-content hidden pt-4 pb-2">
+            <ul class="space-y-2 max-h-60 overflow-auto">
+                {% for color in colors %}
+                <li>
+                    <a href="{% url 'product_list' %}?color={{ color.id }}" 
+                       class="flex justify-between items-center px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
+                              {% if request.GET.color == color.id|stringformat:'s' %}bg-red-50 text-red-600 font-medium{% endif %}">
+                        <span class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full border border-gray-300" 
+                                  style="background-color: {{ color.hex_code|default:'#999' }};"></span>
+                            {{ color.name }}
+                        </span>
+                        <span class="text-xs bg-gray-100 px-2.5 py-1 rounded-full">{{ color.product_count|default:0 }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
     <!-- Sizes -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Sizes</h4>
-        <ul class="grid grid-cols-4 gap-2">
-            {% for size in sizes %}
-            <li>
-                <a href="{% url 'product_list' %}?size={{ size.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="block text-center py-3 border rounded-2xl hover:border-red-500 transition-all text-sm
-                          {% if request.GET.size == size.id|stringformat:'s' %}border-red-600 bg-red-50 text-red-600{% endif %}">
-                    {{ size.name }}
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="filter-section mb-2">
+        <button onclick="toggleFilter(this)" 
+                class="w-full flex items-center justify-between py-4 text-left font-semibold border-b">
+            <span>Sizes</span>
+            <span class="text-xl transition-transform">›</span>
+        </button>
+        <div class="filter-content hidden pt-4 pb-2">
+            <ul class="grid grid-cols-4 gap-2">
+                {% for size in sizes %}
+                <li>
+                    <a href="{% url 'product_list' %}?size={{ size.id }}" 
+                       class="block text-center py-3 border rounded-2xl hover:border-red-500 transition-all text-sm
+                              {% if request.GET.size == size.id|stringformat:'s' %}border-red-600 bg-red-50 text-red-600{% endif %}">
+                        {{ size.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
     <!-- Sleeve -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Sleeve</h4>
-        <ul class="space-y-2">
-            {% for sleeve in sleeves %}
-            <li>
-                <a href="{% url 'product_list' %}?sleeve={{ sleeve.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="flex justify-between px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.sleeve == sleeve.id|stringformat:'s' %}bg-red-50 text-red-600{% endif %}">
-                    <span>{{ sleeve.name }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+    <div class="filter-section mb-2">
+        <button onclick="toggleFilter(this)" 
+                class="w-full flex items-center justify-between py-4 text-left font-semibold border-b">
+            <span>Sleeve</span>
+            <span class="text-xl transition-transform">›</span>
+        </button>
+        <div class="filter-content hidden pt-4 pb-2">
+            <ul class="space-y-2">
+                {% for sleeve in sleeves %}
+                <li>
+                    <a href="{% url 'product_list' %}?sleeve={{ sleeve.id }}" 
+                       class="flex justify-between px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
+                              {% if request.GET.sleeve == sleeve.id|stringformat:'s' %}bg-red-50 text-red-600{% endif %}">
+                        <span>{{ sleeve.name }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
-    <!-- Neck -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Neck Type</h4>
-        <ul class="space-y-2">
-            {% for neck in necks %}
-            <li>
-                <a href="{% url 'product_list' %}?neck={{ neck.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="flex justify-between px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.neck == neck.id|stringformat:'s' %}bg-red-50 text-red-600{% endif %}">
-                    <span>{{ neck.name }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
+    <!-- Neck, Occasion, Pattern can be added similarly -->
 
-    <!-- Occasion -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Occasion</h4>
-        <ul class="space-y-2">
-            {% for occasion in occasions %}
-            <li>
-                <a href="{% url 'product_list' %}?occasion={{ occasion.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="flex justify-between px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.occasion == occasion.id|stringformat:'s' %}bg-red-50 text-red-600{% endif %}">
-                    <span>{{ occasion.name }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <!-- Pattern -->
-    <div class="mb-8">
-        <h4 class="font-semibold mb-4">Pattern</h4>
-        <ul class="space-y-2">
-            {% for pattern in patterns %}
-            <li>
-                <a href="{% url 'product_list' %}?pattern={{ pattern.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}" 
-                   class="flex justify-between px-4 py-2.5 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.pattern == pattern.id|stringformat:'s' %}bg-red-50 text-red-600{% endif %}">
-                    <span>{{ pattern.name }}</span>
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
+    {% endwith %}
 
     <!-- Price Range -->
-    <div class="mb-8">
+    <div class="mt-6 pt-6 border-t">
         <h4 class="font-semibold mb-4">Price Range</h4>
-        <form method="get" id="price-form">
+        <form method="get">
             <div class="grid grid-cols-2 gap-4">
-                <input type="number" name="min_price" placeholder="Min" 
+                <input type="number" name="min_price" placeholder="Min ₹" 
                        value="{{ request.GET.min_price }}" 
                        class="border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-red-500">
-                <input type="number" name="max_price" placeholder="Max" 
+                <input type="number" name="max_price" placeholder="Max ₹" 
                        value="{{ request.GET.max_price }}" 
                        class="border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-red-500">
             </div>
             <button type="submit" 
-                    class="mt-4 w-full bg-red-600 text-white py-3 rounded-2xl hover:bg-red-700">
-                Apply Price
+                    class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl transition-colors">
+                Apply Price Range
             </button>
         </form>
     </div>
 </div>
+
+<script>
+function toggleFilter(btn) {
+    const content = btn.nextElementSibling;
+    const arrow = btn.querySelector('span:last-child');
+    
+    content.classList.toggle('hidden');
+    arrow.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(90deg)';
+}
+
+// Optional: Open first section by default
+document.addEventListener('DOMContentLoaded', () => {
+    const firstBtn = document.querySelector('.filter-section button');
+    if (firstBtn) toggleFilter(firstBtn);
+});
+</script>
