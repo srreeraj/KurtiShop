@@ -79,7 +79,7 @@ Shop | Kurti Shop
             {% endif %}
 
             <!-- Products Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6" id="products-grid">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8" id="products-grid">
                 {% for product in products %}
                     {% include 'includes/product_card.html' with product=product %}
                 {% empty %}
