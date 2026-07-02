@@ -126,8 +126,8 @@ def product_detail(request,slug):
         if color not in variants_by_color:
             variants_by_color[color] = {
                 'color' : color,
-                'variants' : []
-                'images' : product.images.filter(color=color).order_by('display_order')
+                'variants' : [],
+                'images' : product.images.filter(color=color).order_by('display_order'),
             }
         variants_by_color[color]['variants'].append(variant)
 
