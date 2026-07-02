@@ -15,24 +15,33 @@ body {
 
 /* Selection Color */
 ::selection {
-    background: #ec4899;
+    background: #C1121F;
     color: white;
 }
 
-/* Scrollbar */
+/* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
     background: #f3f4f6;
+    border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #ec4899;
+    background: #C1121F;
     border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #db2777;
+    background: #9B0D17;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
 }
