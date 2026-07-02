@@ -119,22 +119,52 @@ def product_detail(request,slug):
         is_deleted=False,
     )
 
-    # Get all variants grouped by colors
-    variants_by_color = {}
-    for variant in product.variants.all():
-        color = variant.color
-        if color not in variants_by_color:
-            variants_by_color[color] = {
-                'color' : color,
-                'variants' : [],
-                'images' : product.images.filter(color=color).order_by('display_order'),
-            }
-        variants_by_color[color]['variants'].append(variant)
+    # Get all variants by colors - Convert to JSON serializable format
 
+    variants_by_color = []
+    for variant in product.variants.all().select_related('color', 'size'):
+        color = variant.color
+
+        # Check if color next already exists in list
+        color_entry = next((item for item in variants_by_color if item['color']['id'] == color.id), None)
+
+        if not color_entry:
+            color_entry = {
+                'color' : {
+                    'id' : color.id,
+                    'name' : color.name,
+                },
+                'variants' : []
+                'images' : []
+            }
+            variants_by_color.append(color_entry)
+
+        # Add variant
+        color_entry['variant'].append({
+            'id' : variant.id,
+            'size' : {
+                'id' : variant.size.id,
+                'name' : variant.size.name,
+            },
+            'stock' : variant.stock,
+            'price' : str(variant.price)
+            'discounted_price' : str(variant.discounted_price),
+        })
+
+    # Add images for each color
+    for color_entry in variants_by_color:
+        color_id = color_entry['color']['id']
+        images = product.images.filter(color_id=color_id).order_by('display_order')
+        color_entry['images'] = [
+            {
+                'image' : {'url' : img.image.url },
+                'alt_text' : img.alt_text               
+            } for img in images
+        ]
 
     context = {
         'product' : product,
-        'variants_by_color' : list(variants_by_color.values()),
+        'variants_by_color' : variants_by_color,
         'defualt_images' : product.images.all().order_by('display_order')
     }
 
