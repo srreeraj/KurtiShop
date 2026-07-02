@@ -134,7 +134,7 @@ def product_detail(request,slug):
 
     context = {
         'product' : product,
-        'variant_by_color' : variants_by_color.values(),
+        'variants_by_color' : list(variants_by_color.values()),
         'defualt_images' : product.images.all().order_by('display_order')
     }
 
