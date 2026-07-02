@@ -119,12 +119,23 @@ def product_detail(request,slug):
         is_deleted=False,
     )
 
-    # Get unique colors
-    unique_colors = product.variants.values('color__id', 'color__name').distinct()
+    # Get all variants grouped by colors
+    variants_by_color = {}
+    for variant in product.variants.all():
+        color = variant.color
+        if color not in variants_by_color:
+            variants_by_color[color] = {
+                'color' : color,
+                'variants' : []
+                'images' : product.images.filter(color=color).order_by('display_order')
+            }
+        variants_by_color[color]['variants'].append(variant)
+
 
     context = {
         'product' : product,
-        'unique_colors' : unique_colors,
+        'variant_by_color' : variants_by_color.values(),
+        'defualt_images' : product.images.all().order_by('display_order')
     }
 
     return render(
