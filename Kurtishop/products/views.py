@@ -134,8 +134,8 @@ def product_detail(request,slug):
                     'id' : color.id,
                     'name' : color.name,
                 },
-                'variants' : []
-                'images' : []
+                'variants' : [],
+                'images' : [],
             }
             variants_by_color.append(color_entry)
 
@@ -147,7 +147,7 @@ def product_detail(request,slug):
                 'name' : variant.size.name,
             },
             'stock' : variant.stock,
-            'price' : str(variant.price)
+            'price' : str(variant.price),
             'discounted_price' : str(variant.discounted_price),
         })
 
