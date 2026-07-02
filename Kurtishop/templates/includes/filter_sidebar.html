@@ -1,36 +1,140 @@
 <!-- includes/filter_sidebar.html -->
 <div class="bg-white rounded-3xl shadow-sm p-6 sticky top-8">
-    <h3 class="font-bold text-xl mb-6">Filters</h3>
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="font-bold text-xl">Filters</h3>
+        <a href="{% url 'product_list' %}" 
+           class="text-red-600 text-sm hover:underline">Clear All</a>
+    </div>
 
-    <!-- Categories -->
+    <!-- Category -->
     <div class="mb-8">
-        <h4 class="font-semibold mb-4">Categories</h4>
-        <ul class="space-y-3">
+        <h4 class="font-semibold mb-3 flex items-center gap-2">
+            <span>Category</span>
+        </h4>
+        <select name="category" id="category-filter" 
+                class="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-red-500">
+            <option value="">All Categories</option>
             {% for category in categories %}
-            <li>
-                <a href="{% url 'product_list' %}?category={{ category.slug }}" 
-                   class="flex justify-between items-center py-2 px-4 rounded-2xl hover:bg-red-50 transition-all
-                          {% if request.GET.category == category.slug %}bg-red-50 text-red-600{% endif %}">
-                    <span>{{ category.name }}</span>
-                    <span class="text-xs bg-gray-100 px-3 py-1 rounded-full">{{ category.products.count }}</span>
-                </a>
-            </li>
+            <option value="{{ category.slug }}" 
+                    {% if request.GET.category == category.slug %}selected{% endif %}>
+                {{ category.name }} ({{ category.products.count }})
+            </option>
             {% endfor %}
-        </ul>
+        </select>
     </div>
 
     <!-- Price Range -->
     <div class="mb-8">
-        <h4 class="font-semibold mb-4">Price Range</h4>
-        <input type="range" min="0" max="5000" class="w-full accent-red-600">
-        <div class="flex justify-between text-sm text-gray-500 mt-2">
-            <span>₹0</span>
-            <span>₹5000+</span>
+        <h4 class="font-semibold mb-3">Price Range</h4>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs text-gray-500">Min Price</label>
+                <input type="number" name="min_price" id="min_price"
+                       value="{{ request.GET.min_price }}"
+                       placeholder="₹0" 
+                       class="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-red-500">
+            </div>
+            <div>
+                <label class="text-xs text-gray-500">Max Price</label>
+                <input type="number" name="max_price" id="max_price"
+                       value="{{ request.GET.max_price }}"
+                       placeholder="₹5000" 
+                       class="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:border-red-500">
+            </div>
         </div>
     </div>
 
-    <a href="{% url 'product_list' %}" 
-       class="block text-center py-4 border border-red-200 text-red-600 rounded-2xl hover:bg-red-50 font-medium">
-        Clear All Filters
-    </a>
+    <!-- Color -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Color</h4>
+        <select name="color" id="color-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any Color</option>
+            {% for color in colors %}
+            <option value="{{ color.id }}" {% if request.GET.color == color.id|stringformat:'s' %}selected{% endif %}>
+                {{ color.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Size -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Size</h4>
+        <select name="size" id="size-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any Size</option>
+            {% for size in sizes %}
+            <option value="{{ size.id }}" {% if request.GET.size == size.id|stringformat:'s' %}selected{% endif %}>
+                {{ size.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Sleeve -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Sleeve</h4>
+        <select name="sleeve" id="sleeve-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any</option>
+            {% for sleeve in sleeves %}
+            <option value="{{ sleeve.id }}">{{ sleeve.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Neck -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Neck Type</h4>
+        <select name="neck" id="neck-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any</option>
+            {% for neck in necks %}
+            <option value="{{ neck.id }}">{{ neck.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Occasion -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Occasion</h4>
+        <select name="occasion" id="occasion-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any Occasion</option>
+            {% for occasion in occasions %}
+            <option value="{{ occasion.id }}">{{ occasion.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Pattern -->
+    <div class="mb-8">
+        <h4 class="font-semibold mb-3">Pattern</h4>
+        <select name="pattern" id="pattern-filter" class="w-full border border-gray-200 rounded-2xl px-4 py-3">
+            <option value="">Any Pattern</option>
+            {% for pattern in patterns %}
+            <option value="{{ pattern.id }}">{{ pattern.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button onclick="applyFilters()" 
+            class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-4 rounded-2xl transition-colors">
+        Apply Filters
+    </button>
 </div>
+
+<script>
+function applyFilters() {
+    const params = new URLSearchParams(window.location.search);
+    
+    const fields = ['category', 'min_price', 'max_price', 'color', 'size', 'sleeve', 'neck', 'occasion', 'pattern'];
+    
+    fields.forEach(field => {
+        const value = document.getElementById(field + '-filter')?.value;
+        if (value) {
+            params.set(field, value);
+        } else {
+            params.delete(field);
+        }
+    });
+
+    window.location.search = params.toString();
+}
+</script>
