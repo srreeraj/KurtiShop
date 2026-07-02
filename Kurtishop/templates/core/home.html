@@ -244,12 +244,12 @@ Home | Fashion Store
 
             <!-- New Arrivals -->
             <div>
-                <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center justifu-between mb-8">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900">New Arrivals</h2>
-                        <p class="text-gray-500 text-sm mt-0.5">Showcase latest products</p>
+                        <h2 class="text-2xl font-bold tex-gray-900">New Arrivals</h2>
+                        <p class="text-gray-500 text-sm mt-0 5">Showcase latest product</p>
                     </div>
-                    <a href="{% url 'product_list' %}" class="text-red-600 text-sm font-semibold hover:underline">View All →</a>
+                    <a href="{% url 'product_list' %}" class="text-red-600 text-sm font-semibold hover:underline">View All</a>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -258,24 +258,28 @@ Home | Fashion Store
                         <div class="relative overflow-hidden" style="height: 220px;">
                             {% if product.images.first %}
                             <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             {% else %}
                             <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                                 <span class="text-gray-400 text-4xl">👗</span>
                             </div>
                             {% endif %}
-                            <button class="absolute top-3 right-3 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm hover:text-red-600 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                </svg>
-                            </button>
                         </div>
+
                         <div class="p-3">
                             <p class="text-sm font-medium text-gray-800 truncate">{{ product.name }}</p>
-                            <div class="flex items-center justify-between mt-1.5">
-                                <span class="text-red-600 font-bold text-sm">₹{{ product.price }}</span>
-                                <button class="bg-gray-900 text-white w-7 h-7 flex items-center justify-center rounded hover:bg-red-600 transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex items-center justify-between mt-2">
+                                {% if product.variants.first %}
+                                    <span class="text-red-600 font-bold text-sm">
+                                        ₹{{ product.variants.first.price }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400 text-sm">Price on request</span>
+                                {% endif %}
+
+                                <!-- Add to Cart Button -->
+                                <button class="bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-red-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                     </svg>
                                 </button>
@@ -283,10 +287,11 @@ Home | Fashion Store
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-gray-400 col-span-2">No new arrivals found.</p>
+                        <p class="text-gray-400 col-span-2">No new arrivals found.</p>
                     {% endfor %}
                 </div>
             </div>
+
 
             <!-- Best Sellers -->
             <div>
@@ -299,41 +304,45 @@ Home | Fashion Store
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    {% for product in featured_products %}
+                {% for product in featured_products %}
                     <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
                         <div class="relative overflow-hidden" style="height: 220px;">
                             {% if product.images.first %}
-                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             {% else %}
-                            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                                <span class="text-gray-400 text-4xl">👗</span>
-                            </div>
+                                <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                    <span class="text-gray-400 text-4xl">👗</span>
+                                </div>
                             {% endif %}
-                            <button class="absolute top-3 right-3 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm hover:text-red-600 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                </svg>
-                            </button>
                         </div>
+            
                         <div class="p-3">
                             <p class="text-sm font-medium text-gray-800 truncate">{{ product.name }}</p>
-                            <div class="flex items-center justify-between mt-1.5">
-                                <span class="text-red-600 font-bold text-sm">₹{{ product.price }}</span>
-                                <button class="bg-gray-900 text-white w-7 h-7 flex items-center justify-center rounded hover:bg-red-600 transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                
+                            <div class="flex items-center justify-between mt-2">
+                                {% if product.variants.first %}
+                                    <span class="text-red-600 font-bold text-sm">
+                                        ₹{{ product.variants.first.price }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400 text-sm">Price on request</span>
+                                {% endif %}
+                    
+                                <!-- Add to Cart Button -->
+                                <button class="bg-gray-900 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-red-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                     </svg>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    {% empty %}
+                {% empty %}
                     <p class="text-gray-400 col-span-2">No featured products found.</p>
-                    {% endfor %}
+                {% endfor %}
                 </div>
             </div>
-
         </div>
     </div>
 </section>
