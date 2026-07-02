@@ -25,7 +25,7 @@ def product_list(request):
 
     # Color filter
     color_id = request.GET.get('color')
-    if color__id:
+    if color_id:
         products = products.filter(variants__color_id=color_id)
     
     # Size filter
@@ -49,9 +49,9 @@ def product_list(request):
         products = products.filter(variants__occasion_id=occasion_id)
 
     # Pattern filter
-    patter_id = request.GET.get('pattern')
+    pattern_id = request.GET.get('pattern')
     if pattern_id:
-        products = product.filter(variants__pattern_id=pattern_id)
+        products = products.filter(variants__pattern_id=pattern_id)
     
     # Remove duplicate products
     products = products.distinct()
@@ -88,7 +88,7 @@ def product_list(request):
     sleeves = Sleeve.objects.all()
     necks = Neck.objects.all()
     occasions = Occasion.objects.all()
-    pattern = Pattern.objects.all()
+    patterns = Pattern.objects.all()
 
 
     context = {
