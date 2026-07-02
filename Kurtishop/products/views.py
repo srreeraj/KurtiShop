@@ -140,7 +140,7 @@ def product_detail(request,slug):
             variants_by_color.append(color_entry)
 
         # Add variant
-        color_entry['variant'].append({
+        color_entry['variants'].append({
             'id' : variant.id,
             'size' : {
                 'id' : variant.size.id,
