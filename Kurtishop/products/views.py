@@ -8,14 +8,14 @@ def product_list(request):
     # Based on queryset - Get variants instead of products
     variants = ProductVariant.objects.filter(
         product__is_active = True,
-        product__is_delete = False,
+        product__is_deleted = False,
         is_active = True,
         is_deleted = False,
         stock__gt = 0, # only show variants that are in stock
     ).select_related(
         'product', 'product__category','color','size'
     ).prefetch_related(
-        'product__related'
+        'product__images'
     ).order_by('product__name', 'color__name')
 
     # Category filter
