@@ -21,15 +21,15 @@ def product_list(request):
     # Category filter
     category_slug = request.GET.get('category')
     if category_slug:
-        variants = variants.filter(category__slug=category_slug)
+        variants = variants.filter(product__category__slug=category_slug)
 
     # Price filter
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price:
-        variants = variants.filter(variants__price__gte=min_price)
+        variants = variants.filter(price__gte=min_price)
     if max_price:
-        variants = variants.filter(variants__price__lte=max_price)
+        variants = variants.filter(price__lte=max_price)
 
     # Color filter
     color_id = request.GET.get('color')
