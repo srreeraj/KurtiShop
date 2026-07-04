@@ -1,68 +1,97 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Count, Q
-from .models import Product,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
+from django.db.models import Count, Q, Min
+from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
 
 # Create your views here.
 
 def product_list(request):
-    products = Product.objects.filter(
-        is_active=True,
-        is_deleted=False
-    ).select_related('category','sleeve','neck','occasion','pattern').prefetch_related('images','variants')
+    # Based on queryset - Get variants instead of products
+    variants = ProductVariant.objects.filter(
+        product__is_active = True,
+        product__is_delete = False,
+        is_active = True,
+        is_deleted = False,
+        stock__gt = 0, # only show variants that are in stock
+    ).select_related(
+        'product', 'product__category','color','size'
+    ).prefetch_related(
+        'product__related'
+    ).order_by('product__name', 'color__name')
 
     # Category filter
     category_slug = request.GET.get('category')
     if category_slug:
-        products = products.filter(category__slug=category_slug)
+        variants = variants.filter(category__slug=category_slug)
 
     # Price filter
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price:
-        products = products.filter(variants__price__gte=min_price)
+        variants = variants.filter(variants__price__gte=min_price)
     if max_price:
-        products = products.filter(variants__price__lte=max_price)
+        variants = variants.filter(variants__price__lte=max_price)
 
     # Color filter
     color_id = request.GET.get('color')
     if color_id:
-        products = products.filter(variants__color_id=color_id)
+        variants = variants.filter(variants__color_id=color_id)
     
     # Size filter
     size_id = request.GET.get('size')
     if size_id:
-        products = products.filter(variants__size_id=size_id)
+        variants = variants.filter(variants__size_id=size_id)
 
     # Sleeve filter
     sleeve_id = request.GET.get('sleeve')
     if sleeve_id:
-        products = products.filter(variants__sleeve_id=sleeve_id)
+        variants = variants.filter(variants__sleeve_id=sleeve_id)
 
     # Neck filter
     neck_id = request.GET.get('neck')
     if neck_id:
-        products = products.filter(variants__neck_id=neck_id)
+        variants = variants.filter(variants__neck_id=neck_id)
 
     # Occasion filter
     occasion_id = request.GET.get('occasion')
     if occasion_id:
-        products = products.filter(variants__occasion_id=occasion_id)
+        variants = variants.filter(variants__occasion_id=occasion_id)
 
     # Pattern filter
     pattern_id = request.GET.get('pattern')
     if pattern_id:
-        products = products.filter(variants__pattern_id=pattern_id)
+        variants = variants.filter(variants__pattern_id=pattern_id)
     
-    # Remove duplicate products
-    products = products.distinct()
+    # Remove duplicate color variants per product (keep only one per color)
+    seen = {}
+    unique_variants = []
+    for v in variants:
+        key = (v.product_id, v.color_id)
+        if key not in seen:
+            seen[key] = True
+            unique_variants.append(v)
+    
+    # For each variant, get the best price and primary image
+    for variant in unique_variants:
+        # Get all images for this color
+        color_images = variant.product.images.filter(color=variant.color).order_by('display_order')
+        variant.color_images = color_images[:4]
+        variant.primary_image = color_images.first() if color_images.exists() else None
+
+        # Get lowest price for this color
+        lowest_price_variant = ProductVariant.objects.filter(
+            product=variant.product,
+            color=variant.color,
+            stock__gt=0
+        ).aggregate(min_price=Min('price'))
+        variant.display_price = lowest_price_variant['min_price'] or variant.price
 
 
     # Pagination
 
-    from django.core.paginator import Paginator
-    paginator = Paginator(products, 12) #12 products per page
-    page_number = request.GET.get('page')
-    products_page = paginator.get_page(page_number)
+    # from django.core.paginator import Paginator
+    # paginator = Paginator(products, 12) #12 products per page
+    # page_number = request.GET.get('page')
+    # products_page = paginator.get_page(page_number)
 
     # ====================SIDEBAR DATA===========================================
 
@@ -92,7 +121,7 @@ def product_list(request):
 
 
     context = {
-        'products': products_page,
+        'products': unique_variants,
         'categories' : categories,
         'colors' : colors,
         'sizes' : sizes,
