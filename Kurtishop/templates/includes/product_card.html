@@ -1,16 +1,19 @@
 <!-- includes/product_card.html -->
-<!-- Parent grid should use: grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 -->
-
 <div class="group bg-white rounded-sm overflow-hidden flex flex-col h-full">
 
     <!-- Image Container -->
     <div class="relative overflow-hidden aspect-[3/4] bg-gray-100">
-        <a href="{% url 'product_detail' product.slug %}" class="block h-full w-full">
-            {% if product.images.first %}
-                <img
-                    src="{{ product.images.first.image.url }}"
-                    alt="{{ product.name }}"
-                    class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
+        <a href="{% url 'product_detail' product.product.slug %}?color={{ product.color.id }}" 
+           class="block h-full w-full">
+            
+            {% if product.primary_image %}
+                <img src="{{ product.primary_image.image.url }}"
+                     alt="{{ product.product.name }} - {{ product.color.name }}"
+                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
+            {% elif product.product.images.first %}
+                <img src="{{ product.product.images.first.image.url }}"
+                     alt="{{ product.product.name }}"
+                     class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
             {% else %}
                 <div class="w-full h-full bg-gray-100 flex items-center justify-center">
                     <span class="text-8xl opacity-10">👗</span>
@@ -18,89 +21,59 @@
             {% endif %}
         </a>
 
-        <!-- Top Left: Material label + New / Featured badge -->
+        <!-- Color Name Badge -->
+        <div class="absolute top-4 right-4 bg-white/95 text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm">
+            {{ product.color.name }}
+        </div>
+
+        <!-- Top Left: Material + Badges -->
         <div class="absolute top-4 left-4 flex flex-col items-start gap-2 pointer-events-none">
-            {% if product.material %}
-            <span class="text-[10px] font-medium text-white uppercase tracking-[0.12em]" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
-                {{ product.material.name }}
+            {% if product.product.material %}
+            <span class="text-[10px] font-medium text-white uppercase tracking-[0.12em]" 
+                  style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+                {{ product.product.material.name }}
             </span>
             {% endif %}
 
-            {% if product.is_new_arrival %}
+            {% if product.product.is_new_arrival %}
             <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #d83a3a;">
                 NEW IN
             </span>
-            {% elif product.is_featured %}
+            {% elif product.product.is_featured %}
             <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #111111;">
                 BEST SELLER
             </span>
             {% endif %}
         </div>
 
-        <!-- Sizes + Add to Cart: reveal on hover, sit over image bottom -->
-        <div class="absolute bottom-0 left-0 right-0 pb-4 flex flex-col items-center gap-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-
-            {% with product.variants.all as size_variants %}
-            {% if size_variants %}
-            <div class="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full px-2 py-1.5 shadow-sm">
-                {% for variant in size_variants %}
-                <button
-                    type="button"
-                    onclick="event.preventDefault(); selectSize(this, {{ product.id }})"
-                    data-variant-id="{{ variant.id }}"
-                    class="size-option w-9 h-9 flex items-center justify-center rounded-full border text-xs font-medium text-gray-800 transition-colors duration-200 hover:bg-gray-100"
-                    style="border-color: #dcdcdc;">
-                    {{ variant.size }}
-                </button>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
-
+        <!-- Hover: Quick Add to Cart -->
+        <div class="absolute bottom-0 left-0 right-0 pb-4 px-4 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
             <button onclick="addToCart(event, {{ product.id }})"
-                    class="w-[90%] h-[42px] bg-white border text-xs font-semibold tracking-[0.15em] rounded-full transition-colors duration-300 flex items-center justify-center"
-                    style="border-color: #d32f2f; color: #d32f2f;"
-                    onmouseover="this.style.backgroundColor='#d32f2f'; this.style.color='#ffffff';"
-                    onmouseout="this.style.backgroundColor='#ffffff'; this.style.color='#d32f2f';">
+                    class="w-full h-11 bg-white border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold tracking-widest rounded-full transition-all">
                 ADD TO CART
             </button>
         </div>
     </div>
 
     <!-- Product Info -->
-    <div class="pt-4 flex-1 flex flex-col">
-        <a href="{% url 'product_detail' product.slug %}" class="flex-1">
-            <h3 class="text-[16px] font-medium leading-snug text-gray-900 line-clamp-2">
-                {{ product.name }}
+    <div class="pt-4 flex-1 flex flex-col px-1">
+        <a href="{% url 'product_detail' product.product.slug %}?color={{ product.color.id }}" 
+           class="flex-1">
+            <h3 class="text-[16px] font-medium leading-snug text-gray-900 line-clamp-2 hover:text-red-600 transition-colors">
+                {{ product.product.name }}
             </h3>
         </a>
 
         <!-- Price -->
-        <div class="mt-2">
-            {% with variant=product.variants.first %}
-            {% if variant %}
-                <span class="text-[18px] font-bold text-gray-900">
-                    ₹{{ variant.discounted_price|floatformat:0 }}
-                </span>
-            {% else %}
-                <span class="text-gray-400 text-sm">Price on request</span>
-            {% endif %}
-            {% endwith %}
+        <div class="mt-3">
+            <span class="text-[18px] font-bold text-gray-900">
+                ₹{{ product.display_price|floatformat:0 }}
+            </span>
         </div>
+
+        <!-- Color info (optional) -->
+        <p class="text-xs text-gray-500 mt-1">
+            {{ product.color.name }}
+        </p>
     </div>
 </div>
-
-<script>
-    // Purely visual size selection — does not affect addToCart() logic or backend calls
-    function selectSize(button, productId) {
-        const group = button.closest('.flex');
-        group.querySelectorAll('.size-option').forEach(btn => {
-            btn.style.backgroundColor = '';
-            btn.style.color = '';
-            btn.style.borderColor = '#dcdcdc';
-        });
-        button.style.backgroundColor = '#111111';
-        button.style.color = '#ffffff';
-        button.style.borderColor = '#111111';
-    }
-</script>
