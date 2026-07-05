@@ -148,6 +148,7 @@ def product_detail(request,slug):
         is_deleted=False,
     )
 
+    preselected_color_id = request.GET.get('color')
     # Get all variants by colors - Convert to JSON serializable format
 
     variants_by_color = []
@@ -194,7 +195,8 @@ def product_detail(request,slug):
     context = {
         'product' : product,
         'variants_by_color' : variants_by_color,
-        'defualt_images' : product.images.all().order_by('display_order')
+        'defualt_images' : product.images.all().order_by('display_order'),
+        'preselected_color_id' : preselected_color_id,
     }
 
     return render(
