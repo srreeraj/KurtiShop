@@ -34,32 +34,32 @@ def product_list(request):
     # Color filter
     color_id = request.GET.get('color')
     if color_id:
-        variants = variants.filter(variants__color_id=color_id)
+        variants = variants.filter(color_id=color_id)
     
     # Size filter
     size_id = request.GET.get('size')
     if size_id:
-        variants = variants.filter(variants__size_id=size_id)
+        variants = variants.filter(size_id=size_id)
 
     # Sleeve filter
     sleeve_id = request.GET.get('sleeve')
     if sleeve_id:
-        variants = variants.filter(variants__sleeve_id=sleeve_id)
+        variants = variants.filter(sleeve_id=sleeve_id)
 
     # Neck filter
     neck_id = request.GET.get('neck')
     if neck_id:
-        variants = variants.filter(variants__neck_id=neck_id)
+        variants = variants.filter(neck_id=neck_id)
 
     # Occasion filter
     occasion_id = request.GET.get('occasion')
     if occasion_id:
-        variants = variants.filter(variants__occasion_id=occasion_id)
+        variants = variants.filter(occasion_id=occasion_id)
 
     # Pattern filter
     pattern_id = request.GET.get('pattern')
     if pattern_id:
-        variants = variants.filter(variants__pattern_id=pattern_id)
+        variants = variants.filter(pattern_id=pattern_id)
     
     # Remove duplicate color variants per product (keep only one per color)
     seen = {}
