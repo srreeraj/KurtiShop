@@ -20,10 +20,11 @@
     <div class="max-w-7xl mx-auto px-5">
         <div class="grid lg:grid-cols-12 gap-12">
 
-            <!-- Image Gallery -->
+            <!-- ===================== IMAGE GALLERY ===================== -->
             <div class="lg:col-span-7">
                 <div class="flex gap-6">
-                    <!-- Thumbnails -->
+
+                    <!-- Vertical Thumbnails -->
                     <div class="flex flex-col gap-4 w-20" id="thumbnail-container">
                         {% for image in default_images %}
                         <div onclick="changeMainImage(this)" 
@@ -45,13 +46,13 @@
                 </div>
             </div>
 
-            <!-- Product Info -->
+            <!-- ===================== PRODUCT INFO ===================== -->
             <div class="lg:col-span-5">
 
                 <h1 class="text-4xl font-bold text-gray-900">{{ product.name }}</h1>
                 <p class="text-red-600 mt-1">{{ product.category.name }}</p>
 
-                <!-- Selected Color -->
+                <!-- Selected Color Name -->
                 <p id="selected-color-name" class="text-lg font-medium text-gray-700 mt-2 min-h-[28px]"></p>
 
                 <!-- Price -->
@@ -91,7 +92,7 @@
                         <a href="#" class="text-red-600 text-sm hover:underline">Size Guide</a>
                     </div>
                     <div class="flex flex-wrap gap-3" id="size-options">
-                        <!-- JS will populate -->
+                        <!-- Dynamically populated -->
                     </div>
                 </div>
 
@@ -120,24 +121,30 @@
 
 {% block extra_js %}
 <script>
+// Global Data
 const colorData = {{ variants_by_color|json_script:"color-data" }};
 
 let currentColorId = null;
 let currentVariantId = null;
 
+// Select Color
 function selectColor(btn, colorId) {
     currentColorId = colorId;
 
-    document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('border-red-600', 'ring-2', 'ring-red-200'));
+    // Highlight
+    document.querySelectorAll('.color-swatch').forEach(b => {
+        b.classList.remove('border-red-600', 'ring-2', 'ring-red-200');
+    });
     btn.classList.add('border-red-600', 'ring-2', 'ring-red-200');
 
     const selected = colorData.find(c => c.color.id === colorId);
     if (!selected) return;
 
+    // Show color name
     document.getElementById('selected-color-name').textContent = selected.color.name;
 
     // Update main image
-    if (selected.images.length > 0) {
+    if (selected.images && selected.images.length > 0) {
         document.getElementById('main-image').src = selected.images[0].image.url;
     }
 
@@ -152,40 +159,50 @@ function selectColor(btn, colorId) {
         thumbContainer.appendChild(div);
     });
 
+    // Update sizes
     updateSizes(selected.variants);
 }
 
+// Update Sizes
 function updateSizes(variants) {
     const container = document.getElementById('size-options');
     container.innerHTML = '';
 
     variants.forEach(variant => {
         const btn = document.createElement('button');
-        btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${variant.stock > 0 ? 'border-gray-300 hover:border-red-600' : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'}`;
+        btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${variant.stock > 0 
+            ? 'border-gray-300 hover:border-red-600' 
+            : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'}`;
         btn.textContent = variant.size.name;
         btn.onclick = () => selectSize(btn, variant.id);
         container.appendChild(btn);
     });
 }
 
+// Select Size
 function selectSize(btn, variantId) {
     currentVariantId = variantId;
-    document.querySelectorAll('#size-options button').forEach(b => b.classList.remove('border-red-600', 'bg-red-50'));
+    document.querySelectorAll('#size-options button').forEach(b => {
+        b.classList.remove('border-red-600', 'bg-red-50');
+    });
     btn.classList.add('border-red-600', 'bg-red-50');
 }
 
+// Change Main Image (Thumbnail)
 function changeMainImage(thumb) {
     document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('border-red-600'));
     thumb.classList.add('border-red-600');
     document.getElementById('main-image').src = thumb.querySelector('img').src;
 }
 
+// Quantity
 function changeQty(change) {
     const input = document.getElementById('quantity');
     let val = parseInt(input.value) || 1;
     input.value = Math.max(1, val + change);
 }
 
+// Add to Cart
 function addToCartDetail() {
     if (!currentVariantId) {
         alert("⚠️ Please select a size first.");
@@ -194,8 +211,20 @@ function addToCartDetail() {
     alert("✅ Product added to cart successfully!");
 }
 
-// Auto start with first color
+// Auto Select Color (from URL or first one)
 document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const preselectedColor = urlParams.get('color');
+
+    if (preselectedColor) {
+        const targetBtn = document.querySelector(`.color-swatch[data-color-id="${preselectedColor}"]`);
+        if (targetBtn) {
+            targetBtn.click();
+            return;
+        }
+    }
+
+    // Default: first color
     const firstBtn = document.querySelector('.color-swatch');
     if (firstBtn) firstBtn.click();
 });
