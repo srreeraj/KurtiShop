@@ -5,7 +5,7 @@
     <div class="relative overflow-hidden aspect-[3/4] bg-gray-100">
         <a href="{% url 'product_detail' product.product.slug %}?color={{ product.color.id }}" 
            class="block h-full w-full">
-            
+
             {% if product.primary_image %}
                 <img src="{{ product.primary_image.image.url }}"
                      alt="{{ product.product.name }} - {{ product.color.name }}"
@@ -21,29 +21,29 @@
             {% endif %}
         </a>
 
-        <!-- Color Name Badge -->
-        <div class="absolute top-4 right-4 bg-white/95 text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm">
-            {{ product.color.name }}
-        </div>
-
         <!-- Top Left: Material + Badges -->
         <div class="absolute top-4 left-4 flex flex-col items-start gap-2 pointer-events-none">
             {% if product.product.material %}
-            <span class="text-[10px] font-medium text-white uppercase tracking-[0.12em]" 
-                  style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+            <span class="text-[10px] font-medium text-white uppercase tracking-widest px-2.5 py-1 bg-black/60 rounded" 
+                  style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
                 {{ product.product.material.name }}
             </span>
             {% endif %}
 
             {% if product.product.is_new_arrival %}
-            <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #d83a3a;">
+            <span class="text-white text-[11px] font-semibold px-3 py-1.5 bg-red-600 rounded">
                 NEW IN
             </span>
             {% elif product.product.is_featured %}
-            <span class="text-white text-[11px] font-semibold px-3 py-1.5" style="background-color: #111111;">
+            <span class="text-white text-[11px] font-semibold px-3 py-1.5 bg-black rounded">
                 BEST SELLER
             </span>
             {% endif %}
+        </div>
+
+        <!-- Color Name (Top Right) -->
+        <div class="absolute top-4 right-4 bg-white/90 text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm">
+            {{ product.color.name }}
         </div>
 
         <!-- Hover: Quick Add to Cart -->
@@ -71,9 +71,5 @@
             </span>
         </div>
 
-        <!-- Color info (optional) -->
-        <p class="text-xs text-gray-500 mt-1">
-            {{ product.color.name }}
-        </p>
     </div>
 </div>
