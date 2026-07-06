@@ -192,6 +192,8 @@ def product_detail(request,slug):
             } for img in images
         ]
 
+    print("Preselected color from URL:", preselected_color_id)  # in console
+
     context = {
         'product' : product,
         'variants_by_color' : variants_by_color,
