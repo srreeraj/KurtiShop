@@ -120,22 +120,22 @@
 {% endblock %}
 
 {% block extra_js %}
-
 <script>
-// === DEBUG: Check if JSON is valid ===
+// Single JSON load with error handling
+let colorData = [];
+
 try {
-    const colorData = {{ variants_by_color|json_script:"color-data" }};
+    colorData = {{ variants_by_color|json_script:"color-data" }};
     console.log("✅ colorData loaded successfully:", colorData);
 } catch(e) {
-    console.error("❌ JSON Error:", e);
+    console.error("❌ JSON Rendering Error:", e);
     document.getElementById('selected-color-name').innerHTML = 
-        '<span style="color:red">Error loading color data. Check console.</span>';
+        '<span style="color: red; font-weight: bold;">Error: Could not load product data</span>';
 }
 </script>
-<script>
-// Global Data
-const colorData = {{ variants_by_color|json_script:"color-data" }};
 
+<script>
+// Global variables
 let currentColorId = null;
 let currentVariantId = null;
 
@@ -143,7 +143,6 @@ let currentVariantId = null;
 function selectColor(btn, colorId) {
     currentColorId = parseInt(colorId);
 
-    // Highlight
     document.querySelectorAll('.color-swatch').forEach(b => {
         b.classList.remove('border-red-600', 'ring-2', 'ring-red-200');
     });
@@ -151,35 +150,34 @@ function selectColor(btn, colorId) {
 
     const selected = colorData.find(c => c.color.id === currentColorId);
     if (!selected) {
-        console.warn("Color not found:", currentColorId)
+        console.warn("Color not found in data:", currentColorId);
         return;
     }
 
-    // Show color name
     document.getElementById('selected-color-name').textContent = selected.color.name;
 
-    // Update main image
     if (selected.images && selected.images.length > 0) {
         document.getElementById('main-image').src = selected.images[0].image.url;
     }
 
-    // Rebuild thumbnails
+    // Rebuild Thumbnails
     const thumbContainer = document.getElementById('thumbnail-container');
     thumbContainer.innerHTML = '';
 
     selected.images.forEach((img, index) => {
         const div = document.createElement('div');
         div.className = `thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all ${index === 0 ? 'border-red-600' : ''}`;
+        
         div.innerHTML = `
             <img src="${img.image.url}" 
-            class="w-full aspect-square object-cover">
-            alt="${img.alt_text || ''}"`;
-
+                 class="w-full aspect-square object-cover" 
+                 alt="${img.alt_text || ''}">
+        `;
+        
         div.onclick = () => changeMainImage(div);
         thumbContainer.appendChild(div);
     });
 
-    // Update sizes
     updateSizes(selected.variants);
 }
 
@@ -201,7 +199,6 @@ function updateSizes(variants) {
     });
 }
 
-// Select Size
 function selectSize(btn, variantId) {
     currentVariantId = variantId;
     document.querySelectorAll('#size-options button').forEach(b => {
@@ -210,21 +207,18 @@ function selectSize(btn, variantId) {
     btn.classList.add('border-red-600', 'bg-red-50');
 }
 
-// Change Main Image (Thumbnail)
 function changeMainImage(thumb) {
     document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('border-red-600'));
     thumb.classList.add('border-red-600');
     document.getElementById('main-image').src = thumb.querySelector('img').src;
 }
 
-// Quantity
 function changeQty(change) {
     const input = document.getElementById('quantity');
     let val = parseInt(input.value) || 1;
     input.value = Math.max(1, val + change);
 }
 
-// Add to Cart
 function addToCartDetail() {
     if (!currentVariantId) {
         alert("⚠️ Please select a size first.");
@@ -233,13 +227,13 @@ function addToCartDetail() {
     alert("✅ Product added to cart successfully!");
 }
 
+// Auto load color from URL
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     let preselectedColor = urlParams.get('color');
 
     if (preselectedColor) {
         preselectedColor = parseInt(preselectedColor);
-        
         const targetBtn = document.querySelector(`.color-swatch[data-color-id="${preselectedColor}"]`);
         if (targetBtn) {
             targetBtn.click();
@@ -247,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fallback to first color
     const firstBtn = document.querySelector('.color-swatch');
     if (firstBtn) firstBtn.click();
 });
