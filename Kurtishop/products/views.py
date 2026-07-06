@@ -177,8 +177,8 @@ def product_detail(request,slug):
                 'name' : variant.size.name,
             },
             'stock' : variant.stock,
-            'price' : str(variant.price),
-            'discounted_price' : str(variant.discounted_price),
+            'price' : float(variant.price),
+            'discounted_price' : float(variant.discounted_price),
         })
 
     # Add images for each color
