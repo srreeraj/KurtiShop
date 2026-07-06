@@ -201,7 +201,7 @@ def product_detail(request,slug):
     context = {
         'product' : product,
         'variants_by_color' : variants_by_color,
-        'defualt_images' : product.images.all().order_by('display_order'),
+        'default_images' : product.images.all().order_by('display_order'),
         'preselected_color_id' : preselected_color_id,
     }
 
