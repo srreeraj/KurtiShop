@@ -211,12 +211,13 @@ function addToCartDetail() {
     alert("✅ Product added to cart successfully!");
 }
 
-// Auto Select Color (from URL or first one)
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const preselectedColor = urlParams.get('color');
+    let preselectedColor = urlParams.get('color');
 
     if (preselectedColor) {
+        preselectedColor = parseInt(preselectedColor);
+        
         const targetBtn = document.querySelector(`.color-swatch[data-color-id="${preselectedColor}"]`);
         if (targetBtn) {
             targetBtn.click();
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Default: first color
+    // Fallback to first color
     const firstBtn = document.querySelector('.color-swatch');
     if (firstBtn) firstBtn.click();
 });
