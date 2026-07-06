@@ -120,6 +120,18 @@
 {% endblock %}
 
 {% block extra_js %}
+
+<script>
+// === DEBUG: Check if JSON is valid ===
+try {
+    const colorData = {{ variants_by_color|json_script:"color-data" }};
+    console.log("✅ colorData loaded successfully:", colorData);
+} catch(e) {
+    console.error("❌ JSON Error:", e);
+    document.getElementById('selected-color-name').innerHTML = 
+        '<span style="color:red">Error loading color data. Check console.</span>';
+}
+</script>
 <script>
 // Global Data
 const colorData = {{ variants_by_color|json_script:"color-data" }};
@@ -129,7 +141,7 @@ let currentVariantId = null;
 
 // Select Color
 function selectColor(btn, colorId) {
-    currentColorId = colorId;
+    currentColorId = parseInt(colorId);
 
     // Highlight
     document.querySelectorAll('.color-swatch').forEach(b => {
@@ -137,8 +149,11 @@ function selectColor(btn, colorId) {
     });
     btn.classList.add('border-red-600', 'ring-2', 'ring-red-200');
 
-    const selected = colorData.find(c => c.color.id === colorId);
-    if (!selected) return;
+    const selected = colorData.find(c => c.color.id === currentColorId);
+    if (!selected) {
+        console.warn("Color not found:", currentColorId)
+        return;
+    }
 
     // Show color name
     document.getElementById('selected-color-name').textContent = selected.color.name;
@@ -151,10 +166,15 @@ function selectColor(btn, colorId) {
     // Rebuild thumbnails
     const thumbContainer = document.getElementById('thumbnail-container');
     thumbContainer.innerHTML = '';
+
     selected.images.forEach((img, index) => {
         const div = document.createElement('div');
         div.className = `thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all ${index === 0 ? 'border-red-600' : ''}`;
-        div.innerHTML = `<img src="${img.image.url}" class="w-full aspect-square object-cover">`;
+        div.innerHTML = `
+            <img src="${img.image.url}" 
+            class="w-full aspect-square object-cover">
+            alt="${img.alt_text || ''}"`;
+
         div.onclick = () => changeMainImage(div);
         thumbContainer.appendChild(div);
     });
@@ -170,9 +190,11 @@ function updateSizes(variants) {
 
     variants.forEach(variant => {
         const btn = document.createElement('button');
-        btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${variant.stock > 0 
-            ? 'border-gray-300 hover:border-red-600' 
-            : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'}`;
+        btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${
+            variant.stock > 0 
+                ? 'border-gray-300 hover:border-red-600' 
+                : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
+        }`;
         btn.textContent = variant.size.name;
         btn.onclick = () => selectSize(btn, variant.id);
         container.appendChild(btn);
