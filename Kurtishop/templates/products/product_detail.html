@@ -120,68 +120,78 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Single JSON load with error handling
-let colorData = [];
+<script id="color-data" type="application/json">
+{{ variants_by_color|json_script }}
+</script>
 
+<script>
+// Parse the JSON data safely
+let colorData = [];
 try {
-    colorData = {{ variants_by_color|json_script:"color-data" }};
-    console.log("✅ colorData loaded successfully:", colorData);
+    const jsonElement = document.getElementById('color-data');
+    if (jsonElement) {
+        colorData = JSON.parse(jsonElement.textContent);
+        console.log("✅ colorData loaded successfully:", colorData);
+    } else {
+        throw new Error("color-data script element not found");
+    }
 } catch(e) {
-    console.error("❌ JSON Rendering Error:", e);
+    console.error("❌ JSON Parsing Error:", e);
     document.getElementById('selected-color-name').innerHTML = 
-        '<span style="color: red; font-weight: bold;">Error: Could not load product data</span>';
+        '<span style="color: red;">Error loading product variants</span>';
 }
 </script>
 
 <script>
-// Global variables
+// ==================== GLOBAL VARIABLES ====================
 let currentColorId = null;
 let currentVariantId = null;
 
-// Select Color
+// ==================== HELPER FUNCTIONS ====================
 function selectColor(btn, colorId) {
     currentColorId = parseInt(colorId);
 
+    // Update active swatch UI
     document.querySelectorAll('.color-swatch').forEach(b => {
         b.classList.remove('border-red-600', 'ring-2', 'ring-red-200');
     });
     btn.classList.add('border-red-600', 'ring-2', 'ring-red-200');
 
-    const selected = colorData.find(c => c.color.id === currentColorId);
-    if (!selected) {
-        console.warn("Color not found in data:", currentColorId);
-        return;
+    const selectedColor = colorData.find(c => c.color.id === currentColorId);
+    if (!selectedColor) return;
+
+    // Update color name
+    document.getElementById('selected-color-name').textContent = selectedColor.color.name;
+
+    // Update main image (first image of selected color)
+    if (selectedColor.images && selectedColor.images.length > 0) {
+        document.getElementById('main-image').src = selectedColor.images[0].image.url;
     }
 
-    document.getElementById('selected-color-name').textContent = selected.color.name;
+    // Rebuild thumbnails for selected color only
+    rebuildThumbnails(selectedColor.images);
 
-    if (selected.images && selected.images.length > 0) {
-        document.getElementById('main-image').src = selected.images[0].image.url;
-    }
+    // Update available sizes
+    updateSizes(selectedColor.variants);
+}
 
-    // Rebuild Thumbnails
+function rebuildThumbnails(images) {
     const thumbContainer = document.getElementById('thumbnail-container');
     thumbContainer.innerHTML = '';
 
-    selected.images.forEach((img, index) => {
+    images.forEach((img, index) => {
         const div = document.createElement('div');
         div.className = `thumbnail cursor-pointer rounded-xl overflow-hidden border-2 border-transparent hover:border-red-400 transition-all ${index === 0 ? 'border-red-600' : ''}`;
-        
         div.innerHTML = `
             <img src="${img.image.url}" 
                  class="w-full aspect-square object-cover" 
                  alt="${img.alt_text || ''}">
         `;
-        
         div.onclick = () => changeMainImage(div);
         thumbContainer.appendChild(div);
     });
-
-    updateSizes(selected.variants);
 }
 
-// Update Sizes
 function updateSizes(variants) {
     const container = document.getElementById('size-options');
     container.innerHTML = '';
@@ -190,11 +200,13 @@ function updateSizes(variants) {
         const btn = document.createElement('button');
         btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${
             variant.stock > 0 
-                ? 'border-gray-300 hover:border-red-600' 
+                ? 'border-gray-300 hover:border-red-600 cursor-pointer' 
                 : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
         }`;
         btn.textContent = variant.size.name;
-        btn.onclick = () => selectSize(btn, variant.id);
+        if (variant.stock > 0) {
+            btn.onclick = () => selectSize(btn, variant.id);
+        }
         container.appendChild(btn);
     });
 }
@@ -208,7 +220,9 @@ function selectSize(btn, variantId) {
 }
 
 function changeMainImage(thumb) {
-    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('border-red-600'));
+    document.querySelectorAll('.thumbnail').forEach(t => {
+        t.classList.remove('border-red-600');
+    });
     thumb.classList.add('border-red-600');
     document.getElementById('main-image').src = thumb.querySelector('img').src;
 }
@@ -224,25 +238,29 @@ function addToCartDetail() {
         alert("⚠️ Please select a size first.");
         return;
     }
-    alert("✅ Product added to cart successfully!");
+    // TODO: Replace with real cart logic
+    alert("✅ Product added to cart!");
 }
 
-// Auto load color from URL
+// ==================== AUTO SELECT ON PAGE LOAD ====================
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    let preselectedColor = urlParams.get('color');
+    const preselectedColor = parseInt(urlParams.get('color'));
+
+    let targetBtn = null;
 
     if (preselectedColor) {
-        preselectedColor = parseInt(preselectedColor);
-        const targetBtn = document.querySelector(`.color-swatch[data-color-id="${preselectedColor}"]`);
-        if (targetBtn) {
-            targetBtn.click();
-            return;
-        }
+        targetBtn = document.querySelector(`.color-swatch[data-color-id="${preselectedColor}"]`);
     }
 
-    const firstBtn = document.querySelector('.color-swatch');
-    if (firstBtn) firstBtn.click();
+    // Fallback to first color
+    if (!targetBtn) {
+        targetBtn = document.querySelector('.color-swatch');
+    }
+
+    if (targetBtn) {
+        targetBtn.click();
+    }
 });
 </script>
 {% endblock %}
