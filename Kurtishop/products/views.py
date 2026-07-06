@@ -187,14 +187,13 @@ def product_detail(request,slug):
         images = product.images.filter(color_id=color_id).order_by('display_order')
         color_entry['images'] = []
         
-        for img in images:
-            try:
-                color_entry['images'].append({
-                    'image': {'url': img.image.url},
-                    'alt_text': img.alt_text or f"{product.name} - {color_entry['color']['name']}"
-                })
-            except Exception as e:
-                print(f"Image error for color {color_id}: {e}")
+        color_entry['images'] = [
+            {
+                'image': {'url': img.image.url},
+                'alt_text': img.alt_text or f"{product.name} - {color_entry['color']['name']}"
+            }
+            for img in images
+        ]
         
     print("Preselected color from URL:", preselected_color_id)  # in console
 
