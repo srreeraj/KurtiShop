@@ -112,6 +112,76 @@
                         ADD TO CART
                     </button>
                 </div>
+
+                <!-- ACCORDIAN SECTION -->
+                <div class="space-y-4">
+                    <!-- Description -->
+                    <div class="border border-gray-200 rounded-2xl overflow-hidden">
+                        <button onclick="toggleAccordion(this)"
+                            class="w-full px-6 py-5 text-left font-medium flex justify-between items-center hover:bg-gray-50"
+                        >
+                            <span>Product Description</span>
+                            <span class="text-xl transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content px-6 pb-6 text-gray-600 leading-relaxed hidden">
+                            {{ product.description | linebreaks}}
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="border border-gray-200 rounded-2xl overflow-hidden">
+                        <button onclick="toggleAccordion(this)"
+                            class="w-full px-6 py-5 text-left font-medium flex justify-between items-center hover:bg-gray-50"
+                        >
+                            <span>Product Details</span>
+                            <span class="text-xl transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content px-6 pb-6 hidden">
+                            <table class="w-full text-sm">
+                                <tr class="border-b">
+                                    <td class="py-3 font-medium w-1/3">Material</td>
+                                    <td>{{ product.material.name|default:"-" }}</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 font-medium w-1/3">Length</td>
+                                    <td>{{ product.length|default:"-" }}</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 font-medium w-1/3">Sleeve</td>
+                                    <td>{{ product.sleeve.name|default:"-" }}</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 font-medium w-1/3">Neck</td>
+                                    <td>{{ product.neck.name|default:"-" }}</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 font-medium w-1/3">Pattern</td>
+                                    <td>{{ product.pattern.name|default:"-" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 font-medium w-1/3">Occasion</td>
+                                    <td>{{ product.occasion.name|default:"-" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Care Instructions -->
+                    {% if product.wash_care %}
+                    <div class="border border-gray-200 rounded-2xl overflow-hidden">
+                        <button onclick="toggleAccordion(this)" 
+                                class="w-full px-6 py-5 text-left font-medium flex justify-between items-center hover:bg-gray-50">
+                            <span>Care Instructions</span>
+                            <span class="text-xl transition-transform">+</span>
+                        </button>
+                        <div class="accordion-content px-6 pb-6 text-gray-600 hidden">
+                            {{ product.wash_care|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -252,6 +322,19 @@ function initColorSelection() {
         targetBtn = document.querySelector('.color-swatch');
     }
     if (targetBtn) targetBtn.click();
+}
+
+function toggleAccordion(btn) {
+    const content = btn.nextElementSibling;
+    const icon = btn.querySelector('span:last-child');
+
+    content.classList.toggle('hidden');
+
+    if ( content.classList.contains('hidden')) {
+        icon.textContent = '+';
+    } else {
+        icon.textContent = '-';
+    }
 }
 </script>
 
