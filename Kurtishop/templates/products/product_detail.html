@@ -105,7 +105,7 @@
         
                         <input id="quantity" type="number" value="1" readonly
                             class="w-16 text-center text-xl font-semibold focus:outline-none"
-                            oninput="updateQuantityButtons(); showStockInfo();">
+                            oninput="updateQuantityButtons(); showStockInfo(); updateURL();">
         
                         <button onclick="changeQty(1)" 
                             class="qty-plus w-12 h-12 text-2xl font-light hover:bg-gray-100 rounded-r-2xl transition-colors"
@@ -206,6 +206,23 @@ let currentColorId = null;
 let currentVariantId = null;
 let currentStock = 0;
 
+function getUrlParams() {
+    return new URLSearchParams(window.location.search);
+}
+
+function updateUrl() {
+    const params = getUrlParams();
+    if (currentColorId) params.set('color', currentColorId);
+    if (currentVariantId) params.set('variant', currentVariantId);
+
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    if (qty > 1) params.set('qty', qty);
+    else params.delete('qty');
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    history.replaceState(null, '', newUrl);
+}
+
 function selectColor(btn, colorId) {
     currentColorId = parseInt(colorId);
 
@@ -230,6 +247,8 @@ function selectColor(btn, colorId) {
 
     // Update sizes
     updateSizes(selected.variants);
+
+    updateUrl();
 }
 
 function rebuildThumbnails(images) {
@@ -257,6 +276,8 @@ function updateSizes(variants) {
                 : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
         }`;
         btn.textContent = variant.size.name;
+        btn.dataset.variantId = variant.id;
+
         if (variant.stock > 0) {
             btn.onclick = () => selectSize(btn, variant.id, variant.stock);
         }
@@ -278,6 +299,7 @@ function selectSize(btn, variantId, stock) {
 
     resetQuantity();
     updateQuantityButtons();
+    updateUrl();
 }
 
 function changeMainImage(thumb) {
@@ -295,6 +317,53 @@ function changeQty(change) {
     input.value = qty;
     updateQuantityButtons();
     showStockInfo();
+    updateUrl();
+}
+
+// ==================== RESTORE STATE ON LOAD ==============================
+function restoreState() {
+    const params = getUrlParams();
+    const colorParam = params.get('color');
+    const variantParam = params.get('variant');
+    const qtyParam = parseInt(params.get('qty'));
+
+    // First select color
+    let colorBtn = null;
+    if (colorParam) {
+        colorBtn = document.querySelector(`.color-swatch[data-color-id="${colorParam}"]`);
+    }
+
+    if(!colorBtn) {
+        colorBtn = document.querySelector('.color-swatch');
+    }
+
+    if (colorBtn) {
+        colorId = parseInt(colorBtn.dataset.colorId);
+        colorBtn.click();
+
+        //  Wait a bit for sizes to populate, then restore size
+        setTimeout(() => {
+            if(variantParam) {
+                const sizeBtn = Array.from(document.querySelectorAll('#size-option button'))
+                    .find(btn => {
+                        // We'll need to store variant id on the button
+                        return btn.dataset.variantId == variantParam;
+                    });
+                if (sizeBtn) sizeBtn.click();
+            }
+
+            // Restore quantity
+            if (qtyParam) {
+                const qtyInput = document.getElementById('quantity');
+                const qty = parseInt(qtyParam);
+                if (qty > 0 ) {
+                    qtyInput.value = Math.min(qty, currentStock || qty);
+                    updateQuantityButtons();
+                    showStockInfo();
+                }
+            }
+        }, 100);
+    }
 }
 
 function updateQuantityButtons() {
