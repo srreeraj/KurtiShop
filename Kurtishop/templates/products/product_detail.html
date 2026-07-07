@@ -69,18 +69,14 @@
 
                 <!-- Color Selection -->
                 <div class="mb-8">
-                    <h3 class="font-semibold mb-3">Select Color</h3>
-                    <div class="flex flex-wrap gap-4" id="color-options">
+                    <h3 class="font-semibold mb-4">Select Color</h3>
+                    <div class="flex flex-wrap gap-3" id="color-options">
                         {% for item in variants_by_color %}
-                        <button onclick="selectColor(this, {{ item.color.id }})" 
+                            <button onclick="selectColor(this, {{ item.color.id }})" 
                                 data-color-id="{{ item.color.id }}"
-                                class="color-swatch w-12 h-12 rounded-2xl border-2 overflow-hidden hover:border-red-500 transition-all {% if forloop.first %}border-red-600 ring-2 ring-red-200{% endif %}">
-                            {% if item.images.first %}
-                                <img src="{{ item.images.first.image.url }}" class="w-full h-full object-cover">
-                            {% else %}
-                                <div class="w-full h-full" style="background-color: #ccc;"></div>
-                            {% endif %}
-                        </button>
+                                class="color-swatch px-5 py-3 border-2 rounded-2xl text-sm font-medium transition-all hover:border-red-500 hover:bg-red-50 {% if forloop.first %}border-red-600 bg-red-50{% endif %}">
+                                {{ item.color.name }}
+                            </button>
                         {% endfor %}
                     </div>
                 </div>
