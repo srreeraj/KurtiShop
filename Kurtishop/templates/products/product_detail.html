@@ -97,10 +97,21 @@
                     <div>
                         <p class="text-sm text-gray-500 mb-2">Quantity</p>
                         <div class="flex items-center border border-gray-300 rounded-2xl">
-                            <button onclick="changeQty(-1)" class="w-12 h-12 text-2xl font-light">-</button>
-                            <input id="quantity" type="number" value="1" class="w-16 text-center text-xl font-semibold focus:outline-none">
-                            <button onclick="changeQty(1)" class="w-12 h-12 text-2xl font-light">+</button>
+                            <button onclick="changeQty(-1)" 
+                                class="qty-minus w-12 h-12 text-2xl font-light hover:bg-gray-100 rounded-l-2xl transition-colors"
+                                disabled>
+                                -
+                            </button>
+        
+                        <input id="quantity" type="number" value="1" readonly
+                            class="w-16 text-center text-xl font-semibold focus:outline-none"
+                            oninput="updateQuantityButtons(); showStockInfo();">
+        
+                        <button onclick="changeQty(1)" 
+                            class="qty-plus w-12 h-12 text-2xl font-light hover:bg-gray-100 rounded-r-2xl transition-colors"
+                        >+</button>
                         </div>
+                        <div id="stock-info" class="text-sm mt-1 min-h-[20px]"></div>
                     </div>
 
                     <button onclick="addToCartDetail()" 
@@ -187,39 +198,13 @@
 
 {% block extra_js %}
 {{ variants_by_color|json_script:"color-data" }}
-
-<script>
-// 2. Safely parse the JSON
-let colorData = [];
-
-document.addEventListener('DOMContentLoaded', function() {
-    try {
-        const jsonElement = document.getElementById('color-data');
-        if (!jsonElement) {
-            throw new Error("color-data element not found");
-        }
-
-        colorData = JSON.parse(jsonElement.textContent);
-        console.log("✅ colorData loaded successfully:", colorData);
-
-        // Auto-select color after data is loaded
-        initColorSelection();
-
-    } catch(e) {
-        console.error("❌ JSON Parsing Error:", e);
-        const colorNameEl = document.getElementById('selected-color-name');
-        if (colorNameEl) {
-            colorNameEl.innerHTML = '<span style="color:red;">Error loading variants</span>';
-        }
-    }
-});
-</script>
-
 <script>
 // ==================== COLOR SWITCHING LOGIC ====================
 
+let colorData = [];
 let currentColorId = null;
 let currentVariantId = null;
+let currentStock = 0;
 
 function selectColor(btn, colorId) {
     currentColorId = parseInt(colorId);
@@ -267,22 +252,32 @@ function updateSizes(variants) {
     variants.forEach(variant => {
         const btn = document.createElement('button');
         btn.className = `px-6 py-3 border-2 rounded-2xl font-medium transition-all ${
-            variant.stock > 0 ? 'border-gray-300 hover:border-red-600' : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
+            variant.stock > 0  
+                ? 'border-gray-300 hover:border-red-600' 
+                : 'border-gray-200 text-gray-400 line-through cursor-not-allowed'
         }`;
         btn.textContent = variant.size.name;
         if (variant.stock > 0) {
-            btn.onclick = () => selectSize(btn, variant.id);
+            btn.onclick = () => selectSize(btn, variant.id, variant.stock);
         }
         container.appendChild(btn);
     });
 }
 
-function selectSize(btn, variantId) {
+function selectSize(btn, variantId, stock) {
     currentVariantId = variantId;
+    currentStock = stock || 0;
+
+    console.log(`✅ Size selected - Variant ID: ${variantId}, Stock: ${currentStock}`); // Debug
+
+    // Highligh selected size
     document.querySelectorAll('#size-options button').forEach(b => {
         b.classList.remove('border-red-600', 'bg-red-50');
     });
     btn.classList.add('border-red-600', 'bg-red-50');
+
+    resetQuantity();
+    updateQuantityButtons();
 }
 
 function changeMainImage(thumb) {
@@ -293,8 +288,47 @@ function changeMainImage(thumb) {
 
 function changeQty(change) {
     const input = document.getElementById('quantity');
-    let val = parseInt(input.value) || 1;
-    input.value = Math.max(1, val + change);
+    let qty = parseInt(input.value) || 1;
+    qty = qty + change;
+
+    qty = Math.max(1, Math.min(qty, currentStock || 1));
+    input.value = qty;
+    updateQuantityButtons();
+    showStockInfo();
+}
+
+function updateQuantityButtons() {
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    const minusBtn = document.querySelector('.qty-minus');
+    const plusBtn = document.querySelector('.qty-plus');
+
+    if (minusBtn) minusBtn.disabled = qty <= 1;
+    if (plusBtn) plusBtn.disabled = qty >= currentStock;
+}
+
+function resetQuantity() {
+    const input = document.getElementById('quantity');
+    input.value = 1;
+    // Optional: Show stock info
+    showStockInfo();
+    updateQuantityButtons();
+}
+
+function showStockInfo() {
+    const stockEl = document.getElementById('stock-info');
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
+    const remainingStock = currentStock - qty;
+
+    if (remainingStock <= 0) {
+        stockEl.textContent = "Out of stock";
+        stockEl.className = "text-red-600 font-medium";
+    } else if (remainingStock <= 5){
+        stockEl.textContent = `Only ${remainingStock} left in stock!`;
+        stockEl.className = "text-amber-600 font-medium";
+    } else {
+        stockEl.textContent = "";
+        stockEl.className = "";
+    }
 }
 
 function addToCartDetail() {
@@ -302,7 +336,15 @@ function addToCartDetail() {
         alert("Please select a size first.");
         return;
     }
-    alert("Product added to cart!"); // Replace with real logic later
+
+    const qty = parseInt(document.getElementById('quantity').value);
+
+    if (qty > currentStock) {
+        alert(`Sorry, only ${currentStock} items are available in stock.`);
+        document.getElementById('quantity').value = currentStock;
+        return;
+    }
+    alert(`Added ${qty} × ${document.getElementById('selected-color-name').textContent} to cart!`);
 }
 
 // Auto select from URL or first color
@@ -332,6 +374,29 @@ function toggleAccordion(btn) {
         icon.textContent = '-';
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const jsonElement = document.getElementById('color-data');
+        if (!jsonElement) {
+            throw new Error("color-data element not found");
+        }
+
+        colorData = JSON.parse(jsonElement.textContent);
+        console.log("✅ colorData loaded successfully:", colorData);
+
+        // Auto-select color after data is loaded
+        initColorSelection();
+
+    } catch(e) {
+        console.error("❌ JSON Parsing Error:", e);
+        const colorNameEl = document.getElementById('selected-color-name');
+        if (colorNameEl) {
+            colorNameEl.innerHTML = '<span style="color:red;">Error loading variants</span>';
+        }
+    }
+});
 </script>
 
 {% endblock %}
