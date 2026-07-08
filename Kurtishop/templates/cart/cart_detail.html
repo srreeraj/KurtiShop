@@ -59,7 +59,10 @@
                                 <div class="flex items-center border border-gray-300 rounded-2xl">
                                     <button onclick="updateQuantity({{ item.id }}, -1)" 
                                             class="w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 rounded-l-2xl">-</button>
-                                    <input type="text" value="{{ item.quantity }}" readonly
+                                    <input type="text" 
+                                           value="{{ item.quantity }}" 
+                                           readonly
+                                           data-item-id="{{ item.id }}"
                                            class="w-12 text-center font-semibold focus:outline-none">
                                     <button onclick="updateQuantity({{ item.id }}, 1)" 
                                             class="w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 rounded-r-2xl">+</button>
@@ -141,30 +144,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function updateQuantity(itemId, change) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/cart/update/${itemId}/`;
-    
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'quantity';
-    input.value = change;  // Note: This is simplified. Better to send new quantity
-    
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
-}
-
-function removeItem(itemId) {
-    if (confirm('Remove this item from cart?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/cart/remove/${itemId}/`;
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>
+<script src="{% static 'js/cart.js' %}"></script>
 {% endblock %}
