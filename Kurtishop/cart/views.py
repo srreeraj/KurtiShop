@@ -69,7 +69,7 @@ def add_to_cart(request, variant_id):
 @require_POST
 def remove_from_cart(request, item_id):
     cart = get_or_create_cart(request)
-    cart_item = get_object_or_404(CartItem, id=item.id, cart=cart)
+    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
     cart_item.delete()
     messages.success(request,'It removed from cart')
     return redirect('cart:cart_detail')
@@ -78,15 +78,21 @@ def remove_from_cart(request, item_id):
 def update_cart_quantity(request, item_id):
     cart = get_or_create_cart(request)
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
-
-    quantity = int(request.POST.get('quantity'),1)
+    
+    try:
+        quantity = int(request.POST.get('quantity'))
+    except (ValueError, TypeError):
+        messages.error(request, 'Invalid quantity value')
+        return redirect('cart:cart_detail')
 
     if quantity < 1:
         cart_item.delete()
+        messages.success(request, 'Item removed from cart')
     elif quantity > cart_item.variant.stock:
         messages.error(request, 'Not enough stock')
     else:
         cart_item.quantity = quantity
         cart_item.save()
+        messages.success(request, 'Cart updated successfully')
 
     return redirect('cart:cart_detail')
