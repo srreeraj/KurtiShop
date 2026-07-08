@@ -151,18 +151,33 @@
       <li><a href="#" class="nav-link">Contact</a></li>
     </ul>
 
-    <!-- Right: Search -->
-    <div class="flex items-center">
-      <div class="flex items-center" id="search-wrap">
+    <!-- Right Side: Search + Cart -->
+    <div class="flex items-center gap-4">
+    
+    <!-- Search (existing) -->
+    <div class="flex items-center" id="search-wrap">
         <input type="text" id="search-input" class="search-input" placeholder="Search...">
         <button id="search-btn" class="p-2" aria-label="Search">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
         </button>
-      </div>
     </div>
+
+    <!-- Cart Icon -->
+    <a href="#" id="cart-btn" class="relative p-2 text-white hover:text-red-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="21" r="1"/>
+            <circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L22 6H6"/>
+        </svg>
+        <span id="cart-count" 
+              class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            0
+        </span>
+    </a>
+  </div>
   </div>
 </nav>
 
