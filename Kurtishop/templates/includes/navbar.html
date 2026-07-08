@@ -205,6 +205,16 @@
   </nav>
 </div>
 
+<!-- ==================== CART DRAWER ==================== -->
+<div id="cart-overlay" class="fixed inset-0 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300 z-[60] hidden"></div>
+
+<div id="cart-drawer" class="fixed top-0 right-0 h-full w-full md:w-[460px] bg-white shadow-2xl translate-x-full transition-transform duration-300 z-[70] flex flex-col overflow-hidden">
+    
+    <div id="cart-drawer-content" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Cart content will be loaded here dynamically -->
+    </div>
+</div>
+
 <script>
   (function () {
     const navbar = document.getElementById('main-navbar');
@@ -257,4 +267,62 @@
 
     handleScroll(); // Initial check
   })();
+
+// Cart Drawer Functions
+function openCartDrawer() {
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.add('opacity-100');
+    }, 10);
+    drawer.classList.remove('translate-x-full');
+    
+    loadCartIntoDrawer();
+}
+
+function closeCartDrawer() {
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    
+    overlay.classList.remove('opacity-100');
+    drawer.classList.add('translate-x-full');
+    
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+    }, 300);
+}
+
+async function loadCartIntoDrawer() {
+    try {
+        const response = await fetch('/cart/drawer/');
+        if (!response.ok) throw new Error('Failed to load cart');
+        
+        const html = await response.text();
+        document.getElementById('cart-drawer-content').innerHTML = html;
+    } catch (error) {
+        console.error('Cart load error:', error);
+        document.getElementById('cart-drawer-content').innerHTML = `
+            <div class="p-8 text-center">
+                <p class="text-red-600">Unable to load cart. Please try again.</p>
+            </div>`;
+    }
+}
+
+// Close drawer when clicking overlay
+document.getElementById('cart-overlay').addEventListener('click', closeCartDrawer);
+
+// Connect Cart Icon
+document.getElementById('cart-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    openCartDrawer();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        closeCartDrawer();
+    }
+});
 </script>
