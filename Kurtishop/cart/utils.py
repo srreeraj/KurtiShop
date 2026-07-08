@@ -1,4 +1,4 @@
-from django.Http import HttpRequest
+from django.http import HttpRequest
 from .models import Cart
 
 def get_or_create_cart(request: HttpRequest):

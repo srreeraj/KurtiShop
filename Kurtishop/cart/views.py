@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.confrib import messages
+from django.contrib import messages
 
 from products.models import ProductVariant
 from .models import Cart, CartItem
