@@ -490,13 +490,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         colorData = JSON.parse(jsonElement.textContent);
-        console.log("✅ colorData loaded successfully:", colorData);
 
         // Auto-select color after data is loaded
         initColorSelection();
 
     } catch(e) {
-        console.error("❌ JSON Parsing Error:", e);
         const colorNameEl = document.getElementById('selected-color-name');
         if (colorNameEl) {
             colorNameEl.innerHTML = '<span style="color:red;">Error loading variants</span>';
