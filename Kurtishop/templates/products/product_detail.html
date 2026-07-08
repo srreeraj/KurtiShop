@@ -345,7 +345,7 @@ function restoreState() {
         //  Wait a bit for sizes to populate, then restore size
         setTimeout(() => {
             if(variantParam) {
-                const sizeBtn = Array.from(document.querySelectorAll('#size-option button'))
+                const sizeBtn = Array.from(document.querySelectorAll('#size-options button'))
                     .find(btn => {
                         // We'll need to store variant id on the button
                         return btn.dataset.variantId == variantParam;
@@ -407,99 +407,50 @@ function addToCartDetail() {
         return;
     }
 
-    const qty = parseInt(document.getElementById('quantity').value);
+    const qty = parseInt(document.getElementById('quantity').value) || 1;
 
     if (qty > currentStock) {
-        alert(`Sorry, only ${currentStock} items are available in stock.`);
+        alert(`Sorry, only ${currentStock} items available.`);
         document.getElementById('quantity').value = currentStock;
         return;
     }
 
-    // Show loading state
     const addBtn = document.querySelector('button[onclick="addToCartDetail()"]');
     const originalText = addBtn.textContent;
-    addBtn.textContent = 'Adding..';
+    addBtn.textContent = "ADDING...";
     addBtn.disabled = true;
 
-    fetch(`/cart/add/${currentVariantId}/`,{
-        method : 'POST',
-        headers : {
-            'X-CSRFToken' : getCSRFToken(),
-            'Content-Type' : 'application/x-www-form-urlencoded',
+    fetch(`/cart/add/${currentVariantId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body = `quantity=${qty}`
+        body: `quantity=${qty}`
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status === 'success'){
-            // Success feedback
-            addBtn.textContent = "✓ ADDED!"
-            addBtn.classList.add('bg-green-600')
-
-            // Optional: Show nice message
+        if (data.status === 'success') {
+            addBtn.textContent = "✓ ADDED!";
+            addBtn.classList.add('bg-green-600');
             showToast(data.message);
 
-            // Reset button after 2 seconds
             setTimeout(() => {
                 addBtn.textContent = originalText;
                 addBtn.classList.remove('bg-green-600');
                 addBtn.disabled = false;
             }, 2000);
         } else {
-            alert(data.message || "Something went wrong");
+            alert(data.message || "Failed");
             addBtn.textContent = originalText;
             addBtn.disabled = false;
         }
     })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Failed to add to cart. Please try again");
+    .catch(() => {
+        alert("Error occurred");
         addBtn.textContent = originalText;
         addBtn.disabled = false;
-    })
-}
-
-// Helper function to get CSRF token
-function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
-}
-
-function getCookie(name){
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== ''){
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')){
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Simple toask
-// Simple Toast Notification
-function showToast(message) {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast';
-        toast.style.cssText = `
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: #166534; color: white; padding: 16px 24px; border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); z-index: 1000;
-            font-weight: 500;
-        `;
-        document.body.appendChild(toast);
-    }
-    toast.textContent = message;
-    toast.style.opacity = '1';
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-    }, 2500);
+    });
 }
 
 // Auto select from URL or first color
@@ -552,6 +503,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#166534;color:white;padding:16px 24px;border-radius:12px;z-index:10000;`;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = 1;
+    setTimeout(() => toast.style.opacity = 0, 2500);
+}
 </script>
 
 {% endblock %}
