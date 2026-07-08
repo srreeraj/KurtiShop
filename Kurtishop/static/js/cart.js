@@ -1,60 +1,11 @@
+// ==================== CART DRAWER JS ====================
+
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const token = document.querySelector('[name=csrfmiddlewaretoken]');
+    return token ? token.value : '';
 }
 
-function updateQuantity(itemId, change) {
-    const quantityInput = document.querySelector(`input[data-item-id="${itemId}"]`);
-    let currentQty = parseInt(quantityInput.value);
-    let newQty = currentQty + change;
-
-    if (newQty < 1) {
-        if (confirm('Remove this item from cart?')) {
-            removeItem(itemId);
-        }
-        return;
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/cart/update/${itemId}/`;
-    form.style.display = 'none';
-
-    // CSRF Token
-    const csrf = document.createElement('input');
-    csrf.type = 'hidden';
-    csrf.name = 'csrfmiddlewaretoken';
-    csrf.value = getCSRFToken();
-    form.appendChild(csrf);
-
-    // Quantity
-    const qtyInput = document.createElement('input');
-    qtyInput.type = 'hidden';
-    qtyInput.name = 'quantity';
-    qtyInput.value = newQty;
-    form.appendChild(qtyInput);
-
-    document.body.appendChild(form);
-    form.submit()
-}
-
-function removeItem(itemId) {
-    if (confirm('Remove this item from cart?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/cart/remove/${itemId}/`;
-        form.style.display = 'none';
-
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = 'csrfmiddlewaretoken';
-        csrf.value = getCSRFToken();
-        form.appendChild(csrf);
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
+// Open / Close Drawer
 function openCartDrawer() {
     const drawer = document.getElementById('cart-drawer');
     const overlay = document.getElementById('cart-overlay');
@@ -75,30 +26,71 @@ function closeCartDrawer() {
     setTimeout(() => overlay.classList.add('hidden'), 300);
 }
 
+// Load Cart Content via AJAX
 async function loadCartDrawer() {
     try {
         const res = await fetch('/cart/drawer/');
         const html = await res.text();
         document.getElementById('cart-drawer-content').innerHTML = html;
-    } catch(e) {
+    } catch (e) {
         console.error("Failed to load cart", e);
     }
 }
 
-// Update quantity in drawer
+// Update Quantity in Drawer (Proper POST)
 function updateDrawerQty(itemId, change) {
-    // You can make this AJAX later. For now, full reload is fine.
-    window.location.href = `/cart/update/${itemId}/?change=${change}`;
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/cart/update/${itemId}/`;
+    form.style.display = 'none';
+
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrfmiddlewaretoken';
+    csrf.value = getCSRFToken();
+    form.appendChild(csrf);
+
+    const qtyInput = document.createElement('input');
+    qtyInput.type = 'hidden';
+    qtyInput.name = 'quantity';
+    qtyInput.value = change;        // We'll handle logic in view
+    form.appendChild(qtyInput);
+
+    document.body.appendChild(form);
+    form.submit();
 }
 
+// Remove Item from Drawer
 function removeFromDrawer(itemId) {
-    if (confirm('Remove item?')) {
-        window.location.href = `/cart/remove/${itemId}/`;
+    if (confirm('Remove this item from cart?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cart/remove/${itemId}/`;
+        form.style.display = 'none';
+
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = getCSRFToken();
+        form.appendChild(csrf);
+
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 
-// Add event listener in navbar
-document.getElementById('cart-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    openCartDrawer();
+// Cart Icon Click
+document.addEventListener('DOMContentLoaded', () => {
+    const cartBtn = document.getElementById('cart-btn');
+    if (cartBtn) {
+        cartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCartDrawer();
+        });
+    }
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCartDrawer();
 });
