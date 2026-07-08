@@ -3,7 +3,7 @@ from products.models import ProductVariant
 # Create your models here.
 
 class Cart(models.Model):
-    session_key = models.CharField(max_length=40, unique=True)
+    session_key = models.CharField(max_length=40, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
