@@ -9,22 +9,6 @@ from .utils import get_or_create_cart, get_cart_item_count
 
 # Create your views here.
 
-def cart_detail(request):
-    cart = get_or_create_cart(request)
-    items = cart.items.select_related(
-        'variant__product',
-        'variant__color',
-        'variant__size',
-    ).all()
-
-    subtotal = sum(item.total_price for item in items)
-
-    context = {
-        'cart' : cart,
-        'items' : items,
-        'subtotal' : subtotal,
-    }
-    return render(request, 'cart/cart_detail.html', context)
 
 def cart_drawer(request):
     cart = get_or_create_cart(request)
@@ -85,7 +69,7 @@ def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
     cart_item.delete()
     messages.success(request,'It removed from cart')
-    return redirect('cart:cart_detail')
+    return redirect('cart:cart_drawer')
 
 @require_POST
 def update_cart_quantity(request, item_id):
@@ -108,4 +92,4 @@ def update_cart_quantity(request, item_id):
         cart_item.save()
         messages.success(request, 'Cart updated successfully')
 
-    return redirect('cart:cart_detail')
+    return redirect('cart:cart_drawer')
