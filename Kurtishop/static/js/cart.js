@@ -3,7 +3,7 @@ function getCSRFToken() {
 }
 
 function updateQuantity(itemId, change) {
-    const quantityInput = document.querySelector(`input[data-item-id]="${itemId}"]`);
+    const quantityInput = document.querySelector(`input[data-item-id="${itemId}"]`);
     let currentQty = parseInt(quantityInput.value);
     let newQty = currentQty + change;
 
