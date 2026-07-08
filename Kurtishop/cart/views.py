@@ -9,7 +9,7 @@ from .utils import get_or_create_cart, get_cart_item_count
 
 # Create your views here.
 
-def cart_drawer(request):
+def cart_detail(request):
     cart = get_or_create_cart(request)
     items = cart.items.select_related(
         'variant__product',
@@ -24,7 +24,20 @@ def cart_drawer(request):
         'items' : items,
         'subtotal' : subtotal,
     }
-    return render(request, 'cart/cart_drawer.html', context)
+    return render(request, 'cart/cart_detail.html', context)
+
+def cart_drawer(request):
+    cart = get_or_create_cart(request)
+    items = cart.items.select_related(
+        'variant__product', 'variant__color', 'variant__size'
+    ).all()
+    
+    subtotal = sum(item.total_price for item in items)
+
+    return render(request, 'cart/cart_drawer.html', {
+        'items': items,
+        'subtotal': subtotal,
+    })
 
 @require_POST
 def add_to_cart(request, variant_id):
