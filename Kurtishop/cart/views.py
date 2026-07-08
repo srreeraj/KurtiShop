@@ -65,3 +65,28 @@ def add_to_cart(request, variant_id):
         'message' : f'{quantity} x {variant.product.name} added to cart',
         'cart_count' : cart.items.count()
     })
+
+@require_POST
+def remove_from_cart(request, item_id):
+    cart = get_or_create_cart(request)
+    cart_item = get_object_or_404(CartItem, id=item.id, cart=cart)
+    cart_item.delete()
+    messages.success(request,'It removed from cart')
+    return redirect('cart:cart_detail')
+
+@require_POST
+def update_cart_quantity(request, item_id):
+    cart = get_or_create_cart(request)
+    cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+
+    quantity = int(request.POST.get('quantity'),1)
+
+    if quantity < 1:
+        cart_item.delete()
+    elif quantity > cart_item.variant.stock:
+        messages.error(request, 'Not enough stock')
+    else:
+        cart_item.quantity = quantity
+        cart_item.save()
+
+    return redirect('cart:cart_detail')
