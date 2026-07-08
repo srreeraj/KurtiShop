@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 
 <section class="relative h-[280px] flex items-center justify-center overflow-hidden">
     <img src="{% static 'images/hero/hero2.png' %}" alt="Product" class="absolute inset-0 w-full h-full object-cover">
@@ -413,7 +414,92 @@ function addToCartDetail() {
         document.getElementById('quantity').value = currentStock;
         return;
     }
-    alert(`Added ${qty} × ${document.getElementById('selected-color-name').textContent} to cart!`);
+
+    // Show loading state
+    const addBtn = document.querySelector('button[onclick="addToCartDetail()"]');
+    const originalText = addBtn.textContent;
+    addBtn.textContent = 'Adding..';
+    addBtn.disabled = true;
+
+    fetch(`/cart/add/${currentVariantId}/`,{
+        method : 'POST',
+        headers : {
+            'X-CSRFToken' : getCSRFToken(),
+            'Content-Type' : 'application/x-www-form-urlencoded',
+        },
+        body = `quantity=${qty}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success'){
+            // Success feedback
+            addBtn.textContent = "✓ ADDED!"
+            addBtn.classList.add('bg-green-600')
+
+            // Optional: Show nice message
+            showToast(data.message);
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                addBtn.textContent = originalText;
+                addBtn.classList.remove('bg-green-600');
+                addBtn.disabled = false;
+            }, 2000);
+        } else {
+            alert(data.message || "Something went wrong");
+            addBtn.textContent = originalText;
+            addBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Failed to add to cart. Please try again");
+        addBtn.textContent = originalText;
+        addBtn.disabled = false;
+    })
+}
+
+// Helper function to get CSRF token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+}
+
+function getCookie(name){
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== ''){
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')){
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Simple toask
+// Simple Toast Notification
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #166534; color: white; padding: 16px 24px; border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); z-index: 1000;
+            font-weight: 500;
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2500);
 }
 
 // Auto select from URL or first color
