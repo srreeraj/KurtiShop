@@ -1,3 +1,67 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.confrib import messages
+
+from products.models import ProductVariant
+from .models import Cart, CartItem
+from .utils import get_or_create_cart, get_cart_item_count
 
 # Create your views here.
+
+def cart_detail(request):
+    cart = get_or_create_cart(request)
+    items = cart.items.select_related(
+        'variant__product',
+        'variant__color',
+        'variant__size',
+    ).all()
+
+    subtotal = sum(item.total_price for item in items)
+
+    context = {
+        'cart' : cart,
+        'items' : items,
+        'subtotal' : subtotal,
+    }
+    return render(request, 'cart/cart_detail.html', context)
+
+@require_POST
+def add_to_cart(request, variant_id):
+    cart = get_or_create_cart(request)
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+
+    quantity = int(request.POST.get('quantity', 1))
+
+    if quantity < 1:
+        return JsonResponse({'status' : 'error' , 'message' : 'Invalid quantity'}, status=404)
+
+    # Stock check
+    if quantity > variant.stock:
+        return JsonResponse({
+            'status' : 'error',
+            'message' : f'Only {variant.stock} items available in stock'
+        }, status=400)
+
+    # Add or update items
+    cart_item, created = CartItem.objects.get_or_create(
+        cart=cart,
+        variant=variant,
+        defaults={'quantity' : quantity}
+    )
+
+    if not created:
+        new_qty = cart_item.quantity + quantity
+        if new_qty > variant.stock:
+            return JsonResponse({
+                'status' : 'error',
+                'message' : 'Not enough stock',
+            }, status=404)
+        cart_item.quantity = new_qty
+        cart_item.save()
+
+    return JsonResponse({
+        'status' : 'success',
+        'message' : f'{quantity} x {variant.product.name} added to cart',
+        'cart_count' : cart.items.count()
+    })
