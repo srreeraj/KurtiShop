@@ -54,3 +54,51 @@ function removeItem(itemId) {
         form.submit();
     }
 }
+
+function openCartDrawer() {
+    const drawer = document.getElementById('cart-drawer');
+    const overlay = document.getElementById('cart-overlay');
+    
+    overlay.classList.remove('hidden');
+    setTimeout(() => overlay.classList.add('opacity-100'), 10);
+    drawer.classList.remove('translate-x-full');
+
+    loadCartDrawer();
+}
+
+function closeCartDrawer() {
+    const drawer = document.getElementById('cart-drawer');
+    const overlay = document.getElementById('cart-overlay');
+    
+    overlay.classList.remove('opacity-100');
+    drawer.classList.add('translate-x-full');
+    setTimeout(() => overlay.classList.add('hidden'), 300);
+}
+
+async function loadCartDrawer() {
+    try {
+        const res = await fetch('/cart/drawer/');
+        const html = await res.text();
+        document.getElementById('cart-drawer-content').innerHTML = html;
+    } catch(e) {
+        console.error("Failed to load cart", e);
+    }
+}
+
+// Update quantity in drawer
+function updateDrawerQty(itemId, change) {
+    // You can make this AJAX later. For now, full reload is fine.
+    window.location.href = `/cart/update/${itemId}/?change=${change}`;
+}
+
+function removeFromDrawer(itemId) {
+    if (confirm('Remove item?')) {
+        window.location.href = `/cart/remove/${itemId}/`;
+    }
+}
+
+// Add event listener in navbar
+document.getElementById('cart-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    openCartDrawer();
+});
