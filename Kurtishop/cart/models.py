@@ -36,7 +36,7 @@ class CartItem(models.Model):
     class Meta:
         ordering = ['created_at']
 
-        constriants = [
+        constraints = [
             models.UniqueConstraint(
                 fields=['cart', 'variant'],
                 name='unique_cart_item'
