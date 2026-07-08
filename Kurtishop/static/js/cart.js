@@ -37,7 +37,6 @@ async function loadCartDrawer() {
     }
 }
 
-// Update Quantity in Drawer (Proper POST)
 function updateDrawerQty(itemId, change) {
     const form = document.createElement('form');
     form.method = 'POST';
@@ -53,7 +52,7 @@ function updateDrawerQty(itemId, change) {
     const qtyInput = document.createElement('input');
     qtyInput.type = 'hidden';
     qtyInput.name = 'quantity';
-    qtyInput.value = change;        // We'll handle logic in view
+    qtyInput.value = change;   // +1 or -1
     form.appendChild(qtyInput);
 
     document.body.appendChild(form);
@@ -94,3 +93,29 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeCartDrawer();
 });
+
+// Attach event listeners after drawer is loaded
+function attachDrawerListeners() {
+    // Quantity buttons
+    document.querySelectorAll('[data-action="update-qty"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const change = parseInt(this.getAttribute('data-change'));
+            updateDrawerQty(itemId, change);
+        });
+    });
+}
+
+// Call this after loading drawer content
+async function loadCartDrawer() {
+    try {
+        const res = await fetch('/cart/drawer/');
+        const html = await res.text();
+        document.getElementById('cart-drawer-content').innerHTML = html;
+        
+        // Re-attach listeners after content is loaded
+        setTimeout(attachDrawerListeners, 100);
+    } catch(e) {
+        console.error("Failed to load cart", e);
+    }
+}
