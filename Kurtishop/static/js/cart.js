@@ -16,7 +16,7 @@ function updateQuantity(itemId, change) {
 
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/cart/update/${itemId}`;
+    form.action = `/cart/update/${itemId}/`;
     form.style.display = 'none';
 
     // CSRF Token
