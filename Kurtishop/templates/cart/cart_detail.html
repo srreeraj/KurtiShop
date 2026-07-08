@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart | Kurti Shop{% endblock %}
+
+{% block content %}
+
+<section class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-5">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-900">Your Cart</h1>
+            <a href="{% url 'product_list' %}" 
+               class="text-red-600 hover:text-red-700 font-medium flex items-center gap-2">
+                ← Continue Shopping
+            </a>
+        </div>
+
+        {% if items %}
+        <div class="grid lg:grid-cols-12 gap-10">
+
+            <!-- Cart Items -->
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
+                    {% for item in items %}
+                    <div class="p-6 border-b last:border-b-0 flex gap-6">
+                        
+                        <!-- Image -->
+                        <div class="w-28 h-28 flex-shrink-0 rounded-2xl overflow-hidden border">
+                            {% if item.variant.product.images.first %}
+                                <img src="{{ item.variant.product.images.first.image.url }}" 
+                                     alt="{{ item.variant.product.name }}"
+                                     class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                    No Image
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Details -->
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="font-semibold text-lg text-gray-900">{{ item.variant.product.name }}</h3>
+                                    <p class="text-red-600">{{ item.variant.color.name }} • {{ item.variant.size.name }}</p>
+                                </div>
+                                <button onclick="removeItem({{ item.id }})"
+                                        class="text-gray-400 hover:text-red-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6h12v12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="mt-4 flex items-center justify-between">
+                                <!-- Quantity -->
+                                <div class="flex items-center border border-gray-300 rounded-2xl">
+                                    <button onclick="updateQuantity({{ item.id }}, -1)" 
+                                            class="w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 rounded-l-2xl">-</button>
+                                    <input type="text" value="{{ item.quantity }}" readonly
+                                           class="w-12 text-center font-semibold focus:outline-none">
+                                    <button onclick="updateQuantity({{ item.id }}, 1)" 
+                                            class="w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 rounded-r-2xl">+</button>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="text-right">
+                                    <p class="font-bold text-2xl text-red-600">
+                                        ₹{{ item.total_price|floatformat:0 }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        ₹{{ item.unit_price|floatformat:0 }} × {{ item.quantity }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-4">
+                <div class="bg-white rounded-3xl shadow-sm p-8 sticky top-8">
+                    <h2 class="text-2xl font-semibold mb-6">Order Summary</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-lg">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span class="font-semibold">₹{{ subtotal|floatformat:0 }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between text-lg">
+                            <span class="text-gray-600">Shipping</span>
+                            <span class="text-green-600">Calculated at checkout</span>
+                        </div>
+                    </div>
+
+                    <hr class="my-8">
+
+                    <div class="flex justify-between text-2xl font-bold mb-8">
+                        <span>Total</span>
+                        <span>₹{{ subtotal|floatformat:0 }}</span>
+                    </div>
+
+                    <a href="{% url 'checkout' %}" 
+                       class="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-4 rounded-2xl font-semibold text-lg transition-all">
+                        PROCEED TO CHECKOUT
+                    </a>
+
+                    <p class="text-center text-sm text-gray-500 mt-6">
+                        Taxes and shipping will be calculated at checkout
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Empty Cart -->
+        <div class="text-center py-20">
+            <div class="mx-auto w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mb-8">
+                <span class="text-6xl">🛒</span>
+            </div>
+            <h2 class="text-3xl font-semibold text-gray-800 mb-3">Your cart is empty</h2>
+            <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                Looks like you haven't added anything yet. 
+                Start shopping to fill your cart!
+            </p>
+            <a href="{% url 'product_list' %}" 
+               class="inline-block bg-red-600 text-white px-10 py-4 rounded-2xl font-semibold">
+                Browse Kurtis
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateQuantity(itemId, change) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/cart/update/${itemId}/`;
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'quantity';
+    input.value = change;  // Note: This is simplified. Better to send new quantity
+    
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removeItem(itemId) {
+    if (confirm('Remove this item from cart?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cart/remove/${itemId}/`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}
