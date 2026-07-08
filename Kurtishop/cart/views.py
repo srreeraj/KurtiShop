@@ -77,7 +77,7 @@ def update_cart_quantity(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
     
     try:
-        change = int(request.POST.get('quantity'), 0)
+        change = int(request.POST.get('quantity', 0))
         new_quantity = cart_item.quantity + change
     except (ValueError, TypeError):
         messages.error(request, 'Invalid quantity value')
