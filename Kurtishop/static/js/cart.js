@@ -23,7 +23,7 @@ function updateQuantity(itemId, change) {
     const csrf = document.createElement('input');
     csrf.type = 'hidden';
     csrf.name = 'csrfmiddlewaretoken';
-    csrf.value = 'getCSRFToken()';
+    csrf.value = getCSRFToken();
     form.appendChild(csrf);
 
     // Quantity
