@@ -11,7 +11,7 @@
     <div class="flex-1 overflow-auto p-6" id="drawer-cart-items">
         {% if items %}
             {% for item in items %}
-            <div class="flex gap-4 py-6 border-b last:border-b-0">
+            <div class="flex gap-4 py-6 border-b last:border-b-0" data-item-id="{{ item.id }}">
                 <div class="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border">
                     {% if item.variant.product.images.first %}
                         <img src="{{ item.variant.product.images.first.image.url }}" 
@@ -29,9 +29,11 @@
                     
                     <div class="flex justify-between items-center mt-3">
                         <div class="flex items-center border rounded-lg">
-                            <button onclick="updateDrawerQty({{ item.id }}, -1)" class="px-3 py-1">-</button>
-                            <span class="px-4">{{ item.quantity }}</span>
-                            <button onclick="updateDrawerQty({{ item.id }}, 1)" class="px-3 py-1">+</button>
+                            <button data-action="update-qty" data-item-id="{{ item.id }}" data-change="-1" 
+                                    class="px-4 py-1 hover:bg-gray-100">-</button>
+                            <span class="px-6 font-medium">{{ item.quantity }}</span>
+                            <button data-action="update-qty" data-item-id="{{ item.id }}" data-change="1" 
+                                    class="px-4 py-1 hover:bg-gray-100">+</button>
                         </div>
                         <p class="font-semibold text-red-600">₹{{ item.total_price|floatformat:0 }}</p>
                     </div>
@@ -53,8 +55,7 @@
             <span class="font-semibold" id="drawer-subtotal">₹{{ subtotal|floatformat:0 }}</span>
         </div>
         
-        <a href="#" 
-           class="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-4 rounded-2xl font-semibold">
+        <a href="#" class="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-4 rounded-2xl font-semibold">
             PROCEED TO CHECKOUT
         </a>
     </div>
