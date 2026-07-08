@@ -83,13 +83,13 @@ def update_cart_quantity(request, item_id):
         messages.error(request, 'Invalid quantity value')
         return redirect('cart:cart_detail')
 
-    if quantity < 1:
+    if new_quantity < 1:
         cart_item.delete()
         messages.success(request, 'Item removed from cart')
-    elif quantity > cart_item.variant.stock:
+    elif new_quantity > cart_item.variant.stock:
         messages.error(request, 'Not enough stock')
     else:
-        cart_item.quantity = quantity
+        cart_item.quantity = new_quantity
         cart_item.save()
         messages.success(request, 'Cart updated successfully')
 
