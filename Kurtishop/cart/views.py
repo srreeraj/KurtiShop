@@ -86,7 +86,7 @@ def update_cart_quantity(request, item_id):
             "message" : "Invalid quantity",
         }, status=400)
 
-    new_quantity = 
+    new_quantity = cart_item.quantity + change
 
     if new_quantity < 1:
         cart_item.delete()
