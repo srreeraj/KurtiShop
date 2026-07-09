@@ -81,17 +81,27 @@ def update_cart_quantity(request, item_id):
         change = int(request.POST.get('quantity', 0))
         new_quantity = cart_item.quantity + change
     except (ValueError, TypeError):
-        messages.error(request, 'Invalid quantity value')
-        return redirect('cart:cart_detail')
+        return JsonResponse({
+            "status": "error",
+            "message" : "Invalid quantity",
+        }, status=400)
+
+    new_quantity = 
 
     if new_quantity < 1:
         cart_item.delete()
-        messages.success(request, 'Item removed from cart')
-    elif new_quantity > cart_item.variant.stock:
-        messages.error(request, 'Not enough stock')
-    else:
-        cart_item.quantity = new_quantity
-        cart_item.save()
-        messages.success(request, 'Cart updated successfully')
+        return JsonResponse({
+            "status": "success"
+        })
+    if new_quantity > cart_item.variant.stock:
+        return JsonResponse({
+            "status": "error",
+            "message": f"Only {cart_item.variant.stock} item(s) available."
+        }, status=400)
+    
+    cart_item.quantity = new_quantity
+    cart_item.save()
 
-    return redirect('cart:cart_drawer')
+    return JsonResponse({
+        "status": "success"
+    })
