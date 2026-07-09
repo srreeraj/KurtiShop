@@ -1,118 +1,192 @@
-// ==================== CART DRAWER JS ====================
+// ================= CSRF =================
 
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
 }
 
-// Load Cart
+// ================= LOAD DRAWER =================
+
 async function loadCartDrawer() {
+
     try {
-        const res = await fetch('/cart/drawer/');
-        const html = await res.text();
-        const content = document.getElementById('cart-drawer-content');
-        content.innerHTML = html;
-        
-        setTimeout(attachDrawerListeners, 50); // Small delay to ensure DOM is ready
-    } catch(e) {
-        console.error("Failed to load cart", e);
+
+        const response = await fetch('/cart/drawer/');
+
+        const html = await response.text();
+
+        document.getElementById('cart-drawer-content').innerHTML = html;
+
+        attachDrawerListeners();
+
+    } catch (err) {
+
+        console.error(err);
+
     }
+
 }
 
-// Attach listeners to dynamic content
+// ================= LISTENERS =================
+
 function attachDrawerListeners() {
-    // Quantity buttons
+
     document.querySelectorAll('[data-action="update-qty"]').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const itemId = this.dataset.itemId;
-            const change = parseInt(this.dataset.change);
 
-            await updateQuantityAjax(itemId, change);
+        btn.addEventListener('click', function () {
+
+            updateQuantityAjax(
+                this.dataset.itemId,
+                this.dataset.change
+            );
+
         });
+
     });
 
-    // Remove buttons
-    document.querySelectorAll('.remove-from-drawer').forEach(btn => {  // We'll add this class
-        btn.addEventListener('click', async function() {
-            if (confirm('Remove this item from cart?')) {
-                await removeFromDrawerAjax(this.dataset.itemId);
+    document.querySelectorAll('.remove-from-drawer').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+            if (confirm("Remove this item?")) {
+
+                removeFromDrawerAjax(
+                    this.dataset.itemId
+                );
+
             }
+
         });
+
     });
+
 }
 
-// AJAX Update Quantity
+// ================= UPDATE QUANTITY =================
+
 async function updateQuantityAjax(itemId, change) {
+
     const formData = new FormData();
-    formData.append('quantity', change);
-    formData.append('csrfmiddlewaretoken', getCSRFToken());
 
-    try {
-        const res = await fetch(`/cart/update/${itemId}/`, {
-            method: 'POST',
-            body: formData
-        });
+    formData.append("quantity", change);
 
-        if (res.ok) {
-            loadCartDrawer(); // Refresh drawer
-        } else {
-            alert('Failed to update quantity');
-        }
-    } catch(e) {
-        console.error(e);
+    formData.append("csrfmiddlewaretoken", getCSRFToken());
+
+    const response = await fetch(`/cart/update/${itemId}/`, {
+
+        method: "POST",
+
+        body: formData
+
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+
+        loadCartDrawer();
+
+    } else {
+
+        alert(data.message);
+
     }
+
 }
 
-// AJAX Remove
+// ================= REMOVE =================
+
 async function removeFromDrawerAjax(itemId) {
+
     const formData = new FormData();
-    formData.append('csrfmiddlewaretoken', getCSRFToken());
 
-    try {
-        const res = await fetch(`/cart/remove/${itemId}/`, {
-            method: 'POST',
-            body: formData
-        });
+    formData.append("csrfmiddlewaretoken", getCSRFToken());
 
-        if (res.ok) {
-            loadCartDrawer();
-        }
-    } catch(e) {
-        console.error(e);
+    const response = await fetch(`/cart/remove/${itemId}/`, {
+
+        method: "POST",
+
+        body: formData
+
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+
+        loadCartDrawer();
+
     }
+
 }
 
-// Open Drawer
+// ================= OPEN =================
+
 function openCartDrawer() {
-    const overlay = document.getElementById('cart-overlay');
-    const drawer = document.getElementById('cart-drawer');
-    
-    overlay.classList.remove('hidden');
-    setTimeout(() => overlay.classList.add('opacity-100'), 10);
-    drawer.classList.remove('translate-x-full');
+
+    const overlay = document.getElementById("cart-overlay");
+
+    const drawer = document.getElementById("cart-drawer");
+
+    overlay.classList.remove("hidden");
+
+    setTimeout(() => {
+
+        overlay.classList.add("opacity-100");
+
+    }, 10);
+
+    drawer.classList.remove("translate-x-full");
 
     loadCartDrawer();
+
 }
+
+// ================= CLOSE =================
 
 function closeCartDrawer() {
-    const overlay = document.getElementById('cart-overlay');
-    const drawer = document.getElementById('cart-drawer');
-    
-    overlay.classList.remove('opacity-100');
-    drawer.classList.add('translate-x-full');
-    setTimeout(() => overlay.classList.add('hidden'), 300);
+
+    const overlay = document.getElementById("cart-overlay");
+
+    const drawer = document.getElementById("cart-drawer");
+
+    overlay.classList.remove("opacity-100");
+
+    drawer.classList.add("translate-x-full");
+
+    setTimeout(() => {
+
+        overlay.classList.add("hidden");
+
+    }, 300);
+
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    const cartBtn = document.getElementById('cart-btn');
+// ================= INIT =================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const cartBtn = document.getElementById("cart-btn");
+
     if (cartBtn) {
-        cartBtn.addEventListener('click', (e) => {
+
+        cartBtn.addEventListener("click", function (e) {
+
             e.preventDefault();
+
             openCartDrawer();
+
         });
+
     }
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeCartDrawer();
+    document.addEventListener("keydown", function (e) {
+
+        if (e.key === "Escape") {
+
+            closeCartDrawer();
+
+        }
+
     });
+
 });
