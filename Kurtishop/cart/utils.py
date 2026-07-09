@@ -1,6 +1,6 @@
 from django.http import HttpRequest
 from .models import Cart
-from django.models import Sum
+from django.db.models import Sum
 
 def get_or_create_cart(request: HttpRequest):
     """Get or create a cart for the current session."""
