@@ -1,7 +1,8 @@
 // ================= CSRF =================
 
 function getCSRFToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const el = document.querySelector('[name=csrfmiddlewaretoken]');
+    return el ? el.value : null;
 }
 
 // ================= LOAD DRAWER =================
@@ -10,7 +11,9 @@ async function loadCartDrawer() {
 
     try {
 
-        const response = await fetch('/cart/drawer/');
+        const response = await fetch('/cart/drawer/', {
+            credentials: 'same-origin'
+        });
 
         const html = await response.text();
 
@@ -20,7 +23,7 @@ async function loadCartDrawer() {
 
     } catch (err) {
 
-        console.error(err);
+        console.error('Failed to load cart drawer:', err);
 
     }
 
@@ -32,11 +35,17 @@ function attachDrawerListeners() {
 
     document.querySelectorAll('[data-action="update-qty"]').forEach(btn => {
 
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.disabled) return;
 
             updateQuantityAjax(
                 this.dataset.itemId,
-                this.dataset.change
+                this.dataset.change,
+                this
             );
 
         });
@@ -45,12 +54,18 @@ function attachDrawerListeners() {
 
     document.querySelectorAll('.remove-from-drawer').forEach(btn => {
 
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.disabled) return;
 
             if (confirm("Remove this item?")) {
 
                 removeFromDrawerAjax(
-                    this.dataset.itemId
+                    this.dataset.itemId,
+                    this
                 );
 
             }
@@ -63,31 +78,57 @@ function attachDrawerListeners() {
 
 // ================= UPDATE QUANTITY =================
 
-async function updateQuantityAjax(itemId, change) {
+async function updateQuantityAjax(itemId, change, btn) {
+
+    const csrfToken = getCSRFToken();
+
+    if (!csrfToken) {
+        console.error('CSRF token missing from drawer.');
+        return;
+    }
 
     const formData = new FormData();
 
     formData.append("quantity", change);
 
-    formData.append("csrfmiddlewaretoken", getCSRFToken());
+    formData.append("csrfmiddlewaretoken", csrfToken);
 
-    const response = await fetch(`/cart/update/${itemId}/`, {
+    if (btn) btn.disabled = true;
 
-        method: "POST",
+    try {
 
-        body: formData
+        const response = await fetch(`/cart/update/${itemId}/`, {
 
-    });
+            method: "POST",
 
-    const data = await response.json();
+            body: formData,
 
-    if (data.status === "success") {
+            credentials: 'same-origin'
 
-        loadCartDrawer();
+        });
 
-    } else {
+        if (!response.ok && response.status !== 400) {
+            throw new Error(`Server returned ${response.status}`);
+        }
 
-        alert(data.message);
+        const data = await response.json();
+
+        if (data.status === "success") {
+
+            loadCartDrawer();
+
+        } else {
+
+            alert(data.message || "Could not update quantity.");
+            if (btn) btn.disabled = false;
+
+        }
+
+    } catch (err) {
+
+        console.error('Update quantity failed:', err);
+        alert("Something went wrong updating your cart. Please try again.");
+        if (btn) btn.disabled = false;
 
     }
 
@@ -95,25 +136,54 @@ async function updateQuantityAjax(itemId, change) {
 
 // ================= REMOVE =================
 
-async function removeFromDrawerAjax(itemId) {
+async function removeFromDrawerAjax(itemId, btn) {
+
+    const csrfToken = getCSRFToken();
+
+    if (!csrfToken) {
+        console.error('CSRF token missing from drawer.');
+        return;
+    }
 
     const formData = new FormData();
 
-    formData.append("csrfmiddlewaretoken", getCSRFToken());
+    formData.append("csrfmiddlewaretoken", csrfToken);
 
-    const response = await fetch(`/cart/remove/${itemId}/`, {
+    if (btn) btn.disabled = true;
 
-        method: "POST",
+    try {
 
-        body: formData
+        const response = await fetch(`/cart/remove/${itemId}/`, {
 
-    });
+            method: "POST",
 
-    const data = await response.json();
+            body: formData,
 
-    if (data.status === "success") {
+            credentials: 'same-origin'
 
-        loadCartDrawer();
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+
+            loadCartDrawer();
+
+        } else {
+
+            if (btn) btn.disabled = false;
+
+        }
+
+    } catch (err) {
+
+        console.error('Remove item failed:', err);
+        alert("Something went wrong removing this item. Please try again.");
+        if (btn) btn.disabled = false;
 
     }
 
