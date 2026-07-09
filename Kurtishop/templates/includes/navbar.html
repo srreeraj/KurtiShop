@@ -11,14 +11,24 @@
     --brand-hover: #9B0D17;
   }
 
+  html, body {
+    /* Safety net: nothing on the page — including the navbar — is allowed
+       to create a horizontal scrollbar. */
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   #main-navbar {
     transition: background 0.4s ease, box-shadow 0.4s ease;
+    max-width: 100vw;
+    overflow: hidden; /* clip any stray sub-pixel overflow from children */
   }
 
   /* Default State (Transparent + White) */
   .nav-logo {
     color: #ffffff;
     transition: color 0.4s ease;
+    white-space: nowrap;
   }
 
   .nav-link {
@@ -69,7 +79,8 @@
 
   #main-navbar.scrolled .nav-logo,
   #main-navbar.scrolled #hamburger-btn,
-  #main-navbar.scrolled #search-btn svg {
+  #main-navbar.scrolled #search-btn svg,
+  #main-navbar.scrolled #cart-btn {
     color: var(--brand);
     stroke: var(--brand);
   }
@@ -83,9 +94,13 @@
     color: var(--brand);
   }
 
-  /* Search Input */
+  /* Search Input
+     width is capped with min() so it can never demand more horizontal
+     space than the viewport can actually offer — this is what was
+     forcing the page to scroll sideways on narrow screens. */
   .search-input {
     width: 0;
+    min-width: 0;
     opacity: 0;
     border: none;
     outline: none;
@@ -95,10 +110,40 @@
     letter-spacing: 1px;
   }
   .search-input.open {
-    width: 160px;
+    width: min(160px, 30vw);
     opacity: 1;
     border-bottom: 1px solid #ccc;
     padding: 4px 0;
+  }
+
+  /* ===== Three-section layout (mobile/tablet only) =====
+     .nav-section-left / .nav-section-right share the remaining space
+     equally (flex: 1 1 0) and are allowed to shrink (min-width: 0),
+     so the center section (logo) stays perfectly centered and the
+     right section can never push content past the viewport edge —
+     it shrinks instead of overflowing.
+
+     At the lg breakpoint these wrappers become `display:contents`,
+     which removes them from the box model entirely. Their children
+     fall back to being direct children of the original flex row,
+     exactly reproducing the original (unchanged) desktop layout. */
+  .nav-section {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .nav-section-left,
+  .nav-section-right {
+    flex: 1 1 0;
+  }
+  .nav-section-left { justify-content: flex-start; }
+  .nav-section-right { justify-content: flex-end; }
+  .nav-section-center { justify-content: center; }
+
+  @media (min-width: 1024px) {
+    .nav-section {
+      display: contents;
+    }
   }
 
   /* Mobile */
@@ -123,23 +168,27 @@
 <!-- ===================== NAVBAR ===================== -->
 <nav id="main-navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent" style="height: 88px;">
 
-  <div class="max-w-screen-2xl mx-auto h-full flex items-center justify-between px-5 md:px-8 lg:px-16">
+  <div class="max-w-screen-2xl mx-auto h-full w-full flex items-center justify-between px-4 sm:px-5 md:px-8 lg:px-16">
 
-    <!-- Left: Hamburger -->
-    <button id="hamburger-btn" class="lg:hidden flex flex-col justify-center items-center gap-[5px] p-2"
-            aria-label="Open menu">
-      <span class="bar"></span>
-      <span class="bar"></span>
-      <span class="bar"></span>
-    </button>
+    <!-- LEFT SECTION: hamburger -->
+    <div class="nav-section nav-section-left">
+      <button id="hamburger-btn" class="lg:hidden flex flex-col justify-center items-center gap-[5px] p-2 -ml-2"
+              aria-label="Open menu">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+    </div>
 
-    <!-- Center: Logo -->
-    <a href="{% url 'home' %}" class="nav-logo flex-shrink-0 mx-auto lg:mx-0"
-       style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
-      liara
-    </a>
+    <!-- CENTER SECTION: logo -->
+    <div class="nav-section nav-section-center">
+      <a href="{% url 'home' %}" class="nav-logo flex-shrink-0"
+         style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
+        liara
+      </a>
+    </div>
 
-    <!-- Desktop Navigation -->
+    <!-- Desktop Navigation (unchanged: hidden below lg, flex at lg+) -->
     <ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
       <li><a href="{% url 'home' %}" class="nav-link active">Home</a></li>
       <li><a href="#" class="nav-link">New Arrivals</a></li>
@@ -151,40 +200,44 @@
       <li><a href="#" class="nav-link">Contact</a></li>
     </ul>
 
-    <!-- Right Side: Search + Cart -->
-    <div class="flex items-center gap-4">
-    
-    <!-- Search (existing) -->
-    <div class="flex items-center" id="search-wrap">
-        <input type="text" id="search-input" class="search-input" placeholder="Search...">
-        <button id="search-btn" class="p-2" aria-label="Search">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="m21 21-4.35-4.35"/>
-            </svg>
-        </button>
-    </div>
+    <!-- RIGHT SECTION: search + cart -->
+    <div class="nav-section nav-section-right">
+      <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
 
-    <!-- Cart Icon -->
-    <a href="#" id="cart-btn" class="relative p-2 text-white hover:text-red-600 transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Search -->
+        <div class="flex items-center min-w-0" id="search-wrap">
+          <input type="text" id="search-input" class="search-input" placeholder="Search...">
+          <button id="search-btn" class="p-2 flex-shrink-0" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Cart Icon -->
+        <a href="#" id="cart-btn" class="relative p-2 -mr-2 flex-shrink-0 text-white hover:text-red-600 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="8" cy="21" r="1"/>
             <circle cx="19" cy="21" r="1"/>
             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57L22 6H6"/>
-        </svg>
-        <span id="cart-count" 
-              class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+          </svg>
+          <span id="cart-count"
+                class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
             0
-        </span>
-    </a>
-  </div>
+          </span>
+        </a>
+
+      </div>
+    </div>
+
   </div>
 </nav>
 
 <!-- ============== MOBILE DRAWER ============== -->
 <div id="drawer-overlay" class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity z-40 lg:hidden"></div>
 
-<div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[300px] bg-white translate-x-full transition-transform duration-300 z-50 lg:hidden"
+<div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] bg-white translate-x-full transition-transform duration-300 z-50 lg:hidden"
      style="padding: 80px 30px 40px;">
 
   <span style="position: absolute; top: 28px; left: 30px; font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; color: var(--brand);">
@@ -208,8 +261,8 @@
 <!-- ==================== CART DRAWER ==================== -->
 <div id="cart-overlay" class="fixed inset-0 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300 z-[60] hidden"></div>
 
-<div id="cart-drawer" class="fixed top-0 right-0 h-full w-full md:w-[460px] bg-white shadow-2xl translate-x-full transition-transform duration-300 z-[70] flex flex-col overflow-hidden">
-    
+<div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-full md:w-[460px] bg-white shadow-2xl translate-x-full transition-transform duration-300 z-[70] flex flex-col overflow-hidden">
+
     <div id="cart-drawer-content" class="flex-1 flex flex-col overflow-hidden">
         <!-- Cart content will be loaded here dynamically -->
     </div>
