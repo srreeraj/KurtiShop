@@ -1,5 +1,6 @@
 from django.http import HttpRequest
 from .models import Cart
+from django.models import Sum
 
 def get_or_create_cart(request: HttpRequest):
     """Get or create a cart for the current session."""
@@ -13,4 +14,6 @@ def get_or_create_cart(request: HttpRequest):
 def get_cart_item_count(request: HttpRequest):
     """For showing the count in navbar"""
     cart = get_or_create_cart(request)
-    return cart.items.count()
+    return cart.items.aggregate(
+        total=Sum("quantity")
+    )["total"] or 0
