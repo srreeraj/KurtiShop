@@ -68,8 +68,9 @@ def remove_from_cart(request, item_id):
     cart = get_or_create_cart(request)
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
     cart_item.delete()
-    messages.success(request,'It removed from cart')
-    return redirect('cart:cart_drawer')
+    return JsonResponse({
+        "status" : "success"
+    })
 
 @require_POST
 def update_cart_quantity(request, item_id):
