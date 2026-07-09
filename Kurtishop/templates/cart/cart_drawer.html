@@ -7,7 +7,7 @@
             Your Cart
         </h2>
 
-        <button onclick="closeCartDrawer()" class="text-3xl text-gray-400 hover:text-gray-700">
+        <button type="button" onclick="closeCartDrawer()" class="text-3xl text-gray-400 hover:text-gray-700">
             &times;
         </button>
     </div>
@@ -47,6 +47,7 @@
                         </div>
 
                         <button
+                            type="button"
                             class="remove-from-drawer text-red-600 hover:text-red-700 text-sm"
                             data-item-id="{{ item.id }}">
                             Remove
@@ -59,6 +60,7 @@
                         <div class="flex items-center border rounded-lg">
 
                             <button
+                                type="button"
                                 data-action="update-qty"
                                 data-item-id="{{ item.id }}"
                                 data-change="-1"
@@ -73,6 +75,7 @@
                             </span>
 
                             <button
+                                type="button"
                                 data-action="update-qty"
                                 data-item-id="{{ item.id }}"
                                 data-change="1"
