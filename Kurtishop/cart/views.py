@@ -76,32 +76,28 @@ def remove_from_cart(request, item_id):
 def update_cart_quantity(request, item_id):
     cart = get_or_create_cart(request)
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
-    
+
     try:
         change = int(request.POST.get('quantity', 0))
-        new_quantity = cart_item.quantity + change
     except (ValueError, TypeError):
         return JsonResponse({
             "status": "error",
-            "message" : "Invalid quantity",
+            "message": "Invalid quantity",
         }, status=400)
 
     new_quantity = cart_item.quantity + change
 
     if new_quantity < 1:
         cart_item.delete()
-        return JsonResponse({
-            "status": "success"
-        })
+        return JsonResponse({"status": "success"})
+
     if new_quantity > cart_item.variant.stock:
         return JsonResponse({
             "status": "error",
             "message": f"Only {cart_item.variant.stock} item(s) available."
         }, status=400)
-    
+
     cart_item.quantity = new_quantity
     cart_item.save()
 
-    return JsonResponse({
-        "status": "success"
-    })
+    return JsonResponse({"status": "success"})
