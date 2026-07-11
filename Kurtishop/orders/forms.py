@@ -11,5 +11,5 @@ class OrderForm(forms.ModelForm):
             'notes'
         ]
         widgets = {
-            'notes' : forms.TextArea(attrs={'rows' : 3}),
+            'notes' : forms.Textarea(attrs={'rows' : 3}),
         }
