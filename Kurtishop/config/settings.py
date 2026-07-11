@@ -143,5 +143,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-RAZORPAY_KEY_ID = 'rzp_test_TC58JqqZDk3UJL'
-RAZORPAY_KEY_SECRET = ''
+RAZORPAY_KEY_ID = 'rzp_test_TC7bm6TCiM1xch'
+RAZORPAY_KEY_SECRET = 'xhnpzS98UMpQ0zS03YwNgVYp'
