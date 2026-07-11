@@ -1,28 +1,4 @@
 {% load static %}
-{#
-  Reusable Order Summary component.
-  Include with: {% include "includes/order_summary.html" %}
-
-  Expected context variables (pass these in from the view, e.g. checkout / payment_page / order_success / order_detail):
-    items          -> queryset/list of cart items or order items, each needs:
-                        item.variant.product.name
-                        item.variant.color.name
-                        item.variant.size.name
-                        item.variant.product.images.first.image.url
-                        item.quantity
-                        item.unit_price  (optional, falls back to per-unit calc)
-                        item.total_price
-    subtotal       -> Decimal
-    discount       -> Decimal (default 0)
-    shipping       -> Decimal (default 0)
-    tax            -> Decimal (default 0)
-    grand_total    -> Decimal
-    show_button    -> bool, whether to render the "Proceed to Secure Payment" button
-                        (True on checkout page, False on payment/success/detail pages)
-    button_text    -> optional override, defaults to "Proceed to Secure Payment"
-    button_url     -> optional url for the button (checkout page submits the form instead)
-#}
-
 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
 
     <!-- Header -->
