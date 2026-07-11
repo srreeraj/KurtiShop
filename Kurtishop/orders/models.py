@@ -77,13 +77,13 @@ class Order(models.Model):
         default=0,
     )
 
-    shipping_charge = model.DecimalField(
+    shipping_charge = models.DecimalField(
         max_digit=12,
         decimal_places=2,
         default=0
     )
 
-    tax = model.DecimalField(
+    tax = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
