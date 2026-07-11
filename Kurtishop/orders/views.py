@@ -52,7 +52,7 @@ def checkout(request):
 
 def payment_success(request):
     razorpay_payment_id = request.GET.get('razorpay_payment_id')
-    razorpay_order_id = request.GET.get('razorypay_order_id')
+    razorpay_order_id = request.GET.get('razorpay_order_id')
 
     order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id)
     order.payment_status = Order.PaymentStatus.PAID
