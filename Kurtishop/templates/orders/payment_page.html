@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2>Complete Your Payment</h2>
+    <p>Order ID: <strong>{{ order.order_number }}</strong></p>
+    <p>Amount: <strong>₹{{ order.grand_total }}</strong></p>
+
+    <form id="payment-form">
+        <button id="pay-btn" class="btn btn-primary btn-lg">
+            Pay ₹{{ order.grand_total }} with Razorpay
+        </button>
+    </form>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "order_id": "{{ razorpay_order_id }}",
+        "name": "Your Store Name",
+        "description": "Purchase from Your Store",
+        "handler": function (response){
+            window.location.href = `/payment-success/?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}`;
+        },
+        "prefill": {
+            "name": "{{ order.full_name }}",
+            "email": "{{ order.email }}",
+            "contact": "{{ order.phone }}"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp = new Razorpay(options);
+    document.getElementById('pay-btn').onclick = function(e){
+        e.preventDefault();
+        rzp.open();
+    };
+</script>
+
+{% endblock %}
