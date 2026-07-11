@@ -44,3 +44,28 @@ def checkout(request):
     context = {'form' : form , 'cart' : cart}
     return render(request, 'orders/checkout.html', context)
 
+def payment_success(request):
+    razorpay_payment_id = request.GET.get('razorpay_payment_id')
+    razorpay_order_id = request.GET.get('razorypay_order_id')
+
+    order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id)
+    order.payment_status = Order.PaymentStatus.PAID
+    order.razorpay_payment_id = razorpay_payment_id
+    order.order_status = Order.OrderStatus.CONFIRMED
+    order.save()
+
+    return redirect('orders:order_success', 'order_number'=order.order_number)
+
+def payment_failed(request):
+    return render(request, 'orders/payment_failed.html')
+
+
+def order_success(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+    return render(request, 'orders/order_success.html', {'order': order})
+
+
+def order_detail(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+    return render(request, 'orders/order_detail.html', {'order': order})
+
