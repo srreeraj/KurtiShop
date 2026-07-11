@@ -16,30 +16,36 @@ def checkout(request):
     if not cart.items.exists():
         return redirect('cart:cart')
 
-    form = OrderForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        order_data = form.cleaned_data
-        order_data.update({
-            "subtotal" : sum(item.total_price for item in cart.items.all()),
-            "grand_total" : sum(item.total_price for item in cart.items.all()),
-        })
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order_data = form.cleaned_data
+            subtotal = sum(item.total_price for item in cart.items.all())
 
-        order = create_order_from_cart(cart, order_data)
+            order = create_order_from_cart(cart, {
+                **order_data,
+                'subtotal' : subtotal,
+                'grand_total' : subtotal,
+            })
+            # Create Razorpay Order
+            razorpay_order = create_razorpay_order(
+                amount_in_paisa=int(order.grand_total * 100)
+            )
+            order.razorpay_order_id = razorpay_order['id']
+            order.save()
 
-        # Create Razorpay Order
-        razorypay_order = create_razorpay_order(int(order.grand_total * 100))
-        order.razorpay_order_id = razorpay_order['id']
-        order.save()
+            context = {
+                'order' : order,
+                'razorpay_key' : 'settings.RAZORPAY_KEY_ID',
+                'razorpay_order_id' : razorpay_order['id'],
+                'amount' : int(order.grand_total * 100) 
+            }
 
-        context = {
-            'order' : order,
-            'razorpay_key' : 'settings.RAZORPAY_KEY_ID',
-            'razorpay_order_id' : razorpay_order['id'],
-            'amount' : int(order.grand_total * 100) 
-        }
+            return render(request, 'orders/payment_page.html', context)
 
-        return render(request, 'orders/payment_page.html', context)
+    else:
+        form = OrderForm()
 
     context = {'form' : form , 'cart' : cart}
     return render(request, 'orders/checkout.html', context)
