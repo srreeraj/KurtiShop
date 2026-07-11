@@ -1,8 +1,7 @@
 from django.db import models
-from django.utils.timezone import now
 from products.models import ProductVariant
-from decimal import Decimal
 import uuid
+from django.core.validators import MinValueValidator
 # Create your models here.
 class Order(models.Model):
 
@@ -96,6 +95,11 @@ class Order(models.Model):
 
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    razorpay_signature = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
 
     notes = models.TextField(
         blank=True
@@ -110,7 +114,7 @@ class Order(models.Model):
         indexes = [
             models.Index(fields=["guest_session_key"]),
             models.Index(fields=["order_number"]),
-            models.Index(fields=["payments_status"]),
+            models.Index(fields=["payment_status"]),
             models.Index(fields=["order_status"]),
         ]
 
@@ -119,9 +123,12 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
-            self.order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+            while True:
+                number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+                if not Order.objects.filter(order_number=number).exists():
+                    self.order_number = number
+                    break
         super().save(*args, **kwargs)
-
 
 class OrderItem(models.Model):
 
@@ -131,14 +138,15 @@ class OrderItem(models.Model):
         related_name="items"
     )
 
-    varaint = models.ForeignKey(
+    variant = models.ForeignKey(
         ProductVariant,
         on_delete = models.PROTECT,
         related_name="order_items"
     )
 
-    quantity = models.PositiveIntegerField()
-
+    quantity = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)]
+    )
     unit_price = models.DecimalField(
         max_digits = 12,
         decimal_places=2
@@ -151,6 +159,12 @@ class OrderItem(models.Model):
         decimal_places=2
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order"]
+
     def __str__(self):
         return f"{self.order.order_number} - {self.variant}"
 
@@ -162,8 +176,17 @@ class OrderStatusHistory(models.Model):
         related_name="status_history"
     )
 
-    status = models.CharField(max_length=50)
+    status = models.CharField(
+        max_length=20,
+        choices=Order.OrderStatus.choices
+    )
 
     note = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.order.order_number} - {self.status}"
