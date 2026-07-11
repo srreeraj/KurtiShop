@@ -60,7 +60,7 @@ def payment_success(request):
     order.order_status = Order.OrderStatus.CONFIRMED
     order.save()
 
-    return redirect('orders:order_success', 'order_number'=order.order_number)
+    return redirect('orders:order_success', order_number=order.order_number)
 
 def payment_failed(request):
     return render(request, 'orders/payment_failed.html')
