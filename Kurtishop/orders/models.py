@@ -78,7 +78,7 @@ class Order(models.Model):
     )
 
     shipping_charge = models.DecimalField(
-        max_digit=12,
+        max_digits=12,
         decimal_places=2,
         default=0
     )
