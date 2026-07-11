@@ -73,7 +73,7 @@ class Order(models.Model):
 
     discount = models.DecimalField(
         max_digits=12,
-        decimal_palces=2,
+        decimal_places=2,
         default=0,
     )
 
