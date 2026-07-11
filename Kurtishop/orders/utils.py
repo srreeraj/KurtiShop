@@ -11,4 +11,9 @@ def create_razorpay_order(amount_in_paise):
         "currency": "INR",
         "payment_capture": "1"
     }
-    return client.order.create(data)
+    try:
+        return client.order.create(data)
+    except Exception as e:
+        # Log error in production
+        print(f"Razorpay Order Creation Error: {e}")
+        raise
