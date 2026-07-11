@@ -11,6 +11,6 @@ def create_razorpay_order(amount_in_paise: int):
     data = {
         "amount": amount_in_paise,
         "currency": "INR",
-        "payment_capture": "1"
+        "payment_capture": 1,
     }
     return client.order.create(data)
