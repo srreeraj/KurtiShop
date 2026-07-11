@@ -95,11 +95,6 @@ class Order(models.Model):
 
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
-    razorpay_signature = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True
-    )
 
     notes = models.TextField(
         blank=True
@@ -138,11 +133,20 @@ class OrderItem(models.Model):
         related_name="items"
     )
 
+    # Reference to current variant (for stock, etc.)
     variant = models.ForeignKey(
         ProductVariant,
-        on_delete = models.PROTECT,
+        on_delete=models.SET_NULL,   # Changed to SET_NULL (important!)
+        null=True,
+        blank=True,
         related_name="order_items"
     )
+
+    # Snapshot fields - What customer actually bought
+    product_name = models.CharField(max_length=255)
+    variant_sku = models.CharField(max_length=100)
+    size = models.CharField(max_length=50)
+    color = models.CharField(max_length=100)
 
     quantity = models.PositiveIntegerField(
         validators=[MinValueValidator(1)]
@@ -166,7 +170,7 @@ class OrderItem(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.order.order_number} - {self.variant}"
+        return f"{self.order.order_number} - {self.product_name} ({self.size}/{self.color})"
 
 class OrderStatusHistory(models.Model):
 
