@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from orders.models import Order
 from .models import Payment
-from .utils import create_razorpay_order
+from .utils import create_razorpay_order, get_razorpay_client
 
 
 def initiate_payment(request, order_number):
