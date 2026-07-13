@@ -6,6 +6,7 @@ from .models import Order
 from .forms import OrderForm
 from .services import create_order_from_cart
 from payments.utils import create_razorpay_order
+from django.conf import settings
 
 # Create your views here.
 
@@ -50,24 +51,38 @@ def checkout(request):
                 'grand_total': grand_total,
                 'payment_method': 'online',
             })
+            razorpay_order = create_razorpay_order(int(order.grand_total * 100))
 
-            return redirect('payments:initiate_payment',order_number=order.order_number)
+            payment, created = Payment.objects.get_or_create(
+                order=order,
+                defaults={
+                    "razorpay_order_id": razorpay_order["id"],
+                    "amount": order.grand_total,
+                }
+            )
+            if not created:
+                payment.razorpay_order_id = razorpay_order["id"]
+                payment.amount = order.grand_total
+                payment.status = "pending"
+                payment.save()
 
+            order.razorpay_order_id = razorpay_order['id']
+            order.save()
+
+            context.update({
+                'form': form,
+                'order': order,
+                'razorpay_key': settings.RAZORPAY_KEY_ID,
+                'razorpay_order_id': razorpay_order['id'],
+                'amount': int(order.grand_total * 100),
+                'trigger_payment': True,   # tells the template to auto-open Razorpay
+            })
+            return render(request, 'orders/checkout.html', context)
     else:
         form = OrderForm()
 
-    context = {
-        'form': form,
-        'cart': cart,
-        'items': items,
-        'subtotal': subtotal,
-        'discount': discount,
-        'shipping': shipping,
-        'tax': tax,
-        'grand_total': grand_total,
-        'show_button': True,
-        'button_text': 'Proceed to Secure Payment',
-    }
+    context['form'] = form
+    return render(request, 'orders/checkout.html', context)
 
     return render(request, 'orders/checkout.html', context)
 
