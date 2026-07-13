@@ -14,11 +14,19 @@ def initiate_payment(request, order_number):
 
     razorpay_order = create_razorpay_order(int(order.grand_total * 100))
 
-    Payment.objects.create(
-        order=order,
-        razorpay_order_id=razorpay_order['id'],
-        amount=order.grand_total
+    payment, created = Payment.objects.get_or_create(
+        order= order,
+        defaults={
+            "razorpay_order_id": razorpay_order["id"],
+            "amount": order.grand_total,
+        }
     )
+
+    if not created:
+        payment.razorpay_order_id = razorpay_order["id"]
+        payment.amount = order.grand_total
+        payment.status = "pending"
+        payment.save()
 
     order.razorpay_order_id = razorpay_order['id']
     order.save()
