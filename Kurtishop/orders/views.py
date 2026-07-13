@@ -50,7 +50,7 @@ def checkout(request):
                 'payment_method': 'online',
             })
 
-            return render(request, 'orders/payment_page.html',order_number=order.order_number)
+            return redirect('payments:initiate_payment',order_number=order.order_number)
 
     else:
         form = OrderForm()
