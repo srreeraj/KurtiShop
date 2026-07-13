@@ -17,7 +17,21 @@ def checkout(request):
     cart = get_object_or_404(Cart, session_key=session_key)
 
     if not cart.items.exists():
-        return redirect('cart:cart')
+        return redirect('cart:cart_drawer')
+
+    # Calculate values for order summary
+    items = cart.items.select_related(
+        'variant__product',
+        'variant__color',
+        'variant__size'
+    ).all()
+
+    sub_total = sum(item.total_price for item in items)
+
+    discount = 0
+    shipping = 0
+    tax = 0
+    grand_total = subtotal + shipping + tax - discount
 
 
     if request.method == "POST":
@@ -28,9 +42,12 @@ def checkout(request):
 
             order = create_order_from_cart(cart, {
                 **order_data,
-                'subtotal' : subtotal,
-                'grand_total' : subtotal,
-                'payment_method' : 'online',
+                'subtotal': subtotal,
+                'discount': discount,
+                'shipping_charge': shipping,
+                'tax': tax,
+                'grand_total': grand_total,
+                'payment_method': 'online',
             })
 
             return render(request, 'orders/payment_page.html',order_number=order.order_number)
@@ -38,7 +55,19 @@ def checkout(request):
     else:
         form = OrderForm()
 
-    context = {'form' : form , 'cart' : cart}
+    context = {
+        'form': form,
+        'cart': cart,
+        'items': items,
+        'subtotal': subtotal,
+        'discount': discount,
+        'shipping': shipping,
+        'tax': tax,
+        'grand_total': grand_total,
+        'show_button': True,
+        'button_text': 'Proceed to Secure Payment',
+    }
+    
     return render(request, 'orders/checkout.html', context)
 
 
