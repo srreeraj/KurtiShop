@@ -196,11 +196,10 @@
                 <!-- Order Summary (Sticky) -->
                 <div class="lg:col-span-2">
                     <div class="lg:sticky lg:top-24">
-                        {% include "includes/order_summary.html" with items=cart.items.all subtotal=cart_subtotal discount=0 shipping=0 tax=0 grand_total=cart_subtotal show_button=False %}
+                        {% include 'includes/order_summary.html' with items=items subtotal=subtotal discount=discount shipping=shipping tax=tax grand_total=grand_total %}
                     </div>
-                </div>
 
-            </div>
+                </div>
         </form>
     </div>
 </div>

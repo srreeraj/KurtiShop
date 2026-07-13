@@ -26,7 +26,7 @@ def checkout(request):
         'variant__size'
     ).all()
 
-    sub_total = sum(item.total_price for item in items)
+    subtotal = sum(item.total_price for item in items)
 
     discount = 0
     shipping = 0
@@ -67,7 +67,7 @@ def checkout(request):
         'show_button': True,
         'button_text': 'Proceed to Secure Payment',
     }
-    
+
     return render(request, 'orders/checkout.html', context)
 
 
