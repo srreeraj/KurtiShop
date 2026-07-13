@@ -40,7 +40,6 @@ def add_to_cart(request, variant_id):
             'message' : f'Only {variant.stock} items available in stock'
         }, status=400)
 
-    price_to_use = variant.discounted_price if hasattr(variant, 'discounted_price') else variant.price
     # Add or update items
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,

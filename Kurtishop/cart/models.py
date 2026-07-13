@@ -29,8 +29,6 @@ class CartItem(models.Model):
 
     quantity = models.PositiveIntegerField(default=1)
 
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -46,10 +44,29 @@ class CartItem(models.Model):
         ]
 
     @property
-    def total_price(self):
-        price = self.unit_price or self.variant.discounted_price or self.variant.price
-        return price * self.quantity
+    def unit_price(self):
+        return self.variant.discounted_price
 
+    @property
+    def total_price(self):
+        return self.unit_price * self.quantity
+
+    @property
+    def image_url(self):
+        """Return the best image for this variant's color"""
+        image = self.variant.product.images.filter(
+            color=self.variant.color,
+            is_primary=True
+        ).first()
+
+        if not image:
+            image = self.variant.product.images.filter(
+                color=self.variant.color
+            ).order_by('display_order').first()
+
+        return image.image.url if image else None
+
+        
     def __str__(self):
         return (
             f"{self.variant.product.name} - "
