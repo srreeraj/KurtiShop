@@ -23,12 +23,17 @@
 
             <div class="flex gap-4 py-6 border-b last:border-b-0">
 
+                <!-- Inside the loop -->
                 <div class="w-20 h-20 rounded-xl overflow-hidden border flex-shrink-0">
-                    {% if item.variant.product.images.first %}
-                    <img
-                        src="{{ item.variant.product.images.first.image.url }}"
-                        class="w-full h-full object-cover"
-                    >
+                    {% if item.image_url %}
+                        <img src="{{ item.image_url }}" 
+                            class="w-full h-full object-cover"
+                            alt="{{ item.variant.product.name }}">
+                    {% else %}
+                        <!-- Optional fallback -->
+                        <div class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                            No Image
+                        </div>
                     {% endif %}
                 </div>
 
