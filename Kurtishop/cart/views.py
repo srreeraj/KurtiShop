@@ -30,7 +30,7 @@ def add_to_cart(request, variant_id):
 
     quantity = int(request.POST.get('quantity', 1))
 
-    if quantity < 1 or quantity > variant.stock :
+    if quantity < 1:
         return JsonResponse({'status' : 'error' , 'message' : 'Invalid quantity'}, status=404)
 
     # Stock check
