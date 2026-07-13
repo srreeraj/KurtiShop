@@ -61,6 +61,16 @@ def razorpay_webhook(request):
                     order.razorpay_payment_id = payment_entity['id']
                     order.order_status = Order.OrderStatus.CONFIRMED
                     order.save()
+
+                    # Update payment
+                    payment = Payment.objects.filter(order=order).first()
+
+                if payment:
+                    payment.razorpay_payment_id = payment_entity["id"]
+                    payment.razorpay_signature = signature
+                    payment.status = 'success'
+                    payment.success
+                    
             return JsonResponse({'status': 'success'})
         except Exception:
             return JsonResponse({'status': 'error'}, status=400)
