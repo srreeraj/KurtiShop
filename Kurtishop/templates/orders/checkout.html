@@ -206,90 +206,33 @@
 
 {% endblock %}
 
-<!-- {% block extra_js %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% block extra_js %}
+
 <script>
-let currentStep = 1;
+window.checkoutConfig = {
+    triggerPayment: {{ trigger_payment|yesno:"true,false" }},
 
-function updateProgress(step) {
-    document.querySelectorAll('.step').forEach(el => {
-        if (parseInt(el.dataset.step) <= step) {
-            el.classList.add('text-red-600');
-            el.classList.remove('text-gray-400');
-        } else {
-            el.classList.remove('text-red-600');
-            el.classList.add('text-gray-400');
-        }
-    });
-}
+    razorpayKey: "{{ razorpay_key|default:'' }}",
 
-function showStep(step) {
-    document.querySelectorAll('.step-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    document.getElementById(`step-${step}`).classList.remove('hidden');
-    currentStep = step;
-    updateProgress(step);
-}
+    amount: "{{ amount|default:'' }}",
 
-function nextStep(step) {
-    // Optional: Add client-side validation here
-    showStep(step);
-}
+    razorpayOrderId: "{{ razorpay_order_id|default:'' }}",
 
-function prevStep(step) {
-    showStep(step);
-}
+    orderNumber: "{{ order.order_number|default:'' }}",
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    showStep(1);
-});
+    verifyUrl: "{% url 'payments:verify_payment' %}",
 
-document.addEventListener('DOMContentLoaded', () => {
-    showStep({% if trigger_payment %}3{% else %}1{% endif %});
+    csrfToken: "{{ csrf_token }}",
 
-    {% if trigger_payment %}
-        var options = {
-            "key": "{{ razorpay_key }}",
-            "amount": "{{ amount }}",
-            "currency": "INR",
-            "order_id": "{{ razorpay_order_id }}",
-            "name": "Kurti Shop",
-            "description": "Order #{{ order.order_number }}",
-            "handler": function (response) {
-                fetch("{% url 'payments:verify_payment' %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    },
-                    body: JSON.stringify({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature,
-                        order_number: "{{ order.order_number }}"
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        alert("Payment verification failed. Please contact support.");
-                    }
-                })
-                .catch(() => alert("Something went wrong verifying your payment."));
-            },
-            "prefill": {
-                "name": "{{ order.full_name }}",
-                "email": "{{ order.email }}",
-                "contact": "{{ order.phone }}"
-            },
-            "theme": { "color": "#C1121F" }
-        };
-        var rzp = new Razorpay(options);
-        rzp.open();
-    {% endif %}
+    customer: {
+        name: "{{ order.full_name|default:'' }}",
+        email: "{{ order.email|default:'' }}",
+        phone: "{{ order.phone|default:'' }}"
+    }
+};
 </script>
-{% endblock %} -->
+
+
+<script src="{% static 'js/checkout.js' %}"></script>
+
+{% endblock %}

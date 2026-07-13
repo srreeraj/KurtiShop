@@ -51,7 +51,11 @@ function prevStep(step) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const config = window.checkoutConfig;
+   const config = window.checkoutConfig;
+
+    if (!config) {
+        return;
+    }
 
     showStep(config.triggerPayment ? 3 : 1);
 
