@@ -35,6 +35,17 @@ def checkout(request):
     tax = 0
     grand_total = subtotal + shipping + tax - discount
 
+    context = {
+        'cart': cart,
+        'items': items,
+        'subtotal': subtotal,
+        'discount': discount,
+        'shipping': shipping,
+        'tax': tax,
+        'grand_total': grand_total,
+        'show_button': True,
+        'button_text': 'Proceed to Secure Payment',
+    }
 
     if request.method == "POST":
         form = OrderForm(request.POST)
