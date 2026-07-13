@@ -13,7 +13,11 @@ from .utils import get_or_create_cart, get_cart_item_count
 def cart_drawer(request):
     cart = get_or_create_cart(request)
     items = cart.items.select_related(
-        'variant__product', 'variant__color', 'variant__size'
+        'variant__product',
+        'variant__color', 
+        'variant__size'
+    ).prefetch_related(
+        'variant__product__images'
     ).all()
     
     subtotal = sum(item.total_price for item in items)
