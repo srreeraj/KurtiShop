@@ -5,239 +5,245 @@
 
 {% block content %}
 
-<div class="bg-white">
+<div class="bg-white min-h-screen">
 
     <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12">
 
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-sm text-gray-500 mb-8">
-            <a href="{% url 'home' %}" class="hover:text-red-600 transition-colors duration-200">Home</a>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            <a href="{% url 'home' %}" class="hover:text-red-600 transition-colors">Home</a>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             <span class="text-gray-900 font-medium">Checkout</span>
         </nav>
 
-        <!-- Page Header -->
-        <div class="mb-10">
-            <h1 class="text-4xl lg:text-5xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                Secure Checkout
-            </h1>
-            <p class="mt-2 text-gray-500">
-                Complete your purchase securely in just a few steps.
-            </p>
-        </div>
+        <h1 class="text-4xl lg:text-5xl font-semibold text-gray-900 mb-2" style="font-family: 'Cormorant Garamond', serif;">
+            Secure Checkout
+        </h1>
+        <p class="text-gray-500 mb-10">Complete your purchase in just a few steps.</p>
 
-        {% if form.non_field_errors %}
-        <div class="mb-8 p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
-            {{ form.non_field_errors }}
+        <!-- Progress Bar -->
+        <div class="max-w-2xl mb-12">
+            <div id="progress-bar" class="flex items-center justify-between text-sm">
+                <div class="step flex items-center gap-2 text-red-600 font-medium" data-step="1">
+                    <div class="w-7 h-7 rounded-full border-2 border-red-600 flex items-center justify-center text-xs font-bold">1</div>
+                    <span>Contact</span>
+                </div>
+                <div class="flex-1 h-px bg-gray-200 mx-4"></div>
+                <div class="step flex items-center gap-2 text-gray-400" data-step="2">
+                    <div class="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold">2</div>
+                    <span>Shipping</span>
+                </div>
+                <div class="flex-1 h-px bg-gray-200 mx-4"></div>
+                <div class="step flex items-center gap-2 text-gray-400" data-step="3">
+                    <div class="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center text-xs font-bold">3</div>
+                    <span>Review & Pay</span>
+                </div>
+            </div>
         </div>
-        {% endif %}
 
         <form id="checkout-form" method="post" action="{% url 'orders:checkout' %}" novalidate>
             {% csrf_token %}
 
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
 
-                <!-- Left Column: Form -->
-                <div class="lg:col-span-3 space-y-8">
+                <!-- Form Steps -->
+                <div class="lg:col-span-3">
 
-                    <!-- Contact Information -->
-                    <section class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-                                <i data-lucide="user" class="w-4 h-4 text-red-600"></i>
-                            </div>
-                            <h2 class="text-xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                                Contact Information
-                            </h2>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                            <div class="sm:col-span-2">
-                                <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Full Name <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.full_name }}
-                                {% if form.full_name.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.full_name.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Email Address <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.email.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Phone Number <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.phone }}
-                                {% if form.phone.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.phone.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                    <!-- Shipping Address -->
-                    <section class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-                                <i data-lucide="map-pin" class="w-4 h-4 text-red-600"></i>
-                            </div>
-                            <h2 class="text-xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                                Shipping Address
-                            </h2>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                            <div class="sm:col-span-2">
-                                <label for="{{ form.address_line_1.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Address Line 1 <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.address_line_1 }}
-                                {% if form.address_line_1.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.address_line_1.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div class="sm:col-span-2">
-                                <label for="{{ form.address_line_2.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Address Line 2
-                                </label>
-                                {{ form.address_line_2 }}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    City <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.city }}
-                                {% if form.city.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.city.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.state.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    State <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.state }}
-                                {% if form.state.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.state.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Postal Code <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.postal_code }}
-                                {% if form.postal_code.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.postal_code.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                            <div>
-                                <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Country <span class="text-red-600">*</span>
-                                </label>
-                                {{ form.country }}
-                                {% if form.country.errors %}
-                                <p class="mt-1.5 text-xs text-red-600">{{ form.country.errors|first }}</p>
-                                {% endif %}
-                            </div>
-
-                        </div>
-
-                    </section>
-
-                    <!-- Additional Notes -->
-                    <section class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-                                <i data-lucide="message-square" class="w-4 h-4 text-red-600"></i>
-                            </div>
-                            <h2 class="text-xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                                Additional Notes
-                            </h2>
-                        </div>
-
-                        <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Delivery Instructions
-                        </label>
-                        {{ form.notes }}
-
-                    </section>
-
-                    <!-- Payment Method -->
-                    <section class="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-                                <i data-lucide="credit-card" class="w-4 h-4 text-red-600"></i>
-                            </div>
-                            <h2 class="text-xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                                Payment Method
-                            </h2>
-                        </div>
-
-                        <label class="flex items-start gap-4 p-5 rounded-xl border-2 border-red-600 bg-red-50/40 cursor-pointer transition-all duration-200">
-
-                            <input type="radio" name="payment_method" value="online" checked
-                                   class="mt-1 w-4 h-4 text-red-600 focus:ring-red-600 border-gray-300">
-
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-medium text-gray-900">Online Payment</span>
-                                    <span class="text-[11px] font-semibold uppercase tracking-wide text-red-600 bg-white px-2 py-0.5 rounded-full border border-red-200">
-                                        Recommended
-                                    </span>
+                    <!-- ==================== STEP 1: Contact ==================== -->
+                    <div id="step-1" class="step-content">
+                        <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+                            <div class="flex items-center gap-3 mb-8">
+                                <div class="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                                    <i data-lucide="user" class="w-5 h-5 text-red-600"></i>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-1">
-                                    Secure payment powered by Razorpay — cards, UPI &amp; netbanking accepted.
+                                <h2 class="text-2xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
+                                    Contact Information
+                                </h2>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-red-600">*</span></label>
+                                    {{ form.full_name }}
+                                    {% if form.full_name.errors %}<p class="mt-1 text-xs text-red-600">{{ form.full_name.errors|first }}</p>{% endif %}
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Address <span class="text-red-600">*</span></label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}<p class="mt-1 text-xs text-red-600">{{ form.email.errors|first }}</p>{% endif %}
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone Number <span class="text-red-600">*</span></label>
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}<p class="mt-1 text-xs text-red-600">{{ form.phone.errors|first }}</p>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="nextStep(2)" 
+                                    class="mt-10 w-full bg-red-600 hover:bg-red-700 text-white font-medium py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2">
+                                Continue to Shipping
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ==================== STEP 2: Shipping ==================== -->
+                    <div id="step-2" class="step-content hidden">
+                        <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+                            <div class="flex items-center gap-3 mb-8">
+                                <div class="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-red-600"></i>
+                                </div>
+                                <h2 class="text-2xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
+                                    Shipping Address
+                                </h2>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div class="sm:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Address Line 1 <span class="text-red-600">*</span></label>
+                                    {{ form.address_line_1 }}
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Address Line 2 (Optional)</label>
+                                    {{ form.address_line_2 }}
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">City <span class="text-red-600">*</span></label>
+                                    {{ form.city }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">State <span class="text-red-600">*</span></label>
+                                    {{ form.state }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Postal Code <span class="text-red-600">*</span></label>
+                                    {{ form.postal_code }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Country <span class="text-red-600">*</span></label>
+                                    {{ form.country }}
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 mt-10">
+                                <button type="button" onclick="prevStep(1)" 
+                                        class="flex-1 border border-gray-300 hover:bg-gray-50 py-4 rounded-2xl font-medium transition-all">
+                                    Back
+                                </button>
+                                <button type="button" onclick="nextStep(3)" 
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-medium transition-all">
+                                    Continue to Review
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ==================== STEP 3: Review & Pay ==================== -->
+                    <div id="step-3" class="step-content hidden">
+                        <div class="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
+                            <div class="flex items-center gap-3 mb-8">
+                                <div class="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                                    <i data-lucide="credit-card" class="w-5 h-5 text-red-600"></i>
+                                </div>
+                                <h2 class="text-2xl font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
+                                    Review & Payment
+                                </h2>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="mb-8">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Instructions (Optional)</label>
+                                {{ form.notes }}
+                            </div>
+
+                            <!-- Payment Info -->
+                            <div class="p-6 bg-red-50/50 border border-red-100 rounded-2xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="font-medium">Online Payment</div>
+                                    <span class="text-xs font-semibold bg-white px-3 py-1 rounded-full border border-red-200 text-red-600">Razorpay Secure</span>
+                                </div>
+                                <p class="text-sm text-gray-600">
+                                    Cards, UPI, Netbanking & Wallets accepted. Your payment is protected with 256-bit SSL encryption.
                                 </p>
                             </div>
 
-                            <i data-lucide="shield-check" class="w-5 h-5 text-red-600 mt-1"></i>
+                            <div class="flex gap-4 mt-10">
+                                <button type="button" onclick="prevStep(2)" 
+                                        class="flex-1 border border-gray-300 hover:bg-gray-50 py-4 rounded-2xl font-medium transition-all">
+                                    Back
+                                </button>
+                                <button type="submit" 
+                                        class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-semibold text-lg transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="lock" class="w-5 h-5"></i>
+                                    Pay Securely Now
+                                </button>
+                            </div>
 
-                        </label>
-
-                    </section>
+                            <p class="text-center text-xs text-gray-400 mt-6 flex items-center justify-center gap-1.5">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                Secured by Razorpay • 256-bit SSL
+                            </p>
+                        </div>
+                    </div>
 
                 </div>
 
-                <!-- Right Column: Order Summary -->
+                <!-- Order Summary (Sticky) -->
                 <div class="lg:col-span-2">
                     <div class="lg:sticky lg:top-24">
-                        {% include "includes/order_summary.html" with items=cart.items.all subtotal=cart_subtotal discount=0 shipping=0 tax=0 grand_total=cart_subtotal show_button=True %}
-
-                        <p class="flex items-center justify-center gap-1.5 text-xs text-gray-400 mt-5">
-                            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                            Your information is encrypted and secure.
-                        </p>
+                        {% include "includes/order_summary.html" with items=cart.items.all subtotal=cart_subtotal discount=0 shipping=0 tax=0 grand_total=cart_subtotal show_button=False %}
                     </div>
                 </div>
 
             </div>
-
         </form>
-
     </div>
-
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+
+function updateProgress(step) {
+    document.querySelectorAll('.step').forEach(el => {
+        if (parseInt(el.dataset.step) <= step) {
+            el.classList.add('text-red-600');
+            el.classList.remove('text-gray-400');
+        } else {
+            el.classList.remove('text-red-600');
+            el.classList.add('text-gray-400');
+        }
+    });
+}
+
+function showStep(step) {
+    document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById(`step-${step}`).classList.remove('hidden');
+    currentStep = step;
+    updateProgress(step);
+}
+
+function nextStep(step) {
+    // Optional: Add client-side validation here
+    showStep(step);
+}
+
+function prevStep(step) {
+    showStep(step);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    showStep(1);
+});
+</script>
 {% endblock %}
