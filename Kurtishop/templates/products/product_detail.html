@@ -59,9 +59,9 @@
                 <!-- Price -->
                 <div id="price-container" class="mt-6 flex items-center gap-4">
                     {% with variant=product.variants.first %}
-                    <span class="text-4xl font-bold text-red-600">₹{{ variant.discounted_price|floatformat:0 }}</span>
+                    <span class="text-4xl font-bold text-red-600">₹{{ variant.discounted_price }}</span>
                     {% if variant.discount_percentage > 0 %}
-                    <span class="text-xl line-through text-gray-400">₹{{ variant.price|floatformat:0 }}</span>
+                    <span class="text-xl line-through text-gray-400">₹{{ variant.price }}</span>
                     {% endif %}
                     {% endwith %}
                 </div>
