@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 import os
 
 from categories.models import Category
@@ -283,8 +283,16 @@ class ProductVariant(models.Model):
 
     @property
     def discounted_price(self):
-        return self.price - (
-            self.price * Decimal(self.discount_percentage) / Decimal('100')
+        if self.discounted_percentage == 0:
+            return self.price.quantize(Decimal("1"))
+
+        discounted = self.price * (
+            Decimal("100") - Decimal(self.discounted_percentage)
+        ) / 100
+
+        return discounted.quantize(
+            Decimal("1"),
+            rounded=ROUND_DOWN
         )
 
     def save(self, *args, **kwargs):
