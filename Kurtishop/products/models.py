@@ -283,16 +283,21 @@ class ProductVariant(models.Model):
 
     @property
     def discounted_price(self):
-        if self.discounted_percentage == 0:
-            return self.price.quantize(Decimal("1"))
+        if self.discount_percentage == 0:
+            return self.price.quantize(
+                Decimal("1"),
+                rounding=ROUND_DOWN
+            )
 
-        discounted = self.price * (
-            Decimal("100") - Decimal(self.discounted_percentage)
-        ) / 100
+        discounted = (
+            self.price *
+            (Decimal("100") - Decimal(self.discount_percentage))
+            / Decimal("100")
+        )
 
         return discounted.quantize(
             Decimal("1"),
-            rounded=ROUND_DOWN
+            rounding=ROUND_DOWN
         )
 
     def save(self, *args, **kwargs):
