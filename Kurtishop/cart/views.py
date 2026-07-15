@@ -72,7 +72,7 @@ def add_to_cart(request, variant_id):
     return JsonResponse({
         'status' : 'success',
         'message' : f'{quantity} x {variant.product.name} added to cart',
-        'cart_count' : cart.items.count()
+        'cart_count' : get_cart_item_count(request)
     })
 
 @require_POST
@@ -81,7 +81,8 @@ def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
     cart_item.delete()
     return JsonResponse({
-        "status" : "success"
+        "status" : "success",
+        "cart_count" : get_cart_item_count(request)
     })
 
 @require_POST
@@ -112,4 +113,7 @@ def update_cart_quantity(request, item_id):
     cart_item.quantity = new_quantity
     cart_item.save()
 
-    return JsonResponse({"status": "success"})
+    return JsonResponse({
+        "status": "success",
+        "cart_count" : get_cart_item_count(request)
+    })
