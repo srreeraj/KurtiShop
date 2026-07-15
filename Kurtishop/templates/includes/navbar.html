@@ -194,16 +194,19 @@
     </div>
 
     <!-- Desktop Navigation (unchanged: hidden below lg, flex at lg+) -->
-    <ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
-      <li><a href="{% url 'home' %}" class="nav-link active">Home</a></li>
-      <li><a href="#" class="nav-link">New Arrivals</a></li>
-      <li><a href="#" class="nav-link">Wedding</a></li>
-      <li><a href="#" class="nav-link">Office Wear</a></li>
-      <li><a href="#" class="nav-link">Ethnic</a></li>
-      <li><a href="#" class="nav-link">Western</a></li>
-      <li><a href="#" class="nav-link sale">Sale</a></li>
-      <li><a href="#" class="nav-link">Contact</a></li>
-    </ul>
+    <!-- Desktop Navigation -->
+<ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
+    <li><a href="{% url 'home' %}" class="nav-link {% if request.path == home_url %}active{% endif %}">Home</a></li>
+    
+    <li><a href="{% url 'product_list' %}?category=new-arrivals" class="nav-link">New Arrivals</a></li>
+    <li><a href="{% url 'product_list' %}?category=wedding" class="nav-link">Wedding</a></li>
+    <li><a href="{% url 'product_list' %}?category=office-wear" class="nav-link">Office Wear</a></li>
+    <li><a href="{% url 'product_list' %}?category=ethnic" class="nav-link">Ethnic</a></li>
+    <li><a href="{% url 'product_list' %}?category=western" class="nav-link">Western</a></li>
+    
+    <li><a href="#" class="nav-link sale">Sale</a></li>
+    <li><a href="#" class="nav-link">Contact</a></li>
+</ul>
 
     <!-- RIGHT SECTION: search + cart -->
     <div class="nav-section nav-section-right">
