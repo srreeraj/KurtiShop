@@ -1,59 +1,52 @@
+# core/context_processors.py
 
 def breadcrumbs(request):
-    path = request.path.strip('/').split('/')
-    breadcrumbs = [{'name': 'Home', 'url': '/'}]
+    """Automatically generates breadcrumbs for all pages"""
+    breadcrumbs_list = [{'name': 'Home', 'url': '/'}]
     
-    current_path = ''
-    title = "Kurti Shop"  # Default fallback
-
-    for segment in path:
-        if not segment:
-            continue
-            
-        current_path += f'/{segment}'
+    path = request.path.strip('/').split('/')
+    
+    # Shop / Product Listing
+    if any(x in request.path for x in ['shop', 'products', 'product_list']):
+        breadcrumbs_list.append({'name': 'Shop', 'url': '/shop/'})
         
-        # ============== CUSTOM LOGIC FOR YOUR PAGES ==============
-        if segment == 'shop' or segment.startswith('products'):
-            name = 'Shop'
-            url = '/shop/' if segment == 'shop' else current_path
-            title = 'Our Collection'
-            
-        elif 'product' in request.path and len(path) > 1:
-            # For product detail pages
-            name = "Product"  # Will be overridden by view if needed
-            url = current_path
-            title = "Product Detail"
-            
-        elif segment == 'checkout':
-            name = 'Checkout'
-            url = current_path
-            title = 'Secure Checkout'
-            
-        elif segment == 'cart':
-            name = 'Cart'
-            url = current_path
-            title = 'Your Cart'
-            
-        elif segment == 'orders' or 'order' in request.path:
-            name = 'Orders'
-            url = current_path
-            title = 'Order'
-            
+        # If category filter is active
+        category_slug = request.GET.get('category')
+        if category_slug:
+            from products.models import Category
+            category = Category.objects.filter(slug=category_slug).first()
+            if category:
+                breadcrumbs_list.append({
+                    'name': category.name, 
+                    'url': f'/shop/?category={category_slug}'
+                })
+
+    # Product Detail Page
+    elif 'product' in request.path and len(path) > 1:
+        breadcrumbs_list.append({'name': 'Shop', 'url': '/shop/'})
+        
+        # We'll set the product name in the view itself (better UX)
+        product = getattr(request, 'current_product', None)
+        if product:
+            breadcrumbs_list.append({
+                'name': product.name,
+                'url': request.path
+            })
         else:
-            # Generic fallback (capitalize)
-            name = segment.replace('-', ' ').replace('_', ' ').title()
-            url = current_path
+            breadcrumbs_list.append({'name': 'Product', 'url': request.path})
 
-        breadcrumbs.append({'name': name, 'url': url})
+    # Checkout
+    elif 'checkout' in request.path:
+        breadcrumbs_list.append({'name': 'Cart', 'url': '/cart/'})
+        breadcrumbs_list.append({'name': 'Checkout', 'url': request.path})
 
-    # Override last item with better name from context if available
-    if hasattr(request, 'resolver_match') and request.resolver_match:
-        view_name = request.resolver_match.view_name
-        if view_name == 'product_detail':
-            # We'll improve this in views
-            pass
+    # Fallback for other pages
+    else:
+        for segment in path:
+            if segment and segment not in ['products', 'orders']:
+                name = segment.replace('-', ' ').replace('_', ' ').title()
+                breadcrumbs_list.append({'name': name, 'url': f'/{segment}/'})
 
     return {
-        'breadcrumbs': breadcrumbs[:-1] if len(breadcrumbs) > 1 else breadcrumbs,  # Remove duplicate last if needed
-        'current_page_title': title
+        'breadcrumbs': breadcrumbs_list,
     }
