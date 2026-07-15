@@ -29,6 +29,21 @@ class CartItem(models.Model):
 
     quantity = models.PositiveIntegerField(default=1)
 
+    # === NEW FIELDS FOR PRICE TRANSPARENCY ===
+    original_unit_price = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0
+    )
+    unit_price = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0
+    )
+    discount_percentage = models.PositiveIntegerField(default=0)
+    savings = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0
+    )
+
+    # Optional: Snapshot name
+    product_name = models.CharField(max_length=255, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -43,9 +58,6 @@ class CartItem(models.Model):
             )
         ]
 
-    @property
-    def unit_price(self):
-        return self.variant.discounted_price
 
     @property
     def total_price(self):
