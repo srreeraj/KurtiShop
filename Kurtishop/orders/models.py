@@ -70,10 +70,18 @@ class Order(models.Model):
         decimal_places=2
     )
 
+    # Current field (can be used for coupon discount later)
     discount = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0,
+        help_text="Coupon or flat discount"
+    )
+
+    # NEW: Recommended field
+    total_discount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
+        help_text="Total discount from all product variants (MRP - Selling Price)"
     )
 
     shipping_charge = models.DecimalField(
