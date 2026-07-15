@@ -32,9 +32,7 @@
 
     {% if request.path != home_url %}
         <div style="margin-top: 88px;">
-            {% if breadcrumbs %}
-                {% include 'includes/breadcrumb.html' %}
-            {% endif %}
+            {% include 'includes/breadcrumb.html' %}
         </div>
     {% endif %}
 
