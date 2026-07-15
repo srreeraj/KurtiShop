@@ -97,6 +97,9 @@ def checkout(request):
                 # Extra context for success/failure pages if needed
                 'total_discount': total_discount,
                 'subtotal_original': subtotal_original,
+                'breadcrumbs': [
+                    {'name': 'Checkout'},
+                ],
             })
             return render(request, 'orders/checkout.html', context)
     else:
