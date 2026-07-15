@@ -9,8 +9,8 @@
         <div class="flex gap-4">
             <!-- Image -->
             <div class="w-16 h-16 rounded-xl overflow-hidden border border-gray-200 flex-shrink-0 relative">
-                {% if item.variant.product.images.first %}
-                    <img src="{{ item.variant.product.images.first.image.url }}" 
+                {% if item.image_url %}
+                    <img src="{{ item.image_url }}" 
                          alt="{{ item.product_name }}" class="w-full h-full object-cover">
                 {% endif %}
                 <span class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
