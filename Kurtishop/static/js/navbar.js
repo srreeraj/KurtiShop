@@ -68,26 +68,41 @@ function updateCartCount(count) {
     const cartCountEl = document.getElementById('cart-count');
     if (!cartCountEl) return;
 
-    cartCountEl.textContent = count || 0;
+    const newCount = parseInt(count) || 0;
+    cartCountEl.textContent = newCount;
 
-    // Nice pop animation
-    cartCountEl.classList.add('scale-125');
-    setTimeout(() => {
-        cartCountEl.classList.remove('scale-125');
-    }, 300);
+    // Optional: only animate if count actually changed
+    if (newCount > 0) {
+        cartCountEl.classList.add('scale-125');
+        setTimeout(() => {
+            cartCountEl.classList.remove('scale-125');
+        }, 300);
+    }
+}
+
+async function fetchCartCount() {
+    try {
+        const response = await fetch('/cart/count/');  // Adjust if you use app_name
+        if (response.ok) {
+            const data = await response.json();
+            updateCartCount(data.cart_count);
+        }
+    } catch (error) {
+        console.warn('Could not fetch cart count:', error);
+    }
 }
 
 function initCartCount() {
-    // Listen for cart updates from product pages, etc.
+    // Fetch initial count when page loads
+    fetchCartCount();
+
+    // Listen for updates from add-to-cart, etc.
     document.addEventListener('cartUpdated', (e) => {
         if (e.detail && e.detail.cart_count !== undefined) {
             updateCartCount(e.detail.cart_count);
         }
     });
-
-    // Optional: Fetch initial count on page load
-    // You can improve this later with a dedicated lightweight endpoint
 }
 
-// Make updateCartCount available globally so other scripts can call it
+// Make it globally available
 window.updateCartCount = updateCartCount;
