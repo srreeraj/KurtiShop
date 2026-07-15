@@ -25,7 +25,18 @@
 <body class="font-[Poppins] bg-gray-50 min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    {% include 'includes/navbar.html' %}
+    {% url 'home' as home_url %}
+        {% block navbar %}
+            {% include 'includes/navbar.html' %}
+        {% endblock %}
+
+    {% if request.path != home_url %}
+        <div style="margin-top: 88px;">
+            {% if breadcrumbs %}
+                {% include 'includes/breadcrumb.html' %}
+            {% endif %}
+        </div>
+    {% endif %}
 
     <!-- Messages -->
     {% if messages %}
