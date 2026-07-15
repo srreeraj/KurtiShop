@@ -117,3 +117,8 @@ def update_cart_quantity(request, item_id):
         "status": "success",
         "cart_count" : get_cart_item_count(request)
     })
+
+def get_cart_count(request):
+    """Lightweight endpoint to return current cart item count"""
+    count = get_cart_item_count(request)
+    return JsonResponse({'cart_count' : count})
