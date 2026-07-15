@@ -166,7 +166,12 @@
 </style>
 
 <!-- ===================== NAVBAR ===================== -->
-<nav id="main-navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent" style="height: 88px;">
+<!-- ===================== NAVBAR ===================== -->
+{% url 'home' as home_url %}
+<nav id="main-navbar"
+     class="fixed top-0 left-0 right-0 z-50 {% if request.path == home_url %}bg-transparent{% else %}scrolled{% endif %}"
+     {% if request.path != home_url %}data-force-solid="true"{% endif %}
+     style="height: 88px;">
 
   <div class="max-w-screen-2xl mx-auto h-full w-full flex items-center justify-between px-4 sm:px-5 md:px-8 lg:px-16">
 
