@@ -29,18 +29,23 @@ def checkout(request):
         'variant__size'
     ).all()
 
-    subtotal = sum(item.total_price for item in items)
+    subtotal = sum(item.total_price for item in items)                    # Discounted subtotal
+    subtotal_original = sum(
+        item.variant.price * item.quantity for item in items
+    )
+    total_discount = subtotal_original - subtotal
 
-    discount = 0
     shipping = 0
     tax = 0
-    grand_total = subtotal + shipping + tax - discount
+    grand_total = subtotal + shipping + tax - 0  # discount already subtracted above
 
     context = {
         'cart': cart,
         'items': items,
         'subtotal': subtotal,
-        'discount': discount,
+        'subtotal_original' : subtotal_original,
+        'total_discount' : total_discount,
+        'discount': total_discount,
         'shipping': shipping,
         'tax': tax,
         'grand_total': grand_total,
@@ -57,7 +62,8 @@ def checkout(request):
             order = create_order_from_cart(cart, {
                 **order_data,
                 'subtotal': subtotal,
-                'discount': discount,
+                'total_discount': total_discount,
+                'discount': total_discount,
                 'shipping_charge': shipping,
                 'tax': tax,
                 'grand_total': grand_total,
@@ -88,6 +94,9 @@ def checkout(request):
                 'razorpay_order_id': razorpay_order['id'],
                 'amount': int(order.grand_total * 100),
                 'trigger_payment': True,   # tells the template to auto-open Razorpay
+                # Extra context for success/failure pages if needed
+                'total_discount': total_discount,
+                'subtotal_original': subtotal_original,
             })
             return render(request, 'orders/checkout.html', context)
     else:
