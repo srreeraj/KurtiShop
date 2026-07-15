@@ -16,6 +16,7 @@ function initNavbar() {
 
     // Scroll Effect
     function handleScroll() {
+        if (navbar.dataset.forceSolid === 'true') return;
         if (window.scrollY > 60) {
             navbar.classList.add('scrolled');
         } else {
