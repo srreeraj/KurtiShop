@@ -256,11 +256,11 @@
 
   <nav class="flex flex-col">
     <a href="{% url 'home' %}" class="mobile-nav-link">Home</a>
-    <a href="#" class="mobile-nav-link">New Arrivals</a>
-    <a href="#" class="mobile-nav-link">Wedding Collection</a>
-    <a href="#" class="mobile-nav-link">Office Wear</a>
-    <a href="#" class="mobile-nav-link">Ethnic Wear</a>
-    <a href="#" class="mobile-nav-link">Western Wear</a>
+    <a href="{% url 'product_list' %}?category=new-arrivals" class="mobile-nav-link">New Arrivals</a>
+    <a href="{% url 'product_list' %}?category=wedding" class="mobile-nav-link">Wedding Collection</a>
+    <a href="{% url 'product_list' %}?category=office-wear" class="mobile-nav-link">Office Wear</a>
+    <a href="{% url 'product_list' %}?category=ethnic" class="mobile-nav-link">Ethnic Wear</a>
+    <a href="{% url 'product_list' %}?category=western" class="mobile-nav-link">Western Wear</a>
     <a href="#" class="mobile-nav-link">Sale</a>
     <a href="#" class="mobile-nav-link">Contact</a>
   </nav>
