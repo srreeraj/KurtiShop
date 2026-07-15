@@ -48,7 +48,14 @@ def add_to_cart(request, variant_id):
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,
         variant=variant,
-        defaults={'quantity' : quantity}
+        defaults={
+            'quantity': quantity,
+            'original_unit_price': variant.price,
+            'unit_price': variant.discounted_price,
+            'discount_percentage': variant.discount_percentage,
+            'savings': (variant.price - variant.discounted_price) * quantity,
+            'product_name': variant.product.name,
+        }
     )
 
     if not created:
@@ -59,6 +66,7 @@ def add_to_cart(request, variant_id):
                 'message' : 'Not enough stock',
             }, status=404)
         cart_item.quantity = new_qty
+        cart_item.savings = (variant.price - variant.discounted_price) * new_qty
         cart_item.save()
 
     return JsonResponse({
