@@ -322,3 +322,38 @@
   })();
 
 </script>
+
+<script>
+// Global function to update cart count
+function updateCartCount(count) {
+    const cartCountEl = document.getElementById('cart-count');
+    if (cartCountEl) {
+        cartCountEl.textContent = count;
+        
+        // Optional: Add a subtle animation
+        cartCountEl.classList.add('scale-125');
+        setTimeout(() => {
+            cartCountEl.classList.remove('scale-125');
+        }, 300);
+    }
+}
+
+// Update count on page load
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('{% url "cart:cart_drawer" %}')  // or create a lightweight count-only endpoint
+        .then(res => res.text())
+        .then(html => {
+            // Optional: You can also update drawer if open, but for now just count
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const countFromServer = tempDiv.querySelectorAll('.cart-item').length || 0; 
+            // Better: Create a dedicated count endpoint later if needed
+        })
+        .catch(() => {});
+    
+    // Listen for custom event (used by add-to-cart buttons)
+    document.addEventListener('cartUpdated', (e) => {
+        updateCartCount(e.detail.cart_count);
+    });
+});
+</script>
