@@ -148,20 +148,25 @@ class OrderItem(models.Model):
     size = models.CharField(max_length=50)
     color = models.CharField(max_length=100)
 
-    quantity = models.PositiveIntegerField(
-        validators=[MinValueValidator(1)]
-    )
+    # New : Critical for tansperency
+    original_unit_price = models.DecimalField(max_digits=12, decimal_places=2) #MRP
     unit_price = models.DecimalField(
         max_digits = 12,
         decimal_places=2
     )
-
     discount_percentage = models.PositiveIntegerField(default=0)
+
+    quantity = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)]
+    )
 
     total_price = models.DecimalField(
         max_digits=12,
         decimal_places=2
     )
+
+    #Per items savings
+    savings = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
