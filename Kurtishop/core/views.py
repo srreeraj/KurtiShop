@@ -56,8 +56,8 @@ def search(request):
         variants = variants.filter(product__category__slug=category_slug)
 
     # Remove duplicate products (show one variant per product)
-    seen = {}
-    unique_products = []
+    products = []
+    seen = set()
     for v in variants:
         if v.product_id not in seen:
             seen.add(v.product_id)
