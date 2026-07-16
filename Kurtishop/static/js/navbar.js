@@ -43,19 +43,17 @@ function initNavbar() {
     closeBtn.addEventListener('click', closeDrawer);
     overlay.addEventListener('click', closeDrawer);
 
-    // Search Toggle
-    searchBtn.addEventListener('click', () => {
-        searchInput.classList.toggle('open');
-        if (searchInput.classList.contains('open')) {
-            searchInput.focus();
-        }
-    });
+    // ===================== SEARCH - NOW OPENS FULL PAGE =====================
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            window.location.href = "{% url 'search' %}";
+        });
+    }
 
     // Keyboard Support
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeDrawer();
-            searchInput.classList.remove('open');
         }
     });
 
