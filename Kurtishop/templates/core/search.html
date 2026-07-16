@@ -53,7 +53,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {% for variant in products %}
-                    {% include 'includes/product_card.html' with product=variant.product image=variant.primary_image %}
+                    {% include 'includes/product_card.html' with product=product %}
                 {% empty %}
                     <div class="col-span-full py-20 text-center">
                         <p class="text-6xl mb-4">🔍</p>
