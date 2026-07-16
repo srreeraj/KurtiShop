@@ -3,16 +3,16 @@
 
     <!-- Image Container -->
     <div class="relative overflow-hidden aspect-[3/4] bg-gray-100">
-        <a href="{% url 'product_detail' product.slug|default:product.id %}?color={{ product.color.id|default:'' }}" 
+        <a href="{% url 'product_detail' product.product.slug %}?color={{ product.color.id }}" 
            class="block h-full w-full">
 
             {% if product.primary_image %}
                 <img src="{{ product.primary_image.image.url }}"
-                     alt="{{ product.name }} - {{ product.color.name|default:'' }}"
+                     alt="{{ product.product.name }} - {{ product.color.name }}"
                      class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
-            {% elif product.images.first %}
-                <img src="{{ product.images.first.image.url }}"
-                     alt="{{ product.name }}"
+            {% elif product.product.images.first %}
+                <img src="{{ product.product.images.first.image.url }}"
+                     alt="{{ product.product.name }}"
                      class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
             {% else %}
                 <div class="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -23,18 +23,18 @@
 
         <!-- Top Left: Material + Badges -->
         <div class="absolute top-4 left-4 flex flex-col items-start gap-2 pointer-events-none">
-            {% if product.material %}
+            {% if product.product.material %}
             <span class="text-[10px] font-medium text-white uppercase tracking-widest px-2.5 py-1 bg-black/60 rounded" 
                   style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
-                {{ product.material.name }}
+                {{ product.product.material.name }}
             </span>
             {% endif %}
 
-            {% if product.is_new_arrival %}
+            {% if product.product.is_new_arrival %}
             <span class="text-white text-[11px] font-semibold px-3 py-1.5 bg-red-600 rounded">
                 NEW IN
             </span>
-            {% elif product.is_featured %}
+            {% elif product.product.is_featured %}
             <span class="text-white text-[11px] font-semibold px-3 py-1.5 bg-black rounded">
                 BEST SELLER
             </span>
@@ -42,16 +42,14 @@
         </div>
 
         <!-- Color Name (Top Right) -->
-        {% if product.color %}
         <div class="absolute top-4 right-4 bg-white/90 text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm">
             {{ product.color.name }}
         </div>
-        {% endif %}
 
         <!-- Hover: Quick Add to Cart -->
         <div class="absolute bottom-0 left-0 right-0 pb-4 px-4 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-            <button onclick="addToCart(event, {{ product.id }})" 
-                    class="w-full h-11 bg-white border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold tracking-widest rounded-full transition-all">
+            <button onclick="addToCart(event, {{ product.id }})"
+                class="w-full h-11 bg-white border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white text-xs font-semibold tracking-widest rounded-full transition-all">
                 ADD TO CART
             </button>
         </div>
@@ -59,19 +57,22 @@
 
     <!-- Product Info -->
     <div class="pt-4 flex-1 flex flex-col px-1">
-        <a href="{% url 'product_detail' product.slug|default:product.id %}" class="flex-1">
+        <a href="{% url 'product_detail' product.product.slug %}?color={{ product.color.id }}" 
+            class="flex-1">
             <h3 class="text-[16px] font-medium leading-snug text-gray-900 line-clamp-2 hover:text-red-600 transition-colors">
-                {{ product.name }}
+                {{ product.product.name }}
             </h3>
         </a>
 
-        <!-- Price Section -->
+        <!-- Price Section - Updated -->
         <div class="mt-3">
             <div class="flex items-baseline gap-2">
+                <!-- Main Discounted Price -->
                 <span class="text-[18px] font-bold text-gray-900">
-                    ₹{{ product.display_price|floatformat:0|default:product.price|floatformat:0 }}
+                    ₹{{ product.display_price|floatformat:0 }}
                 </span>
             
+                <!-- Original Price (Strikethrough) - Show only if discounted -->
                 {% if product.discount_percentage and product.discount_percentage > 0 %}
                     <span class="text-sm line-through text-gray-400">
                         ₹{{ product.price|floatformat:0 }}
@@ -79,6 +80,7 @@
                 {% endif %}
             </div>
         
+            <!-- Optional: Discount Badge -->
             {% if product.discount_percentage and product.discount_percentage > 0 %}
             <span class="inline-block mt-1 text-red-600 text-xs font-semibold">
                 {{ product.discount_percentage }}% OFF

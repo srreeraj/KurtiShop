@@ -12,6 +12,7 @@ function initNavbar() {
     const overlay = document.getElementById('drawer-overlay');
     const closeBtn = document.getElementById('drawer-close-btn');
     const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('search-input');
 
     // Scroll Effect
     function handleScroll() {
@@ -42,23 +43,19 @@ function initNavbar() {
     closeBtn.addEventListener('click', closeDrawer);
     overlay.addEventListener('click', closeDrawer);
 
-    // ===================== SEARCH =====================
-
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const searchUrl = searchBtn.getAttribute('data-search-url');
-            if (searchUrl) {
-                window.location.href = searchUrl;
-            } else {
-                console.error('Search URL not found');
-            }
-        });
-    }
+    // Search Toggle
+    searchBtn.addEventListener('click', () => {
+        searchInput.classList.toggle('open');
+        if (searchInput.classList.contains('open')) {
+            searchInput.focus();
+        }
+    });
 
     // Keyboard Support
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeDrawer();
+            searchInput.classList.remove('open');
         }
     });
 
