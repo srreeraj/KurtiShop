@@ -1,7 +1,6 @@
 from django.db import transaction
 from .models import Order, OrderItem
 from cart.models import Cart
-from django.core.email import send_email
 from django.template.loader import render_to_string
 from django.conf import settings
 
