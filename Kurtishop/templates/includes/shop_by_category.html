@@ -1,0 +1,35 @@
+<section class="py-10 sm:py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-5">
+
+        <div class="flex items-center justify-between mb-6 sm:mb-10">
+            <div>
+                <h2 class="text-xl sm:text-3xl font-bold text-gray-900">Shop By Category</h2>
+                <p class="text-gray-500 text-xs sm:text-sm mt-1">Find the perfect style for every occasion</p>
+            </div>
+            <a href="{% url 'product_list' %}" class="text-red-600 text-xs sm:text-sm font-semibold hover:underline whitespace-nowrap">View All →</a>
+        </div>
+
+        <div class="flex gap-4 overflow-x-auto sm:overflow-visible sm:flex-wrap sm:justify-start sm:gap-6 pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            {% for category in categories %}
+            <a href="#" class="group text-center flex-shrink-0 w-20 sm:w-24 md:w-28 snap-start">
+                <div class="relative mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-gray-100 group-hover:border-red-500 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-red-600 transition-colors">{{ category.name }}</p>
+            </a>
+            {% empty %}
+                {% for icon, name in "👗:Ethnic Wear,👔:Western Wear,💼:Office Wear,🎉:Party Wear,🧥:Casual Wear"|slice:":0" %}{% endfor %}
+                <!-- static fallback while categories are empty -->
+                {% for pair in "👗|Ethnic Wear,👔|Western Wear,💼|Office Wear,🎉|Party Wear,🧥|Casual Wear".split %}{% endfor %}
+            {% endfor %}
+
+            <a href="{% url 'product_list' %}" class="group text-center flex-shrink-0 w-20 sm:w-24 md:w-28 snap-start">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-red-600 flex items-center justify-center shadow-lg group-hover:bg-red-700 transition-colors">
+                    <span class="text-white text-lg sm:text-2xl font-extrabold tracking-tight">SALE</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-red-600">Sale</p>
+            </a>
+        </div>
+    </div>
+</section>
