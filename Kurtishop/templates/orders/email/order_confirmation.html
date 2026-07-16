@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; }
+        .header { background: #C1121F; color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .total { font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Order Confirmed!</h1>
+        <p style="margin: 10px 0 0;">#{{ order.order_number }}</p>
+    </div>
+    <div class="content">
+        <p>Dear <strong>{{ order.full_name }}</strong>,</p>
+        <p>Thank you for shopping with us! Your order has been successfully placed and confirmed.</p>
+
+        <h3>Order Summary</h3>
+        <table>
+            <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.product_name }} ({{ item.color }} / {{ item.size }})</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <p class="total">Total Paid: <strong>₹{{ order.grand_total }}</strong></p>
+
+        <p><strong>Shipping Address:</strong><br>
+        {{ order.full_name }}<br>
+        {{ order.address_line_1 }}, {{ order.address_line_2|default:"" }}<br>
+        {{ order.city }}, {{ order.state }} - {{ order.postal_code }}
+        </p>
+
+        <p>You can track your order status anytime from your account.</p>
+        <p>Thank you for choosing us!</p>
+    </div>
+</div>
+</body>
+</html>
