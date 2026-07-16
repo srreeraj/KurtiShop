@@ -131,7 +131,7 @@ def product_list(request):
         'patterns' : patterns,
 
         # For active filter highlighting
-        'acitve_category' : Category.objects.filter(slug=category_slug).first() if category_slug else None,
+        'active_category' : Category.objects.filter(slug=category_slug).first() if category_slug else None,
     }
 
     return render(
