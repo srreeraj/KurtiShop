@@ -33,7 +33,7 @@ def home(request):
     }
     return render(request, 'core/home.html', context)
 
-    def search(request):
+def search(request):
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('category')
 
