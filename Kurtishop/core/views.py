@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from products.models import Product
+from products.models import Product, ProductVariant
 from categories.models import Category
 from django.db.models import Count, Q
 
