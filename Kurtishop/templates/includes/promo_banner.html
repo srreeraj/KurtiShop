@@ -1,0 +1,29 @@
+<section class="py-4 sm:py-6 bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-5">
+        <div class="grid sm:grid-cols-2 gap-3 sm:gap-4">
+
+            <div class="bg-red-600 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-5 text-white">
+                <svg class="w-9 h-9 sm:w-12 sm:h-12 text-white/80 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
+                </svg>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base sm:text-xl font-bold tracking-wide">FREE SHIPPING</h3>
+                    <p class="text-red-100 text-xs sm:text-sm mt-0.5">On all orders above ₹999</p>
+                    <a href="{% url 'product_list' %}" class="mt-2 sm:mt-3 inline-block bg-white text-red-600 text-[10px] sm:text-xs font-bold tracking-widest uppercase px-4 sm:px-5 py-1.5 sm:py-2 hover:bg-red-50 transition-colors">Shop Now</a>
+                </div>
+            </div>
+
+            <div class="border-2 border-red-600 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-5">
+                <svg class="w-9 h-9 sm:w-12 sm:h-12 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base sm:text-xl font-bold text-gray-900 tracking-wide">UP TO 50% OFF</h3>
+                    <p class="text-gray-500 text-xs sm:text-sm mt-0.5">On selected collections</p>
+                    <a href="{% url 'product_list' %}" class="mt-2 sm:mt-3 inline-block bg-red-600 text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase px-4 sm:px-5 py-1.5 sm:py-2 hover:bg-red-700 transition-colors">Explore Now</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
