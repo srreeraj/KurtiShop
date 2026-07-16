@@ -77,7 +77,7 @@ def search(request):
 
     context = {
         'query': query,
-        'products': unique_products[:48],   # limit results
+        'products': products[:48],   # limit results
         'categories': categories,
         'selected_category': category_slug,
     }
