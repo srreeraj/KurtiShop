@@ -146,3 +146,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RAZORPAY_KEY_ID = 'rzp_test_TC7bm6TCiM1xch'
 RAZORPAY_KEY_SECRET = 'xhnpzS98UMpQ0zS03YwNgVYp'
+
+DEFAULT_FROM_EMAIL = 'psreeraj711@gmail.com'
+ADMIN_EMAIL = 'psreeraj711@gmail.com'   # or list
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # configure properly
