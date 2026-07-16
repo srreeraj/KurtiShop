@@ -3,7 +3,7 @@
 
     <!-- Image Container -->
     <div class="relative overflow-hidden aspect-[3/4] bg-gray-100">
-        <a href="{% url 'product_detail' product.slug %}?color={{ product.color.id|default:'' }}" 
+        <a href="{% url 'product_detail' product.slug|default:product.id %}?color={{ product.color.id|default:'' }}" 
            class="block h-full w-full">
 
             {% if product.primary_image %}
@@ -59,7 +59,7 @@
 
     <!-- Product Info -->
     <div class="pt-4 flex-1 flex flex-col px-1">
-        <a href="{% url 'product_detail' product.slug %}" class="flex-1">
+        <a href="{% url 'product_detail' product.slug|default:product.id %}" class="flex-1">
             <h3 class="text-[16px] font-medium leading-snug text-gray-900 line-clamp-2 hover:text-red-600 transition-colors">
                 {{ product.name }}
             </h3>
