@@ -1,0 +1,29 @@
+<div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 group">
+    <a href="#" class="block relative overflow-hidden h-[150px] sm:h-[190px] lg:h-[220px]">
+        {% if product.images.first %}
+        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+        {% else %}
+        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+            <span class="text-gray-400 text-3xl sm:text-4xl">👗</span>
+        </div>
+        {% endif %}
+    </a>
+    <div class="p-2.5 sm:p-3">
+        <p class="text-xs sm:text-sm font-medium text-gray-800 truncate">{{ product.name }}</p>
+        <div class="flex items-center justify-between mt-1.5 sm:mt-2">
+            {% if product.variants.first %}
+            <span class="text-red-600 font-bold text-xs sm:text-sm">₹{{ product.variants.first.price }}</span>
+            {% else %}
+            <span class="text-gray-400 text-xs sm:text-sm">Price on request</span>
+            {% endif %}
+            <button type="button"
+                    class="add-to-cart-btn bg-gray-900 text-white w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded hover:bg-red-600 active:scale-90 transition-all"
+                    data-product-id="{{ product.id }}" aria-label="Add {{ product.name }} to cart">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
