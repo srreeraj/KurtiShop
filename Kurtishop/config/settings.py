@@ -155,3 +155,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'psreeraj711@gmail.com'          # Your Gmail
 EMAIL_HOST_PASSWORD = 'zfpu tmge zdto cpaz'     # ← VERY IMPORTANT
 DEFAULT_FROM_EMAIL = 'psreeraj711@gmail.com'
+
+# Admin
+ADMIN_EMAIL = 'psreeraj711@gmail.com'
+
+# Recommended
+SITE_URL = 'https://yourdomain.com'
