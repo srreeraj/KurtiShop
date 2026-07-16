@@ -1,0 +1,81 @@
+{% load static %}
+<section class="relative w-full overflow-hidden" id="hero-section">
+    <div id="hero-carousel-track" class="flex transition-transform duration-700 ease-in-out">
+
+        <!-- Slide 1: Wedding -->
+        <div class="relative w-full h-[380px] sm:h-[460px] lg:h-[580px] flex-shrink-0 overflow-hidden" style="background:#1a0a0a;">
+            <img src="{% static 'images/hero/hero1.png' %}" alt="Wedding Collection"
+                 class="absolute inset-0 w-full h-full object-cover opacity-60 scale-105">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            <div class="absolute inset-0 flex items-center px-6 sm:px-12 md:px-24">
+                <div class="text-white max-w-xs sm:max-w-md">
+                    <span class="text-[10px] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-red-400 block mb-2 sm:mb-3">Wedding Collection</span>
+                    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight mb-3 sm:mb-4">Timeless<br>Wedding<br>Elegance</h1>
+                    <p class="text-gray-300 text-sm sm:text-base mb-5 sm:mb-8">Make every moment unforgettable</p>
+                    <a href="{% url 'product_list' %}" class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold tracking-widest uppercase px-6 sm:px-8 py-2.5 sm:py-3 transition-colors">Shop Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Office -->
+        <div class="relative w-full h-[380px] sm:h-[460px] lg:h-[580px] flex-shrink-0 overflow-hidden" style="background:#0f1a0f;">
+            <img src="{% static 'images/hero/hero2.png' %}" alt="Office Wear"
+                 class="absolute inset-0 w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            <div class="absolute inset-0 flex items-center px-6 sm:px-12 md:px-24">
+                <div class="text-white max-w-xs sm:max-w-md">
+                    <span class="text-[10px] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-red-400 block mb-2 sm:mb-3">Office Wear</span>
+                    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight mb-3 sm:mb-4">Power Dressing<br>For Every<br>Workday</h1>
+                    <p class="text-gray-300 text-sm sm:text-base mb-5 sm:mb-8">Smart. Stylish. Unstoppable.</p>
+                    <a href="{% url 'product_list' %}" class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold tracking-widest uppercase px-6 sm:px-8 py-2.5 sm:py-3 transition-colors">Shop Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Casual -->
+        <div class="relative w-full h-[380px] sm:h-[460px] lg:h-[580px] flex-shrink-0 overflow-hidden" style="background:#1a1a0f;">
+            <img src="{% static 'images/hero/hero3.png' %}" alt="Casual Collection"
+                 class="absolute inset-0 w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            <div class="absolute inset-0 flex items-center px-6 sm:px-12 md:px-24">
+                <div class="text-white max-w-xs sm:max-w-md">
+                    <span class="text-[10px] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-red-400 block mb-2 sm:mb-3">Casual Collection</span>
+                    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight mb-3 sm:mb-4">Everyday<br>Comfort<br>Everyday You</h1>
+                    <p class="text-gray-300 text-sm sm:text-base mb-5 sm:mb-8">Trendy styles for every mood</p>
+                    <a href="{% url 'product_list' %}" class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold tracking-widest uppercase px-6 sm:px-8 py-2.5 sm:py-3 transition-colors">Shop Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Party -->
+        <div class="relative w-full h-[380px] sm:h-[460px] lg:h-[580px] flex-shrink-0 overflow-hidden" style="background:#1a0f0a;">
+            <img src="{% static 'images/hero/hero4.png' %}" alt="Party & Festive"
+                 class="absolute inset-0 w-full h-full object-cover opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            <div class="absolute inset-0 flex items-center px-6 sm:px-12 md:px-24">
+                <div class="text-white max-w-xs sm:max-w-md">
+                    <span class="text-[10px] sm:text-xs font-semibold tracking-[0.2em] sm:tracking-[0.25em] uppercase text-red-400 block mb-2 sm:mb-3">Party & Festive</span>
+                    <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold leading-tight mb-3 sm:mb-4">Shine Bright<br>Own Every<br>Occasion</h1>
+                    <p class="text-gray-300 text-sm sm:text-base mb-5 sm:mb-8">Stand out in style</p>
+                    <a href="{% url 'product_list' %}" class="inline-block bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold tracking-widest uppercase px-6 sm:px-8 py-2.5 sm:py-3 transition-colors">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="hero-prev" aria-label="Previous slide"
+            class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-10 h-10 lg:w-12 lg:h-12 items-center justify-center backdrop-blur-sm transition-all z-10">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button id="hero-next" aria-label="Next slide"
+            class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-10 h-10 lg:w-12 lg:h-12 items-center justify-center backdrop-blur-sm transition-all z-10">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10" id="hero-dots">
+        <button class="hero-dot w-6 sm:w-8 h-1.5 bg-red-600 transition-all duration-300" data-index="0"></button>
+        <button class="hero-dot w-2 h-1.5 bg-white/50 transition-all duration-300" data-index="1"></button>
+        <button class="hero-dot w-2 h-1.5 bg-white/50 transition-all duration-300" data-index="2"></button>
+        <button class="hero-dot w-2 h-1.5 bg-white/50 transition-all duration-300" data-index="3"></button>
+    </div>
+</section>
