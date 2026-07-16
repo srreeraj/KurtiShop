@@ -12,7 +12,6 @@ function initNavbar() {
     const overlay = document.getElementById('drawer-overlay');
     const closeBtn = document.getElementById('drawer-close-btn');
     const searchBtn = document.getElementById('search-btn');
-    const searchInput = document.getElementById('search-input');
 
     // Scroll Effect
     function handleScroll() {
@@ -44,7 +43,6 @@ function initNavbar() {
     overlay.addEventListener('click', closeDrawer);
 
     // ===================== SEARCH =====================
-    const searchBtn = document.getElementById('search-btn');
 
     if (searchBtn) {
         searchBtn.addEventListener('click', () => {
