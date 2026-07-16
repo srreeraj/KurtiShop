@@ -8,6 +8,7 @@ import json
 from orders.models import Order
 from .models import Payment
 from .utils import create_razorpay_order, get_razorpay_client
+from orders.utils import send_order_confirmation_email, send_admin_new_order_notification
 
 
 @require_POST
@@ -35,6 +36,9 @@ def verify_payment(request):
             payment.razorpay_signature = params['razorpay_signature']
             payment.status = 'success'
             payment.save()
+
+        send_order_confirmation_email(order)
+        send_admin_new_order_notification(order)
         
         return JsonResponse({
             'status': 'success',
@@ -47,36 +51,43 @@ def verify_payment(request):
 
 @csrf_exempt
 def razorpay_webhook(request):
-    if request.method == "POST":
+    if request.method != "POST":
+        return JsonResponse({'status': 'invalid'}, status=405)
+
+    try:
         payload = request.body
         signature = request.headers.get('X-Razorpay-Signature')
 
-        try:
-            client = get_razorpay_client()  # from utils
-            client.utility.verify_webhook_signature(
-                payload.decode(), signature, settings.RAZORPAY_WEBHOOK_SECRET
-            )
+        client = get_razorpay_client()
+        client.utility.verify_webhook_signature(
+            payload.decode('utf-8'), signature, settings.RAZORPAY_WEBHOOK_SECRET
+        )
 
-            data = json.loads(payload)
-            if data['event'] == 'payment.captured':
-                payment_entity = data['payload']['payment']['entity']
-                order = Order.objects.filter(razorpay_order_id=payment_entity['order_id']).first()
-                if order:
-                    order.payment_status = Order.PaymentStatus.PAID
-                    order.razorpay_payment_id = payment_entity['id']
-                    order.order_status = Order.OrderStatus.CONFIRMED
-                    order.save()
+        event = json.loads(payload)
 
-                    # Update payment
-                    payment = Payment.objects.filter(order=order).first()
+        if event['event'] == 'payment.captured':
+            payment_entity = event['payload']['payment']['entity']
+            order = Order.objects.filter(
+                razorpay_order_id=payment_entity['order_id']
+            ).first()
 
-                if payment:
-                    payment.razorpay_payment_id = payment_entity["id"]
-                    payment.razorpay_signature = signature
-                    payment.status = 'success'
-                    payment.success
+            if order and order.payment_status != Order.PaymentStatus.PAID:
+                order.payment_status = Order.PaymentStatus.PAID
+                order.razorpay_payment_id = payment_entity['id']
+                order.order_status = Order.OrderStatus.CONFIRMED
+                order.save()
 
-            return JsonResponse({'status': 'success'})
-        except Exception:
-            return JsonResponse({'status': 'error'}, status=400)
-    return JsonResponse({'status': 'invalid'}, status=405)
+                # Update Payment record
+                Payment.objects.filter(order=order).update(
+                    razorpay_payment_id=payment_entity['id'],
+                    status='success'
+                )
+
+                # Send emails (safe to call again)
+                send_order_confirmation_email(order)
+                send_admin_new_order_notification(order)
+
+        return JsonResponse({'status': 'success'})
+
+    except Exception:
+        return JsonResponse({'status': 'error'}, status=400)
