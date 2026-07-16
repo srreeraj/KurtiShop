@@ -43,10 +43,17 @@ function initNavbar() {
     closeBtn.addEventListener('click', closeDrawer);
     overlay.addEventListener('click', closeDrawer);
 
-    // ===================== SEARCH - NOW OPENS FULL PAGE =====================
+    // ===================== SEARCH =====================
+    const searchBtn = document.getElementById('search-btn');
+
     if (searchBtn) {
         searchBtn.addEventListener('click', () => {
-            window.location.href = "{% url 'search' %}";
+            const searchUrl = searchBtn.getAttribute('data-search-url');
+            if (searchUrl) {
+                window.location.href = searchUrl;
+            } else {
+                console.error('Search URL not found');
+            }
         });
     }
 
