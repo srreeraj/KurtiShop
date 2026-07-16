@@ -19,9 +19,36 @@
                 <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-red-600 transition-colors">{{ category.name }}</p>
             </a>
             {% empty %}
-                {% for icon, name in "👗:Ethnic Wear,👔:Western Wear,💼:Office Wear,🎉:Party Wear,🧥:Casual Wear"|slice:":0" %}{% endfor %}
-                <!-- static fallback while categories are empty -->
-                {% for pair in "👗|Ethnic Wear,👔|Western Wear,💼|Office Wear,🎉|Party Wear,🧥|Casual Wear".split %}{% endfor %}
+            <div class="text-center flex-shrink-0 w-20 sm:w-24 md:w-28">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                    <span class="text-xl sm:text-2xl">👗</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800">Ethnic Wear</p>
+            </div>
+            <div class="text-center flex-shrink-0 w-20 sm:w-24 md:w-28">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                    <span class="text-xl sm:text-2xl">👔</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800">Western Wear</p>
+            </div>
+            <div class="text-center flex-shrink-0 w-20 sm:w-24 md:w-28">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                    <span class="text-xl sm:text-2xl">💼</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800">Office Wear</p>
+            </div>
+            <div class="text-center flex-shrink-0 w-20 sm:w-24 md:w-28">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                    <span class="text-xl sm:text-2xl">🎉</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800">Party Wear</p>
+            </div>
+            <div class="text-center flex-shrink-0 w-20 sm:w-24 md:w-28">
+                <div class="mx-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                    <span class="text-xl sm:text-2xl">🧥</span>
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800">Casual Wear</p>
+            </div>
             {% endfor %}
 
             <a href="{% url 'product_list' %}" class="group text-center flex-shrink-0 w-20 sm:w-24 md:w-28 snap-start">
