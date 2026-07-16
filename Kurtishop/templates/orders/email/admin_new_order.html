@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><style>body{font-family:Arial,sans-serif;}</style></head>
+<body>
+    <h2>New Paid Order Received</h2>
+    <p><strong>Order Number:</strong> #{{ order.order_number }}</p>
+    <p><strong>Customer:</strong> {{ order.full_name }} ({{ order.email }})</p>
+    <p><strong>Phone:</strong> {{ order.phone }}</p>
+    <p><strong>Amount:</strong> ₹{{ order.grand_total }}</p>
+    <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+    
+    <hr>
+    <p><a href="https://yourdomain.com/admin/orders/order/{{ order.id }}/change/">View in Admin Panel</a></p>
+</body>
+</html>
