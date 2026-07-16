@@ -11,7 +11,7 @@ def home(request):
         is_active = True,
         is_deleted = False,
     ).annotate(
-        product_count=Count('products', filter=Q(products__is_active=True, product__is_deleted=False))
+        product_count=Count('products', filter=Q(products__is_active=True, products__is_deleted=False))
     ).order_by('name')[:12]
 
     featured_products = Product.objects.filter(
