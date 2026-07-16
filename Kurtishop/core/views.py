@@ -37,7 +37,7 @@ def search(request):
     query = request.GET.get('q', '').strip()
     category_slug = request.GET.get('category')
 
-    products = ProductVariant.objects.filter(
+    variants = ProductVariant.objects.filter(
         product__is_active=True,
         product__is_deleted=False,
         is_active=True,
@@ -46,25 +46,27 @@ def search(request):
     ).select_related('product', 'product__category', 'color')
 
     if query:
-        products = products.filter(
+        variants = products.filter(
             Q(product__name__icontains=query) |
             Q(product__description__icontains=query) |
             Q(color__name__icontains=query)
         )
 
     if category_slug:
-        products = products.filter(product__category__slug=category_slug)
+        variants = variants.filter(product__category__slug=category_slug)
 
     # Remove duplicate products (show one variant per product)
     seen = {}
     unique_products = []
-    for variant in products:
-        if variant.product_id not in seen:
-            seen[variant.product_id] = True
-            # Attach primary image
-            primary_image = variant.product.images.first()
-            variant.primary_image = primary_image
-            unique_products.append(variant)
+    for v in variants:
+        if v.product_id not in seen:
+            seen.add(v.product_id)
+            product = v.product
+            product.primary_image = v.product.images.first()
+            product.color = v.color                     # Attach color for card
+            product.display_price = v.price             # Attach price
+            product.discount_percentage = v.discount_percentage
+            products.append(product)
 
     categories = Category.objects.filter(
         is_active=True,
