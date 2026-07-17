@@ -12,4 +12,5 @@ urlpatterns = [
         views.product_detail,
         name='product_detail'
     ),
+    path('search/suggestions/', views.search_suggestions, name='search_suggestions'),
 ]
