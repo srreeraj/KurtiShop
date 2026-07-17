@@ -12,8 +12,14 @@ def send_order_confirmation_email(order):
         'site_url': settings.SITE_URL if hasattr(settings, 'SITE_URL') else 'https://yourdomain.com',
     }
 
-    html_message = render_to_string('orders/email/order_confirmation.html', context)
-    plain_message = render_to_string('orders/email/order_confirmation.txt', context)
+    try:
+        html_message = render_to_string('orders/email/order_confirmation.html', context)
+        plain_message = render_to_string('orders/email/order_confirmation.txt', context)
+    except Exception as template_error:
+        # Fallback if any template fails
+        print(f"Email template error: {template_error}")  # For debugging
+        plain_message = f"Your order #{order.order_number} has been confirmed. Total: ₹{order.grand_total}"
+        html_message = f"<h2>Order #{order.order_number} Confirmed</h2><p>Total: ₹{order.grand_total}</p>"
 
     send_mail(
         subject=f"Order Confirmed - #{order.order_number}",
