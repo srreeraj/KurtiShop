@@ -198,13 +198,13 @@
 <ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
     <li><a href="{% url 'home' %}" class="nav-link {% if request.path == home_url %}active{% endif %}">Home</a></li>
     
-    <li><a href="{% url 'product_list' %}?category=new-arrivals" class="nav-link">New Arrivals</a></li>
-    <li><a href="{% url 'product_list' %}?category=wedding" class="nav-link">Wedding</a></li>
-    <li><a href="{% url 'product_list' %}?category=office-wear" class="nav-link">Office Wear</a></li>
-    <li><a href="{% url 'product_list' %}?category=ethnic" class="nav-link">Ethnic</a></li>
-    <li><a href="{% url 'product_list' %}?category=western" class="nav-link">Western</a></li>
+    <li><a href="{% url 'product_list' %}?new-arrivals=true" class="nav-link">New Arrivals</a></li>
+    <li><a href="{% url 'product_list' %}?occasion=wedding" class="nav-link">Wedding</a></li>
+    <li><a href="{% url 'product_list' %}?occasion=office-wear" class="nav-link">Office Wear</a></li>
+    <li><a href="{% url 'product_list' %}?occasion=ethnic" class="nav-link">Ethnic</a></li>
+    <li><a href="{% url 'product_list' %}?occasion=western" class="nav-link">Western</a></li>
     
-    <li><a href="#" class="nav-link sale">Sale</a></li>
+    <li><a href="{% url 'product_list' %}?sale=true" class="nav-link sale">Sale</a></li>
     <li><a href="#" class="nav-link">Contact</a></li>
 </ul>
 
@@ -256,12 +256,12 @@
 
   <nav class="flex flex-col">
     <a href="{% url 'home' %}" class="mobile-nav-link">Home</a>
-    <a href="{% url 'product_list' %}?category=new-arrivals" class="mobile-nav-link">New Arrivals</a>
-    <a href="{% url 'product_list' %}?category=wedding" class="mobile-nav-link">Wedding Collection</a>
-    <a href="{% url 'product_list' %}?category=office-wear" class="mobile-nav-link">Office Wear</a>
-    <a href="{% url 'product_list' %}?category=ethnic" class="mobile-nav-link">Ethnic Wear</a>
-    <a href="{% url 'product_list' %}?category=western" class="mobile-nav-link">Western Wear</a>
-    <a href="#" class="mobile-nav-link">Sale</a>
+    <a href="{% url 'product_list' %}?new_arrivals=trues" class="mobile-nav-link">New Arrivals</a>
+    <a href="{% url 'product_list' %}?occasion=wedding" class="mobile-nav-link">Wedding Collection</a>
+    <a href="{% url 'product_list' %}?occasion=office-wear" class="mobile-nav-link">Office Wear</a>
+    <a href="{% url 'product_list' %}?occasion=ethnic" class="mobile-nav-link">Ethnic Wear</a>
+    <a href="{% url 'product_list' %}?occasion=western" class="mobile-nav-link">Western Wear</a>
+    <a href="{% url 'product_list' %}?sale=true" class="mobile-nav-link">Sale</a>
     <a href="#" class="mobile-nav-link">Contact</a>
   </nav>
 </div>
