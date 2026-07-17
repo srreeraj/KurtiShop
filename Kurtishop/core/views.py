@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from products.models import Product
 from categories.models import Category
 from django.db.models import Count, Q
 from .forms import ContactForm
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 
@@ -68,7 +69,7 @@ def contact(request):
                 )
                 messages.success(request, "Thank you! Your message has been sent successfully.")
                 return redirect('contact')
-            except:
+            except Exception as e:
                 messages.error(request, "Something went wrong. Please try again later.")
         else:
             messages.error(request, "Please correct the errors below.")
