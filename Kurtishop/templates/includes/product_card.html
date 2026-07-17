@@ -65,17 +65,17 @@
                 </span>
             
                 <!-- Original Price (Strikethrough) - Show only if discounted -->
-                {% if product.discount_percentage and product.discount_percentage > 0 %}
+                {% if product.display_discount_percentage and product.display_discount_percentage > 0 %}
                     <span class="text-sm line-through text-gray-400">
-                        ₹{{ product.price|floatformat:0 }}
+                        ₹{{ product.display_original_price|floatformat:0 }}
                     </span>
                 {% endif %}
             </div>
         
             <!-- Optional: Discount Badge -->
-            {% if product.discount_percentage and product.discount_percentage > 0 %}
+            {% if product.display_discount_percentage and product.display_discount_percentage > 0 %}
             <span class="inline-block mt-1 text-red-600 text-xs font-semibold">
-                {{ product.discount_percentage }}% OFF
+                {{ product.display_discount_percentage }}% OFF
             </span>
             {% endif %}
         </div>
