@@ -1,4 +1,5 @@
 let currentStep = 1;
+let isPaymentProcessing = false;
 
 function updateProgress(step) {
     document.querySelectorAll(".step").forEach(stepItem => {
@@ -36,11 +37,9 @@ function showStep(step) {
 // ==================== VALIDATION HELPERS ====================
 
 function showError(input, message) {
-    // Remove old error
     let errorEl = input.parentElement.querySelector('.error-msg');
     if (errorEl) errorEl.remove();
 
-    // Create new error
     errorEl = document.createElement('p');
     errorEl.className = 'mt-1 text-xs text-red-600 error-msg';
     errorEl.textContent = message;
@@ -60,7 +59,6 @@ function validateEmail(email) {
 }
 
 function validatePhone(phone) {
-    // Indian phone number (10 digits, optional +91 or 0)
     const cleaned = phone.replace(/[\s\-\(\)]/g, '');
     return /^[6-9]\d{9}$/.test(cleaned) || /^\+91[6-9]\d{9}$/.test(cleaned);
 }
@@ -73,13 +71,12 @@ function validateRequired(value) {
 function validateStep(step) {
     let isValid = true;
 
-    if (step === 1) { // Contact Information
+    if (step === 1) {
         const fullName = document.querySelector('input[name="full_name"]');
         const email = document.querySelector('input[name="email"]');
         const phone = document.querySelector('input[name="phone"]');
 
-        // Full Name
-        if (!validateRequired(fullName.value)) {
+        if (!validateRequired(fullName?.value)) {
             showError(fullName, "Full name is required");
             isValid = false;
         } else if (fullName.value.trim().length < 2) {
@@ -89,8 +86,7 @@ function validateStep(step) {
             clearError(fullName);
         }
 
-        // Email
-        if (!validateRequired(email.value)) {
+        if (!validateRequired(email?.value)) {
             showError(email, "Email address is required");
             isValid = false;
         } else if (!validateEmail(email.value)) {
@@ -100,8 +96,7 @@ function validateStep(step) {
             clearError(email);
         }
 
-        // Phone
-        if (!validateRequired(phone.value)) {
+        if (!validateRequired(phone?.value)) {
             showError(phone, "Phone number is required");
             isValid = false;
         } else if (!validatePhone(phone.value)) {
@@ -112,7 +107,7 @@ function validateStep(step) {
         }
     }
 
-    else if (step === 2) { // Shipping Address
+    else if (step === 2) {
         const fields = [
             { name: 'address_line_1', label: 'Address Line 1' },
             { name: 'city', label: 'City' },
@@ -133,7 +128,6 @@ function validateStep(step) {
             }
         });
 
-        // Optional: Postal code format (6 digits for India)
         const postal = document.querySelector('input[name="postal_code"]');
         if (postal && validateRequired(postal.value)) {
             if (!/^\d{6}$/.test(postal.value.trim())) {
@@ -158,13 +152,60 @@ function prevStep(prev) {
     showStep(prev);
 }
 
-// Form submission validation (final safety net)
 function handleSubmit(e) {
     if (!validateStep(1) || !validateStep(2)) {
         e.preventDefault();
-        showStep(1); // Go back to first invalid step
+        showStep(1);
         alert("Please fix the errors in the form before submitting.");
     }
+}
+
+// ==================== RAZORPAY PAYMENT HANDLER ====================
+
+function handlePaymentSuccess(response, config) {
+    if (isPaymentProcessing) return;
+    isPaymentProcessing = true;
+
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <span class="inline-block animate-spin mr-2">⟳</span>
+            Verifying Payment...
+        `;
+    }
+
+    fetch(config.verifyUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": config.csrfToken
+        },
+        body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            order_number: config.orderNumber
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            // Small delay for better UX
+            setTimeout(() => {
+                window.location.href = data.redirect_url;
+            }, 800);
+        } else {
+            alert(data.message || "Payment verification failed. Please contact support.");
+            isPaymentProcessing = false;
+            if (submitBtn) submitBtn.disabled = false;
+        }
+    })
+    .catch(() => {
+        alert("Something went wrong during verification. Please contact support.");
+        isPaymentProcessing = false;
+        if (submitBtn) submitBtn.disabled = false;
+    });
 }
 
 // ==================== INIT ====================
@@ -176,25 +217,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // Show correct starting step
     showStep(config.triggerPayment ? 3 : 1);
 
-    // Attach real-time validation on input
+    // Real-time validation
     const allInputs = document.querySelectorAll('#checkout-form input, #checkout-form select, #checkout-form textarea');
     allInputs.forEach(input => {
-        input.addEventListener('blur', () => {
-            // Re-validate current step on blur
-            validateStep(currentStep);
+        input.addEventListener('blur', () => validateStep(currentStep));
+        input.addEventListener('input', () => {
+            // Optional: clear error on typing
+            if (input.parentElement.querySelector('.error-msg')) {
+                clearError(input);
+            }
         });
     });
 
-    // Prevent default next buttons if validation fails (already handled in nextStep)
-
-    // Final form submit validation
+    // Form submit handler
     const form = document.getElementById('checkout-form');
     if (form) {
         form.addEventListener('submit', handleSubmit);
     }
 
-    // Razorpay payment flow
-    if (config.triggerPayment) {
+    // Razorpay Payment Flow
+    if (config.triggerPayment && config.razorpayOrderId) {
         const options = {
             key: config.razorpayKey,
             amount: config.amount,
@@ -205,29 +247,14 @@ document.addEventListener("DOMContentLoaded", function () {
             prefill: config.customer,
             theme: { color: "#C1121F" },
 
-            handler(response) {
-                fetch(config.verifyUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": config.csrfToken
-                    },
-                    body: JSON.stringify({
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature,
-                        order_number: config.orderNumber
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        alert("Payment verification failed.");
-                    }
-                })
-                .catch(() => alert("Something went wrong."));
+            handler: function (response) {
+                handlePaymentSuccess(response, config);
+            },
+
+            modal: {
+                ondismiss: function() {
+                    isPaymentProcessing = false;
+                }
             }
         };
 
