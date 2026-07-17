@@ -52,7 +52,7 @@ def product_list(request):
         variants = variants.filter(neck_id=neck_id)
 
     # Occasion filter
-    occasion_id = request.GET.get('occasion')
+    occasion_slug = request.GET.get('occasion')
     if occasion_id:
         variants = variants.filter(product__occasion__name__iexact=occasion_slug)
 
