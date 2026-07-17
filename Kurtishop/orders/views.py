@@ -108,8 +108,6 @@ def checkout(request):
     context['form'] = form
     return render(request, 'orders/checkout.html', context)
 
-    return render(request, 'orders/checkout.html', context)
-
 
 def order_success(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
