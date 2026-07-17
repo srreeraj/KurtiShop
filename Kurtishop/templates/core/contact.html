@@ -61,8 +61,10 @@
         <div class="lg:col-span-7">
             {% if messages %}
                 {% for message in messages %}
-                    <div class="mb-6 px-6 py-4 rounded-2xl {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
-                        {{ message }}
+                    <div class="mb-6 px-6 py-4 rounded-2xl 
+                        {% if message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200
+                        {% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
+                            {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
@@ -70,24 +72,64 @@
             <form method="post" class="space-y-6">
                 {% csrf_token %}
 
-                <div class="grid md:grid-cols-2 gap-6">
+                <!-- Name -->
+                <div>
                     {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="text-red-600 text-sm mt-1.5">
+                            {{ form.name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
                     {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-red-600 text-sm mt-1.5">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
+                <!-- Phone -->
+                <div>
                     {{ form.phone }}
-                    {{ form.subject }}
+                    {% if form.phone.errors %}
+                        <div class="text-red-600 text-sm mt-1.5">
+                            {{ form.phone.errors }}
+                        </div>
+                    {% endif %}
                 </div>
 
-                {{ form.message }}
+                <!-- Subject -->
+                <div>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <div class="text-red-600 text-sm mt-1.5">
+                            {{ form.subject.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                </div>
 
-                <button type="submit"
-                        class="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-3xl font-semibold tracking-widest text-lg transition-all">
-                    SEND MESSAGE
-                </button>
-            </form>
-        </div>
+            <!-- Message -->
+            <div>
+                {{ form.message }}
+                    {% if form.message.errors %}
+                    <div class="text-red-600 text-sm mt-1.5">
+                        {{ form.message.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-3xl font-semibold tracking-widest text-lg transition-all mt-4">
+                SEND MESSAGE
+            </button>
+        </form>
+    </div>
     </div>
 </div>
 {% endblock %}
