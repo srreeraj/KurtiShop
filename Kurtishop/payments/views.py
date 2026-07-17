@@ -40,8 +40,11 @@ def verify_payment(request):
             payment.status = 'success'
             payment.save()
 
-        send_order_confirmation_email(order)
-        send_admin_new_order_notification(order)
+        try:
+            send_order_confirmation_email(order)
+            send_admin_new_order_notification(order)
+        except Exception as email_error:
+            print(f"Email sending failed: {email_error}")
         
         return JsonResponse({
             'status': 'success',
