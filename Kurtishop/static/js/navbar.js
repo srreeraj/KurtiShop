@@ -61,59 +61,14 @@ function initNavbar() {
 
     // Initial scroll check
     handleScroll();
-}
 
-// ===================== CART COUNT =====================
-function updateCartCount(count) {
-    const cartCountEl = document.getElementById('cart-count');
-    if (!cartCountEl) return;
+    // ==================== SEARCH WITH SUGGESTIONS ====================
+    function initSearch() {
+        const searchInput = document.getElementById('search-input');
+        const suggestionsBox = document.getElementById('search-suggestions');
+        let timeout = null;
 
-    const newCount = parseInt(count) || 0;
-    cartCountEl.textContent = newCount;
-
-    // Optional: only animate if count actually changed
-    if (newCount > 0) {
-        cartCountEl.classList.add('scale-125');
-        setTimeout(() => {
-            cartCountEl.classList.remove('scale-125');
-        }, 300);
-    }
-}
-
-async function fetchCartCount() {
-    try {
-        const response = await fetch('/cart/count/');  // Adjust if you use app_name
-        if (response.ok) {
-            const data = await response.json();
-            updateCartCount(data.cart_count);
-        }
-    } catch (error) {
-        console.warn('Could not fetch cart count:', error);
-    }
-}
-
-function initCartCount() {
-    // Fetch initial count when page loads
-    fetchCartCount();
-
-    // Listen for updates from add-to-cart, etc.
-    document.addEventListener('cartUpdated', (e) => {
-        if (e.detail && e.detail.cart_count !== undefined) {
-            updateCartCount(e.detail.cart_count);
-        }
-    });
-}
-
-// Make it globally available
-window.updateCartCount = updateCartCount;
-
-// ==================== SEARCH WITH SUGGESTIONS ====================
-function initSearch() {
-    const searchInput = document.getElementById('search-input');
-    const suggestionsBox = document.getElementById('search-suggestions');
-    let timeout = null;
-
-    if (!searchInput) return;
+        if (!searchInput) return;
 
     function hideSuggestions() {
         suggestionsBox.classList.add('hidden');
@@ -198,3 +153,48 @@ function initSearch() {
 
 // Call it
 initSearch();
+}
+
+// ===================== CART COUNT =====================
+function updateCartCount(count) {
+    const cartCountEl = document.getElementById('cart-count');
+    if (!cartCountEl) return;
+
+    const newCount = parseInt(count) || 0;
+    cartCountEl.textContent = newCount;
+
+    // Optional: only animate if count actually changed
+    if (newCount > 0) {
+        cartCountEl.classList.add('scale-125');
+        setTimeout(() => {
+            cartCountEl.classList.remove('scale-125');
+        }, 300);
+    }
+}
+
+async function fetchCartCount() {
+    try {
+        const response = await fetch('/cart/count/');  // Adjust if you use app_name
+        if (response.ok) {
+            const data = await response.json();
+            updateCartCount(data.cart_count);
+        }
+    } catch (error) {
+        console.warn('Could not fetch cart count:', error);
+    }
+}
+
+function initCartCount() {
+    // Fetch initial count when page loads
+    fetchCartCount();
+
+    // Listen for updates from add-to-cart, etc.
+    document.addEventListener('cartUpdated', (e) => {
+        if (e.detail && e.detail.cart_count !== undefined) {
+            updateCartCount(e.detail.cart_count);
+        }
+    });
+}
+
+// Make it globally available
+window.updateCartCount = updateCartCount;
