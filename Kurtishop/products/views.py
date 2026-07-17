@@ -53,7 +53,7 @@ def product_list(request):
 
     # Occasion filter
     occasion_slug = request.GET.get('occasion')
-    if occasion_id:
+    if occasion_slug:
         variants = variants.filter(product__occasion__name__iexact=occasion_slug)
 
     # Pattern filter
