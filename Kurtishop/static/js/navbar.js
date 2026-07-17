@@ -106,3 +106,95 @@ function initCartCount() {
 
 // Make it globally available
 window.updateCartCount = updateCartCount;
+
+// ==================== SEARCH WITH SUGGESTIONS ====================
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const suggestionsBox = document.getElementById('search-suggestions');
+    let timeout = null;
+
+    if (!searchInput) return;
+
+    function hideSuggestions() {
+        suggestionsBox.classList.add('hidden');
+        suggestionsBox.innerHTML = '';
+    }
+
+    async function fetchSuggestions(query) {
+        try {
+            const res = await fetch(`/search/suggestions/?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            
+            suggestionsBox.innerHTML = '';
+            
+            if (data.results.length === 0) {
+                suggestionsBox.innerHTML = `<div class="px-4 py-8 text-center text-gray-500">No matches found</div>`;
+                suggestionsBox.classList.remove('hidden');
+                return;
+            }
+
+            const html = data.results.map(product => `
+                <a href="/product/${product.slug}/" 
+                   class="flex gap-4 px-4 py-3 hover:bg-gray-50 group">
+                    <div class="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">` : 
+                            `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">No img</div>`
+                        }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium text-sm line-clamp-2 group-hover:text-brand">${product.name}</div>
+                        <div class="text-xs text-gray-500">${product.category} ${product.occasion ? '• ' + product.occasion : ''}</div>
+                        ${product.price ? `
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span class="font-semibold">₹${product.price}</span>
+                                ${product.discount > 0 ? 
+                                    `<span class="text-xs text-gray-400 line-through">₹${product.original_price}</span>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </a>
+            `).join('');
+
+            suggestionsBox.innerHTML = html;
+            suggestionsBox.classList.remove('hidden');
+        } catch (e) {
+            console.error('Search error', e);
+        }
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        
+        clearTimeout(timeout);
+        
+        if (query.length < 2) {
+            hideSuggestions();
+            return;
+        }
+
+        timeout = setTimeout(() => {
+            fetchSuggestions(query);
+        }, 250); // debounce
+    });
+
+    // Hide on click outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+
+    // Keyboard: Enter → full search (optional)
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+                window.location.href = `/products/?search=${encodeURIComponent(query)}`; // we'll create this later
+            }
+        }
+    });
+}
+
+// Call it
+initSearch();
