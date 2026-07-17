@@ -1,0 +1,14 @@
+Thank You for Your Order!
+
+Hi {{ order.full_name }},
+
+Your order #{{ order.order_number }} has been successfully placed and confirmed.
+
+Total Amount: ₹{{ order.grand_total }}
+
+We will notify you once your order is shipped.
+
+Thank you for shopping with Liara!
+
+Best regards,
+Liara Team
