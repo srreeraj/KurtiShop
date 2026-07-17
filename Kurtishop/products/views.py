@@ -223,3 +223,59 @@ def product_detail(request,slug):
         'products/product_detail.html',
         context
     )
+
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+
+    if len(query) > 2:
+        return JsonResponse({'results' : []})
+
+    # Broad but efficient search
+    products = Product.objects.filter(
+        Q(name__icontains=query) |
+        Q(category__name__icontains=query) |
+        Q(occasion__name__icontains=query) |
+        Q(description__icontains=query) |
+        Q(sleeve__name__icontains=query) |
+        Q(neck__name__icontains=query) |
+        Q(pattern__name__icontains=query) |
+        Q(fit__name__icontains=query)
+    ).filter(
+        is_active=True,
+        is_deleted=False,
+    ).distinct()[:6]
+
+    results = []
+    for product in products:
+        # Primary image (any color)
+        primary_image = product.images.filter(is_primary=True).first()
+        if not primary_image:
+            primary_image = product.images.first()
+
+        # Best (cheapest in-stock) variant for display price
+        best_variant = ProductVariant.objects.filter(
+            product=product,
+            stock__gt=0,
+            is_active=True,
+            is_deleted=False
+        ).order_by('discounted_price').first()
+
+        price_info = {}
+        if best_variants:
+            price_info = {
+                'price' : float(best_variant.discounted_price),
+                'original_price' : float(best_variant.price),
+                'discount' : best_variant.discount_percentage,
+            }
+
+        result.append({
+            'id' : product.id,
+            'name' : product.name,
+            'slug' : product.slug,
+            'image' : primary_image.image.url if primary_image else None,
+            'category' : product.category.name if product.category else '',
+            'occasion' : product.occasion.name if product.occasion else '',
+            **price_info
+        })
+
+    return JsonResponse({'results' : results})
