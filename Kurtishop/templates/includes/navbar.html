@@ -205,7 +205,7 @@
     <li><a href="{% url 'product_list' %}?occasion=western" class="nav-link">Western</a></li>
     
     <li><a href="{% url 'product_list' %}?sale=true" class="nav-link sale">Sale</a></li>
-    <li><a href="#" class="nav-link">Contact</a></li>
+    <li><a href="{% url 'contact' %}" class="nav-link">Contact</a></li>
 </ul>
 
     <!-- RIGHT SECTION: search + cart -->
@@ -262,7 +262,7 @@
     <a href="{% url 'product_list' %}?occasion=ethnic" class="mobile-nav-link">Ethnic Wear</a>
     <a href="{% url 'product_list' %}?occasion=western" class="mobile-nav-link">Western Wear</a>
     <a href="{% url 'product_list' %}?sale=true" class="mobile-nav-link">Sale</a>
-    <a href="#" class="mobile-nav-link">Contact</a>
+    <a href="{% url 'contact' %}" class="mobile-nav-link">Contact</a>
   </nav>
 </div>
 
