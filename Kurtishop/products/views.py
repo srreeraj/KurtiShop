@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count, Q, Min
 from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -17,6 +18,20 @@ def product_list(request):
     ).prefetch_related(
         'product__images'
     ).order_by('product__name', 'color__name')
+
+        # ==================== SEARCH FILTER ====================
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        variants = variants.filter(
+            Q(product__name__icontains=search_query) |
+            Q(product__category__name__icontains=search_query) |
+            Q(product__occasion__name__icontains=search_query) |
+            Q(product__description__icontains=search_query) |
+            Q(product__sleeve__name__icontains=search_query) |
+            Q(product__neck__name__icontains=search_query) |
+            Q(product__pattern__name__icontains=search_query) |
+            Q(product__fit__name__icontains=search_query)
+        )
 
     # Category filter
     category_slug = request.GET.get('category')
@@ -243,7 +258,7 @@ def search_suggestions(request):
     ).filter(
         is_active=True,
         is_deleted=False,
-    ).distinct()[:6]
+    ).select_related('category', 'occasion').distinct()[:8]
 
     results = []
     for product in products:
