@@ -77,14 +77,20 @@ def product_list(request):
         variant.color_images = color_images[:4]
         variant.primary_image = color_images.first() if color_images.exists() else None
 
-        # Get lowest price for this color
-        lowest_price_variant = ProductVariant.objects.filter(
+        # Get all in-stock variant for the product + color
+        color_variants = list(ProductVariant.objects.filter(
             product=variant.product,
             color=variant.color,
             stock__gt=0
-        ).aggregate(min_price=Min('price'))
-        variant.display_price = lowest_price_variant['min_price'] or variant.price
+        ))
 
+        # Pick the variant with the lowest DISCOUNTED price
+        # (not just lowest raw price) so original + discounted stay in sync
+        best_variant = min(color_variants, key=lambda v: v.discounted_price) if color_variants else variant
+        
+        variant.display_price = best_variant.discounted_price
+        variant.display_original_price = best_variant.price
+        variant.display_discount_percentage = best_variant.discount_percentage
 
     # Pagination
 
