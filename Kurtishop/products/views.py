@@ -54,12 +54,20 @@ def product_list(request):
     # Occasion filter
     occasion_id = request.GET.get('occasion')
     if occasion_id:
-        variants = variants.filter(occasion_id=occasion_id)
+        variants = variants.filter(product__occasion__name__iexact=occasion_slug)
 
     # Pattern filter
     pattern_id = request.GET.get('pattern')
     if pattern_id:
         variants = variants.filter(pattern_id=pattern_id)
+
+    # New Arrivals
+    if request.GET.get('new_arrivals') == 'true':
+        variants = variants.filter(product__is_new_arrival=True)
+
+    # Sale / Discounted products
+    if request.GET.get('sale') == 'true':
+        variants = variants.filter(discount_percentage__gt=0)
     
     # Remove duplicate color variants per product (keep only one per color)
     seen = {}
@@ -87,7 +95,7 @@ def product_list(request):
         # Pick the variant with the lowest DISCOUNTED price
         # (not just lowest raw price) so original + discounted stay in sync
         best_variant = min(color_variants, key=lambda v: v.discounted_price) if color_variants else variant
-        
+
         variant.display_price = best_variant.discounted_price
         variant.display_original_price = best_variant.price
         variant.display_discount_percentage = best_variant.discount_percentage
