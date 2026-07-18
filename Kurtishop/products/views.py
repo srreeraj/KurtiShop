@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Count, Q, Min, F, ExpressionWrapper, DecimalField
+from django.db.models import Count, Q, Min
 from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
 from django.http import JsonResponse
 
@@ -273,12 +273,7 @@ def search_suggestions(request):
             stock__gt=0,
             is_active=True,
             is_deleted=False
-        ).annotate(
-            effective_price = ExpressionWrapper(
-                F('price') * (1 - F('discounted_percentage') / 100),
-                output_field=DecimalField()
-            )
-        ).order_by('effective_price').first()
+        ).order_by('price').first()
 
         price_info = {}
         if best_variant:
