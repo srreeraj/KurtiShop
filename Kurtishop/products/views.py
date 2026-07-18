@@ -242,7 +242,7 @@ def product_detail(request,slug):
 def search_suggestions(request):
     query = request.GET.get('q', '').strip()
 
-    if len(query) > 2:
+    if len(query) > 3:
         return JsonResponse({'results' : []})
 
     # Broad but efficient search
@@ -276,7 +276,7 @@ def search_suggestions(request):
         ).order_by('discounted_price').first()
 
         price_info = {}
-        if best_variants:
+        if best_variant:
             price_info = {
                 'price' : float(best_variant.discounted_price),
                 'original_price' : float(best_variant.price),
