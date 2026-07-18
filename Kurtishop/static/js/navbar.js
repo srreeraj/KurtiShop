@@ -23,7 +23,6 @@ function initNavbar() {
             navbar.classList.remove('scrolled');
         }
     }
-
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     // Mobile Menu Drawer
@@ -32,7 +31,6 @@ function initNavbar() {
         overlay.classList.add('opacity-100', 'pointer-events-auto');
         hamburgerBtn.classList.add('open');
     }
-
     function closeDrawer() {
         drawer.classList.remove('!translate-x-0');
         overlay.classList.remove('opacity-100', 'pointer-events-auto');
@@ -43,7 +41,7 @@ function initNavbar() {
     closeBtn.addEventListener('click', closeDrawer);
     overlay.addEventListener('click', closeDrawer);
 
-    // Search Toggle
+    // Search Toggle (expand input)
     searchBtn.addEventListener('click', () => {
         searchInput.classList.toggle('open');
         if (searchInput.classList.contains('open')) {
@@ -56,19 +54,23 @@ function initNavbar() {
         if (e.key === 'Escape') {
             closeDrawer();
             searchInput.classList.remove('open');
+            hideSuggestions(); // if suggestions are open
         }
     });
 
-    // Initial scroll check
     handleScroll();
 
-    // ==================== SEARCH WITH SUGGESTIONS ====================
-    function initSearch() {
-        const searchInput = document.getElementById('search-input');
-        const suggestionsBox = document.getElementById('search-suggestions');
-        let timeout = null;
+    // ==================== SEARCH SUGGESTIONS ====================
+    initSearch();
+}
 
-        if (!searchInput) return;
+// Separate function for search suggestions
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const suggestionsBox = document.getElementById('search-suggestions');
+    let timeout = null;
+
+    if (!searchInput || !suggestionsBox) return;
 
     function hideSuggestions() {
         suggestionsBox.classList.add('hidden');
@@ -78,19 +80,20 @@ function initNavbar() {
     async function fetchSuggestions(query) {
         try {
             const res = await fetch(`/search/suggestions/?q=${encodeURIComponent(query)}`);
+            if (!res.ok) throw new Error('Failed');
+            
             const data = await res.json();
-            
             suggestionsBox.innerHTML = '';
-            
+
             if (data.results.length === 0) {
-                suggestionsBox.innerHTML = `<div class="px-4 py-8 text-center text-gray-500">No matches found</div>`;
+                suggestionsBox.innerHTML = `<div class="px-4 py-8 text-center text-gray-500">No matches found for "${query}"</div>`;
                 suggestionsBox.classList.remove('hidden');
                 return;
             }
 
             const html = data.results.map(product => `
                 <a href="/product/${product.slug}/" 
-                   class="flex gap-4 px-4 py-3 hover:bg-gray-50 group">
+                   class="flex gap-4 px-4 py-3 hover:bg-gray-50 group border-b border-gray-100 last:border-none">
                     <div class="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                         ${product.image ? 
                             `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">` : 
@@ -103,8 +106,7 @@ function initNavbar() {
                         ${product.price ? `
                             <div class="flex items-baseline gap-2 mt-1">
                                 <span class="font-semibold">₹${product.price}</span>
-                                ${product.discount > 0 ? 
-                                    `<span class="text-xs text-gray-400 line-through">₹${product.original_price}</span>` : ''}
+                                ${product.discount > 0 ? `<span class="text-xs text-gray-400 line-through">₹${product.original_price}</span>` : ''}
                             </div>
                         ` : ''}
                     </div>
@@ -114,45 +116,28 @@ function initNavbar() {
             suggestionsBox.innerHTML = html;
             suggestionsBox.classList.remove('hidden');
         } catch (e) {
-            console.error('Search error', e);
+            console.error('Search suggestions error:', e);
         }
     }
 
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim();
-        
         clearTimeout(timeout);
-        
+
         if (query.length < 2) {
             hideSuggestions();
             return;
         }
 
-        timeout = setTimeout(() => {
-            fetchSuggestions(query);
-        }, 250); // debounce
+        timeout = setTimeout(() => fetchSuggestions(query), 300);
     });
 
-    // Hide on click outside
+    // Hide suggestions when clicking outside
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
             hideSuggestions();
         }
     });
-
-    // Keyboard: Enter → full search (optional)
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.trim();
-            if (query) {
-                window.location.href = `/products/?search=${encodeURIComponent(query)}`; // we'll create this later
-            }
-        }
-    });
-}
-
-// Call it
-initSearch();
 }
 
 // ===================== CART COUNT =====================
