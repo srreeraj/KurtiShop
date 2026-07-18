@@ -108,47 +108,38 @@ function initSearch() {
     }
 
     async function fetchSuggestions(query) {
-        try {
-            const res = await fetch(`/products/search/suggestions/?q=${encodeURIComponent(query)}`);
-            if (!res.ok) throw new Error('Failed');
+    try {
+        const res = await fetch(`/products/search/suggestions/?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error('Failed');
 
-            const data = await res.json();
-            suggestionsBox.innerHTML = '';
+        const data = await res.json();
+        suggestionsBox.innerHTML = '';
 
-            if (data.results.length === 0) {
-                suggestionsBox.innerHTML = `<div class="px-4 py-8 text-center text-gray-500">No matches found for "${query}"</div>`;
-                suggestionsBox.classList.remove('hidden');
-                return;
-            }
-
-            const html = data.results.map(product => `
-                <a href="/product/${product.slug}/"
-                   class="flex gap-4 px-4 py-3 hover:bg-gray-50 group border-b border-gray-100 last:border-none">
-                    <div class="w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                        ${product.image ?
-                            `<img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">` :
-                            `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">No img</div>`
-                        }
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="font-medium text-sm line-clamp-2 group-hover:text-[#C1121F]">${product.name}</div>
-                        <div class="text-xs text-gray-500">${product.category} ${product.occasion ? '• ' + product.occasion : ''}</div>
-                        ${product.price ? `
-                            <div class="flex items-baseline gap-2 mt-1">
-                                <span class="font-semibold">₹${product.price}</span>
-                                ${product.discount > 0 ? `<span class="text-xs text-gray-400 line-through">₹${product.original_price}</span>` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                </a>
-            `).join('');
-
-            suggestionsBox.innerHTML = html;
+        if (data.results.length === 0) {
+            suggestionsBox.innerHTML = `<div class="px-4 py-8 text-center text-gray-500">No matches found for "${query}"</div>`;
             suggestionsBox.classList.remove('hidden');
-        } catch (e) {
-            console.error('Search suggestions error:', e);
+            return;
         }
+
+        const html = data.results.map(item => `
+            <a href="${item.url}"
+               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 group border-b border-gray-100 last:border-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                     class="text-gray-400 flex-shrink-0 group-hover:text-[#C1121F]">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <span class="text-sm text-gray-700 group-hover:text-[#C1121F]">${item.label}</span>
+            </a>
+        `).join('');
+
+        suggestionsBox.innerHTML = html;
+        suggestionsBox.classList.remove('hidden');
+    } catch (e) {
+        console.error('Search suggestions error:', e);
     }
+}
 
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim();
