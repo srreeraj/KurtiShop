@@ -70,7 +70,7 @@ def deduct_stock_after_payment(order):
         Deduct stock only after successful payment,
         This is atomic to prevent overselling
     """
-    for item in order.items.select_related('variants').all():
+    for item in order.items.select_related('variant').all():
         if item.variant:
             if item.variant.stock < item.quantity:
                 # This should rarely happen if you lock stock at cart stage
