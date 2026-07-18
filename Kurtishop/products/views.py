@@ -283,7 +283,7 @@ def search_suggestions(request):
                 'discount' : best_variant.discount_percentage,
             }
 
-        result.append({
+        results.append({
             'id' : product.id,
             'name' : product.name,
             'slug' : product.slug,
