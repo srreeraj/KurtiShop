@@ -138,6 +138,15 @@ function initSearch() {
             hideSuggestions();
         }
     });
+
+    searchInput.addEventListener('keypress', (e) => {
+        if(e.key == "Enter") {
+            const query = searchInput.value.trim();
+            if (query.length >= 2){
+                window.location.href = `/products/?search=${encodeURIComponent(query)}`;
+            }
+        }
+    });
 }
 
 // ===================== CART COUNT =====================
