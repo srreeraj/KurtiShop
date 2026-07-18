@@ -278,7 +278,7 @@ def search_suggestions(request):
     base_url = reverse('product_list')
 
     def add_suggestion(label, filter_kwargs, url_params):
-        if label.lower() in seen_lables:
+        if label.lower() in seen_labels:
             return
         if not Product.objects.filter(is_active=True, is_deleted=False, **filter_kwargs).exists():
             return
