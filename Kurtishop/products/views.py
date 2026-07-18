@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Count, Q, Min
 from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
 from django.http import JsonResponse
+from urllib.parse import urlencode
+from django.urls import reverse
 
 # Create your views here.
 
@@ -242,55 +244,71 @@ def product_detail(request,slug):
 def search_suggestions(request):
     query = request.GET.get('q', '').strip()
 
-    if len(query) < 3:
+    if len(query) < 2:
         return JsonResponse({'results' : []})
 
-    # Broad but efficient search
-    products = Product.objects.filter(
-        Q(name__icontains=query) |
-        Q(category__name__icontains=query) |
-        Q(occasion__name__icontains=query) |
-        Q(description__icontains=query) |
-        Q(sleeve__name__icontains=query) |
-        Q(neck__name__icontains=query) |
-        Q(pattern__name__icontains=query) |
-        Q(fit__name__icontains=query)
-    ).filter(
-        is_active=True,
-        is_deleted=False,
-    ).select_related('category', 'occasion').distinct()[:8]
+    query_lower = query.lower()
+    words = [ w for w in query_lower.split() if w]
+    tokens = words + [query_lower]
 
-    results = []
-    for product in products:
-        # Primary image (any color)
-        primary_image = product.images.filter(is_primary=True).first()
-        if not primary_image:
-            primary_image = product.images.first()
+    def word_matches(name):
+        name_lower = name.lower()
+        # bidirectional partial match - handles plurals/typos
+        # eg: "sarees" vs "Saree"
+        return any(t in name_lower or name_lower in t for t in tokens)
+    
+    matched_categories = [c for c in Category.objects.filter(is_active=True, is_deleted=False) if  word_matches(c.name)]
+    matched_colors = [ c for c in Color.objects.all() if word_matches(c.name)]
+    matched_occasions = [o for o in Occasion.objects.all() if word_matches(o.name)]
+    matched_sleeves = [s for s in Sleeve.objects.all() if word_matches(s.name)]
+    matched_necks = [n for n in Neck.objects.all() if word_matches(n.name)]
+    matched_patterns = [p for p in Pattern.objects.all() if word_matches(p.name)]
 
-        # Best (cheapest in-stock) variant for display price
-        best_variant = ProductVariant.objects.filter(
-            product=product,
-            stock__gt=0,
-            is_active=True,
-            is_deleted=False
-        ).order_by('price').first()
+    # (matched objects, product filter field, URL param name, use .name instead of .id in URL?)
+    attribute_groups = [
+        (matched_colors, 'variants__color_id', 'color', False),
+        (matched_occasions, 'occasion_id', 'occasion', True),
+        (matched_sleeves, 'sleeve_id', 'sleeve', False),
+        (matched_necks, 'neck_id', 'neck', False),
+        (matched_patterns, 'pattern_id', 'pattern', False),
+    ]
 
-        price_info = {}
-        if best_variant:
-            price_info = {
-                'price' : float(best_variant.discounted_price),
-                'original_price' : float(best_variant.price),
-                'discount' : best_variant.discount_percentage,
-            }
+    suggestions = []
+    seen_labels = set()
+    base_url = reverse('product_list')
 
-        results.append({
-            'id' : product.id,
-            'name' : product.name,
-            'slug' : product.slug,
-            'image' : primary_image.image.url if primary_image else None,
-            'category' : product.category.name if product.category else '',
-            'occasion' : product.occasion.name if product.occasion else '',
-            **price_info
+    def add_suggestion(label, filter_kwargs, url_params):
+        if label.lower() in seen_lables:
+            return
+        if not Product.objects.filter(is_active=True, is_deleted=False, **filter_kwargs).exists():
+            return
+        seen_labels.add(label.lower())
+        suggestions.append({'label': label, 'url' : f"{base_url}?{urlencode(url_params)}"})
+
+    if matched_categories:
+        for cat in matched_categories:
+            for attrs, filter_field, url_key, use_name, in attribute_groups:
+                for attr in attrs:
+                    label = f"{attr.name} {cat.name}"
+                    filter_kwargs = {'category_id': cat.id, filter_field: attr.id}
+                    url_params =  {'category' : cat.slug, url_key: attr.name if use_name else attr.id}
+                    add_suggestion(label, filter_kwargs, url_params)
+
+            add_suggestion(cat.name, {'category_id' : cat.id}, {'category' : cat.slug})
+    else:
+        for attrs, filter_field, url_key, use_name in attribute_groups:
+            for attr in attrs:
+                add_suggestion(
+                    attr.name,
+                    {filter_field: attr.id},
+                    {url_key: attr.name if use_name else attr.id}
+                )
+
+    # last resort: nothing structured matched — fall back to free-text search
+    if not suggestions:
+        suggestions.append({
+            'label' : f'Search for "{query}"',
+            'url' : f"{base_url}?{urlencode({'search' : query})}"
         })
 
-    return JsonResponse({'results' : results})
+    return JsonResponse({'results' : suggestions[:8]})
