@@ -73,8 +73,11 @@ function initSearch() {
     if (!searchInput || !suggestionsBox) return;
 
     function hideSuggestions() {
-        suggestionsBox.classList.add('hidden');
-        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.opacity='0';
+        setTimeout(() => {
+            suggestionsBox.classList.add('hidden');
+            suggestionsBox.innerHTML = '';
+        }, 150);
     }
 
     async function fetchSuggestions(query) {
@@ -115,6 +118,10 @@ function initSearch() {
 
             suggestionsBox.innerHTML = html;
             suggestionsBox.classList.remove('hidden');
+            // Optional: Add a small delay for smooth appearance
+            setTimeout(() => {
+                suggestionsBox.style.opacity = '1';
+            }, 10);
         } catch (e) {
             console.error('Search suggestions error:', e);
         }
