@@ -12,6 +12,7 @@ from orders.utils import send_order_confirmation_email, send_admin_new_order_not
 from django.urls import reverse
 import razorpay
 from razorpay.errors import SignatureVerificationError
+from orders.services import deduct_stock_after_payment
 
 
 @require_POST
@@ -31,6 +32,9 @@ def verify_payment(request):
         order.razorpay_payment_id = params['razorpay_payment_id']
         order.order_status = Order.OrderStatus.CONFIRMED
         order.save()
+
+        #===== Deduct Stock =====
+        deduct_stock_after_payment(order)
 
         payment = Payment.objects.filter(order=order).first()
 
@@ -82,6 +86,8 @@ def razorpay_webhook(request):
                 order.razorpay_payment_id = payment_entity['id']
                 order.order_status = Order.OrderStatus.CONFIRMED
                 order.save()
+
+                deduct_stock_after_payment(order)
 
                 # Update Payment record
                 Payment.objects.filter(order=order).update(
