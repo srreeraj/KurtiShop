@@ -79,7 +79,7 @@ function initSearch() {
 
     async function fetchSuggestions(query) {
         try {
-            const res = await fetch(`/search/suggestions/?q=${encodeURIComponent(query)}`);
+            const res = await fetch(`/products/search/suggestions/?q=${encodeURIComponent(query)}`);
             if (!res.ok) throw new Error('Failed');
             
             const data = await res.json();
