@@ -63,3 +63,22 @@ def create_order_from_cart(cart, form_data):
     cart.delete()
 
     return order
+
+@transaction.atomic
+def deduct_stock_after_payment(order):
+    """
+        Deduct stock only after successful payment,
+        This is atomic to prevent overselling
+    """
+    for item in order.items.select_related('variants').all():
+        if item.variant:
+            if item.variant.stock < item.quantity:
+                # This should rarely happen if you lock stock at cart stage
+                raise ValueError(f"Insufficient stock for {item.variant}")
+
+            item.variant.stock -= item.quantity
+            item.variant.save(update_fields=['stock'])
+
+    # Optional: Update order status to reflect stock was deducted
+    order.order_status = Order.OrderStatus.CONFIRMED
+    order.save(update_fields=['order_status'])
