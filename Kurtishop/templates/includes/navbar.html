@@ -1,243 +1,141 @@
 {% load static %}
 
-<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
 
-<style>
-  :root {
-    --brand: #C1121F;
-    --brand-hover: #9B0D17;
-  }
-
-  html, body {
-    /* Safety net: nothing on the page — including the navbar — is allowed
-       to create a horizontal scrollbar. */
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  #main-navbar {
-    transition: background 0.4s ease, box-shadow 0.4s ease;
-    max-width: 100vw;
-    overflow: hidden; /* clip any stray sub-pixel overflow from children */
-  }
-
-  /* Default State (Transparent + White) */
-  .nav-logo {
-    color: #ffffff;
-    transition: color 0.4s ease;
-    white-space: nowrap;
-  }
-
-  .nav-link {
-    position: relative;
-    padding-bottom: 3px;
-    color: rgba(255, 255, 255, 0.9);
-    transition: color 0.4s ease;
-  }
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--brand);
-    transition: width 0.3s ease;
-  }
-  .nav-link:hover::after,
-  .nav-link.active::after {
-    width: 100%;
-  }
-
-  /* Hamburger - Improved Visibility */
-  #hamburger-btn {
-    color: #ffffff;           /* Important for initial state */
-    transition: color 0.4s ease;
-  }
-  #hamburger-btn .bar {
-    display: block;
-    width: 24px;
-    height: 1.5px;
-    background: currentColor;   /* Use currentColor for better sync */
-    transition: all 0.4s ease;
-  }
-
-  /* Search Icon */
-  #search-btn svg {
-    stroke: #ffffff;
-    transition: stroke 0.4s ease;
-  }
-
-  /* Scrolled State */
-  #main-navbar.scrolled {
-    background: #ffffff !important;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.08);
-  }
-
-  #main-navbar.scrolled .nav-logo,
-  #main-navbar.scrolled #hamburger-btn,
-  #main-navbar.scrolled #search-btn svg,
-  #main-navbar.scrolled #cart-btn {
-    color: var(--brand);
-    stroke: var(--brand);
-  }
-
-  #main-navbar.scrolled .nav-link {
-    color: #333;
-  }
-
-  #main-navbar.scrolled .nav-link:hover,
-  #main-navbar.scrolled .nav-link.active {
-    color: var(--brand);
-  }
-
-  /* Search Input
-     width is capped with min() so it can never demand more horizontal
-     space than the viewport can actually offer — this is what was
-     forcing the page to scroll sideways on narrow screens. */
-  .search-input {
-    width: 0;
-    min-width: 0;
-    opacity: 0;
-    border: none;
-    outline: none;
-    background: transparent;
-    transition: width 0.4s ease, opacity 0.3s ease;
-    font-size: 12px;
-    letter-spacing: 1px;
-  }
-  .search-input.open {
-    width: min(160px, 30vw);
-    opacity: 1;
-    border-bottom: 1px solid #ccc;
-    padding: 4px 0;
-  }
-
-  /* ===== Three-section layout (mobile/tablet only) =====
-     .nav-section-left / .nav-section-right share the remaining space
-     equally (flex: 1 1 0) and are allowed to shrink (min-width: 0),
-     so the center section (logo) stays perfectly centered and the
-     right section can never push content past the viewport edge —
-     it shrinks instead of overflowing.
-
-     At the lg breakpoint these wrappers become `display:contents`,
-     which removes them from the box model entirely. Their children
-     fall back to being direct children of the original flex row,
-     exactly reproducing the original (unchanged) desktop layout. */
-  .nav-section {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-  }
-  .nav-section-left,
-  .nav-section-right {
-    flex: 1 1 0;
-  }
-  .nav-section-left { justify-content: flex-start; }
-  .nav-section-right { justify-content: flex-end; }
-  .nav-section-center { justify-content: center; }
-
-  @media (min-width: 1024px) {
-    .nav-section {
-      display: contents;
-    }
-  }
-
-  /* Mobile */
-  @media (max-width: 1024px) {
-    .desktop-nav { display: none; }
-  }
-
-  /* Mobile Nav Links */
-  .mobile-nav-link {
-    display: block;
-    padding: 16px 0;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--brand);
-    text-decoration: none;
-    border-bottom: 0.5px solid #f0f0f0;
-  }
-</style>
-
-<!-- ===================== NAVBAR ===================== -->
-<!-- ===================== NAVBAR ===================== -->
 {% url 'home' as home_url %}
+{% if request.path == home_url %}
+  {% comment %} transparent / white-text initial state {% endcomment %}
+{% endif %}
+
 <nav id="main-navbar"
-     class="fixed top-0 left-0 right-0 z-50 {% if request.path == home_url %}bg-transparent{% else %}scrolled{% endif %}"
-     {% if request.path != home_url %}data-force-solid="true"{% endif %}
-     style="height: 88px;">
+     class="fixed top-0 left-0 right-0 z-50 h-[88px] max-w-[100vw] transition-[background-color,box-shadow] duration-[400ms] ease-in-out
+            {% if request.path == home_url %}bg-transparent{% else %}bg-white shadow-[0_1px_0_rgba(0,0,0,0.08)]{% endif %}"
+     {% if request.path != home_url %}data-force-solid="true"{% endif %}>
 
   <div class="max-w-screen-2xl mx-auto h-full w-full flex items-center justify-between px-4 sm:px-5 md:px-8 lg:px-16">
 
-    <!-- LEFT SECTION: hamburger -->
-    <div class="nav-section nav-section-left">
-      <button id="hamburger-btn" class="lg:hidden flex flex-col justify-center items-center gap-[5px] p-2 -ml-2"
+    <!-- LEFT: hamburger -->
+    <div class="flex items-center min-w-0 flex-1 contents lg:contents lg:justify-start">
+      <button id="hamburger-btn"
+              class="lg:hidden flex flex-col justify-center items-center gap-[5px] p-2 -ml-2 transition-colors duration-[400ms]
+                     {% if request.path == home_url %}text-white{% else %}text-[#C1121F]{% endif %}"
               aria-label="Open menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+        <span class="block w-6 h-[1.5px] bg-current transition-all duration-[400ms]"></span>
+        <span class="block w-6 h-[1.5px] bg-current transition-all duration-[400ms]"></span>
+        <span class="block w-6 h-[1.5px] bg-current transition-all duration-[400ms]"></span>
       </button>
     </div>
 
-    <!-- CENTER SECTION: logo -->
-    <div class="nav-section nav-section-center">
-      <a href="{% url 'home' %}" class="nav-logo flex-shrink-0"
-         style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;">
+    <!-- CENTER: logo -->
+    <div class="flex items-center justify-center flex-1 contents lg:contents">
+      <a href="{% url 'home' %}"
+         id="nav-logo"
+         class="flex-shrink-0 whitespace-nowrap transition-colors duration-[400ms] font-['Cormorant_Garamond',Georgia,serif] text-[26px] font-bold tracking-[3px] uppercase
+                {% if request.path == home_url %}text-white{% else %}text-[#C1121F]{% endif %}">
         liara
       </a>
     </div>
 
-    <!-- Desktop Navigation (unchanged: hidden below lg, flex at lg+) -->
     <!-- Desktop Navigation -->
-<ul class="hidden lg:flex items-center list-none m-0 p-0 desktop-nav" style="gap: 32px;">
-    <li><a href="{% url 'home' %}" class="nav-link {% if request.path == home_url %}active{% endif %}">Home</a></li>
-    
-    <li><a href="{% url 'product_list' %}?new-arrivals=true" class="nav-link">New Arrivals</a></li>
-    <li><a href="{% url 'product_list' %}?occasion=wedding" class="nav-link">Wedding</a></li>
-    <li><a href="{% url 'product_list' %}?occasion=office-wear" class="nav-link">Office Wear</a></li>
-    <li><a href="{% url 'product_list' %}?occasion=ethnic" class="nav-link">Ethnic</a></li>
-    <li><a href="{% url 'product_list' %}?occasion=western" class="nav-link">Western</a></li>
-    
-    <li><a href="{% url 'product_list' %}?sale=true" class="nav-link sale">Sale</a></li>
-    <li><a href="{% url 'contact' %}" class="nav-link">Contact</a></li>
-</ul>
+    <ul class="hidden lg:flex items-center list-none m-0 p-0 gap-8">
+      <li>
+        <a href="{% url 'home' %}" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300
+                  {% if request.path == home_url %}text-white/90 after:w-full{% else %}text-gray-700 after:w-0{% endif %}">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?new-arrivals=true" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          New Arrivals
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?occasion=wedding" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Wedding
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?occasion=office-wear" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Office Wear
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?occasion=ethnic" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Ethnic
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?occasion=western" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Western
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?sale=true" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Sale
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'contact' %}" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Contact
+        </a>
+      </li>
+    </ul>
 
-    <!-- RIGHT SECTION: search + cart -->
-    <div class="nav-section nav-section-right">
+    <!-- RIGHT: search + cart -->
+    <div class="flex items-center justify-end flex-1 contents lg:contents">
       <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 min-w-0">
 
-        <!-- Search -->
         <div class="flex items-center min-w-0 relative z-[9999]" id="search-wrap">
-          <input 
-            type="text" 
-            id="search-input" 
-            class="search-input" 
+          <input
+            type="text"
+            id="search-input"
+            autocomplete="off"
             placeholder="Search dresses, wedding, ethnic..."
-            autocomplete="off">
+            class="w-0 min-w-0 opacity-0 border-none outline-none bg-transparent transition-[width,opacity] duration-[400ms] ease-in-out text-xs tracking-widest">
 
-          <button id="search-btn" class="p-2 flex-shrink-0" aria-label="Search">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" 
-              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" 
-              stroke-linejoin="round">
+          <button id="search-btn" aria-label="Search"
+                  class="p-2 flex-shrink-0 transition-colors duration-[400ms]
+                         {% if request.path == home_url %}text-white{% else %}text-[#C1121F]{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"/>
               <path d="m21 21-4.35-4.35"/>
             </svg>
           </button>
 
-          <!-- Suggestions Dropdown -->
-          <div id="search-suggestions" 
-            class="hidden absolute top-[calc(100%+12px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-[9999] max-h-[65vh] overflow-auto">
+          <div id="search-suggestions"
+               class="hidden absolute top-[calc(100%+12px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-[9999] max-h-[65vh] overflow-auto">
           </div>
         </div>
 
-        <!-- Cart Icon -->
-        <a href="#" id="cart-btn" class="relative p-2 -mr-2 flex-shrink-0 text-white hover:text-red-600 transition-colors">
+        <a href="#" id="cart-btn"
+           class="relative p-2 -mr-2 flex-shrink-0 transition-colors duration-[400ms] hover:text-red-600
+                  {% if request.path == home_url %}text-white{% else %}text-[#C1121F]{% endif %}">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="8" cy="21" r="1"/>
             <circle cx="19" cy="21" r="1"/>
@@ -255,38 +153,36 @@
   </div>
 </nav>
 
-<!-- ============== MOBILE DRAWER ============== -->
+<!-- MOBILE DRAWER -->
 <div id="drawer-overlay" class="fixed inset-0 bg-black/50 opacity-0 pointer-events-none transition-opacity z-40 lg:hidden"></div>
 
-<div id="mobile-drawer" class="fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] bg-white translate-x-full transition-transform duration-300 z-50 lg:hidden"
-     style="padding: 80px 30px 40px;">
+<div id="mobile-drawer"
+     class="fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] bg-white translate-x-full transition-transform duration-300 z-50 lg:hidden pt-20 px-[30px] pb-10">
 
-  <span style="position: absolute; top: 28px; left: 30px; font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; color: var(--brand);">
+  <span class="absolute top-7 left-[30px] font-['Cormorant_Garamond',serif] text-[22px] font-bold tracking-[3px] text-[#C1121F]">
     Élégance
   </span>
 
-  <button id="drawer-close-btn" style="position: absolute; top: 24px; right: 28px; font-size: 28px; color: #333;">&times;</button>
+  <button id="drawer-close-btn" class="absolute top-6 right-7 text-[28px] text-gray-700">&times;</button>
 
   <nav class="flex flex-col">
-    <a href="{% url 'home' %}" class="mobile-nav-link">Home</a>
-    <a href="{% url 'product_list' %}?new_arrivals=trues" class="mobile-nav-link">New Arrivals</a>
-    <a href="{% url 'product_list' %}?occasion=wedding" class="mobile-nav-link">Wedding Collection</a>
-    <a href="{% url 'product_list' %}?occasion=office-wear" class="mobile-nav-link">Office Wear</a>
-    <a href="{% url 'product_list' %}?occasion=ethnic" class="mobile-nav-link">Ethnic Wear</a>
-    <a href="{% url 'product_list' %}?occasion=western" class="mobile-nav-link">Western Wear</a>
-    <a href="{% url 'product_list' %}?sale=true" class="mobile-nav-link">Sale</a>
-    <a href="{% url 'contact' %}" class="mobile-nav-link">Contact</a>
+    <a href="{% url 'home' %}" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Home</a>
+    <a href="{% url 'product_list' %}?new_arrivals=trues" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">New Arrivals</a>
+    <a href="{% url 'product_list' %}?occasion=wedding" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Wedding Collection</a>
+    <a href="{% url 'product_list' %}?occasion=office-wear" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Office Wear</a>
+    <a href="{% url 'product_list' %}?occasion=ethnic" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Ethnic Wear</a>
+    <a href="{% url 'product_list' %}?occasion=western" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Western Wear</a>
+    <a href="{% url 'product_list' %}?sale=true" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Sale</a>
+    <a href="{% url 'contact' %}" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Contact</a>
   </nav>
 </div>
 
-<!-- ==================== CART DRAWER ==================== -->
+<!-- CART DRAWER -->
 <div id="cart-overlay" class="fixed inset-0 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-300 z-[60] hidden"></div>
 
-<div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-full md:w-[460px] bg-white shadow-2xl translate-x-full transition-transform duration-300 z-[70] flex flex-col overflow-hidden">
-
-    <div id="cart-drawer-content" class="flex-1 flex flex-col overflow-hidden">
-        <!-- Cart content will be loaded here dynamically -->
-    </div>
+<div id="cart-drawer"
+     class="fixed top-0 right-0 h-full w-full max-w-full md:w-[460px] bg-white shadow-2xl translate-x-full transition-transform duration-300 z-[70] flex flex-col overflow-hidden">
+  <div id="cart-drawer-content" class="flex-1 flex flex-col overflow-hidden"></div>
 </div>
 
 <script src="{% static 'js/navbar.js' %}"></script>
