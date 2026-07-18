@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Count, Q, Min
+from django.db.models import Count, Q, Min, F, ExpressionWrapper, DecimalField
 from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
 from django.http import JsonResponse
 
@@ -242,7 +242,7 @@ def product_detail(request,slug):
 def search_suggestions(request):
     query = request.GET.get('q', '').strip()
 
-    if len(query) > 3:
+    if len(query) < 3:
         return JsonResponse({'results' : []})
 
     # Broad but efficient search
@@ -273,7 +273,12 @@ def search_suggestions(request):
             stock__gt=0,
             is_active=True,
             is_deleted=False
-        ).order_by('discounted_price').first()
+        ).annotate(
+            effective_price = ExpressionWrapper(
+                F('price') * (1 - F('discounted_percentage') / 100),
+                output_field=DecimalField()
+            )
+        ).order_by('effective_price').first()
 
         price_info = {}
         if best_variant:
