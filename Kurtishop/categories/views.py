@@ -53,7 +53,7 @@ def category_update(request, pk):
             return redirect('categories:category_list')
     else:
         form = CategoryForm(instance=category)
-
+    context = get_category_context()
     context.update({
         'form': form,
         'category': category,
