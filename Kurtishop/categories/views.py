@@ -5,10 +5,15 @@ from .models import Category
 from .forms import CategoryForm
 # Create your views here.
 
+def get_category_context():
+    return {
+        'categories': Category.objects.filter(is_deleted=False).select_related('parent').order_by('name')
+    }
+
 @login_required
 @user_passes_test(lambda u : u.is_staff)
 def category_list(request):
-    categories = Category.objects.filter(is_deleted=False).select_related('parent')
+    categories = get_category_context()
     context = {
         'categories' : categories,
         'page_title' : 'Categories'
@@ -27,11 +32,11 @@ def category_create(request):
             return redirect('categories:category_list')
     else:
         form = CategoryForm()
-
-    context = {
+    context = get_category_context()
+    context.update({
         'form' : form,
         'page_title' : 'Create Category'
-    }
+    })
     return render(request, 'dashboard/categories/list.html', context)
 
 
@@ -49,11 +54,11 @@ def category_update(request, pk):
     else:
         form = CategoryForm(instance=category)
 
-    context = {
+    context.update({
         'form': form,
         'category': category,
         'page_title': 'Edit Category'
-    }
+    })
     return render(request, 'dashboard/categories/list.html', context)
 
 @login_required
@@ -63,5 +68,5 @@ def category_delete(request, pk):
     category.is_deleted = True
     category.save()
     messages.success(request, 'Category deleted successfully!')
-    return redirect('dashboard:category_list')
+    return redirect('categories:category_list')
 
