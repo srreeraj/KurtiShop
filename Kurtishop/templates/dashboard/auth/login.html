@@ -1,0 +1,61 @@
+{% extends "dashboard/layout/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Login{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full">
+        <!-- Logo / Brand -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                    A
+                </div>
+                <h1 class="text-3xl font-semibold text-gray-900">Admin</h1>
+            </div>
+            <p class="text-gray-500 mt-2">E-commerce Dashboard</p>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6 text-center">Sign in to your account</h2>
+
+            {% if error %}
+                <div class="mb-6 bg-red-50 border border-red-200 text-red-600 rounded-2xl p-4 text-sm">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                    <input type="text" name="username" required
+                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-red-500 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                    <input type="password" name="password" required
+                           class="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:border-red-500 transition-colors">
+                </div>
+
+                <button type="submit"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2">
+                    Sign In
+                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="#" class="text-sm text-gray-500 hover:text-gray-700">Forgot password?</a>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-gray-400 mt-8">
+            © 2026 Your Store. All rights reserved.
+        </p>
+    </div>
+</div>
+{% endblock %}
