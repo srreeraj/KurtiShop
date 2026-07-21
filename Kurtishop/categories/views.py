@@ -24,7 +24,7 @@ def category_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Category created successfully')
-            return redirect('dashboard:category_list')
+            return redirect('categories:category_list')
     else:
         form = CategoryForm()
 
@@ -32,7 +32,7 @@ def category_create(request):
         'form' : form,
         'page_title' : 'Create Category'
     }
-    return render(request, 'dashboard/categories/form.html', context)
+    return render(request, 'dashboard/categories/list.html', context)
 
 
 @login_required
@@ -45,7 +45,7 @@ def category_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Category updated successfully!')
-            return redirect('dashboard:category_list')
+            return redirect('categories:category_list')
     else:
         form = CategoryForm(instance=category)
 
@@ -54,7 +54,7 @@ def category_update(request, pk):
         'category': category,
         'page_title': 'Edit Category'
     }
-    return render(request, 'dashboard/categories/form.html', context)
+    return render(request, 'dashboard/categories/list.html', context)
 
 @login_required
 @user_passes_test(lambda u: u.is_staff)
