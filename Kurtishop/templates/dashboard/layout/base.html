@@ -54,6 +54,9 @@
         }
     </script>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+        <script src="{% static 'js/dashboard/main.js' %}"></script>
+        {{ block.super }}   <!-- This is important if child templates add more js -->
+    {% endblock %}
 </body>
 </html>
