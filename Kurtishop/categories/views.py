@@ -8,7 +8,7 @@ from .forms import CategoryForm
 @login_required
 @user_passes_test(lambda u : u.is_staff)
 def category_list(request):
-    categories = Category.objects.filter(is_deleted=True).select_related('parent')
+    categories = Category.objects.filter(is_deleted=False).select_related('parent')
     context = {
         'categories' : categories,
         'page_title' : 'Categories'
