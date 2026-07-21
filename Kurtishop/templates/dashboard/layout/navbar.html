@@ -1,0 +1,31 @@
+<header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+        <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-gray-700">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-xl font-semibold text-gray-800">{% block page_title %}Dashboard{% endblock %}</h1>
+    </div>
+
+    <div class="flex items-center gap-6">
+        <div class="relative">
+            <input type="text" placeholder="Search..." 
+                   class="bg-gray-100 border border-transparent focus:border-gray-300 rounded-2xl py-2.5 pl-10 pr-4 text-sm w-80 focus:outline-none">
+            <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3.5 top-3"></i>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button class="text-gray-500 hover:text-gray-700 relative">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">3</span>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-sm font-medium">{{ request.user.get_full_name|default:request.user.username }}</div>
+                    <div class="text-xs text-gray-500">Administrator</div>
+                </div>
+                <div class="w-9 h-9 bg-gray-300 rounded-2xl"></div>
+            </div>
+        </div>
+    </div>
+</header>
