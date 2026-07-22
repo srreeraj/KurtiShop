@@ -21,6 +21,41 @@
 <!-- Categories Table -->
 <div class="bg-white rounded-3xl shadow-sm overflow-hidden">
     {% include "dashboard/categories/table.html" %}
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+        <p class="text-sm text-gray-500">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+        </p>
+        <div class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </a>
+            {% else %}
+                <span class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-300"><i data-lucide="chevron-left" class="w-4 h-4"></i></span>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-600 text-white text-sm font-medium">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 text-sm transition">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </a>
+            {% else %}
+                <span class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-300"><i data-lucide="chevron-right" class="w-4 h-4"></i></span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% include "dashboard/categories/create_modal.html" %}
 {% include "dashboard/categories/edit_modal.html" %}
