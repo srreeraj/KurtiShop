@@ -14,10 +14,7 @@ def get_category_context():
 @user_passes_test(lambda u : u.is_staff)
 def category_list(request):
     categories = get_category_context()
-    context = {
-        'categories' : categories,
-        'page_title' : 'Categories'
-    }
+    context['page_title'] = 'Categories'
     return render(request, 'dashboard/categories/list.html', context)
 
 
