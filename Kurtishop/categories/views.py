@@ -36,7 +36,7 @@ def category_create(request):
             return redirect('categories:category_list')
     else:
         form = CategoryForm()
-    context = get_category_context()
+    context = get_category_context(request)
     context.update({
         'form' : form,
         'page_title' : 'Create Category'
@@ -57,7 +57,7 @@ def category_update(request, pk):
             return redirect('categories:category_list')
     else:
         form = CategoryForm(instance=category)
-    context = get_category_context()
+    context = get_category_context(request)
     context.update({
         'form': form,
         'category': category,
