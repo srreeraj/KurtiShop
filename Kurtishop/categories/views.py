@@ -3,17 +3,24 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Category
 from .forms import CategoryForm
+from django.core.paginator import Paginator
 # Create your views here.
 
-def get_category_context():
+def get_category_context(request, per_page=10):
+    qs = Category.objects.filter(is_deleted=False).select_related('parent').order_by('name')
+    paginator = Paginator(qs, per_page)
+    page_obj = paginator.get_page(request.GET.get('page'))
     return {
-        'categories': Category.objects.filter(is_deleted=False).select_related('parent').order_by('name')
+        'categories': page_obj,
+        'page_obj' : page_obj,
+        'paginator' : paginator,
     }
 
 @login_required
 @user_passes_test(lambda u : u.is_staff)
 def category_list(request):
     context = get_category_context()
+    context['form'] = CategoryForm()
     context['page_title'] = 'Categories'
     return render(request, 'dashboard/categories/list.html', context)
 
