@@ -13,14 +13,14 @@
         <label class="block text-sm font-medium text-gray-700 mb-1.5">
             Category Name <span class="text-red-500">*</span>
         </label>
-        {{ form.name|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.name }}
         {{ form.name.errors }}
     </div>
 
     <!-- Parent -->
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
-        {{ form.parent|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.parent }}
         {{ form.parent.errors }}
     </div>
 
@@ -41,14 +41,14 @@
             {% endif %}
         </div>
 
-        {{ form.image|add_class:"block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100" }}
+        {{ form.image }}
         {{ form.image.errors }}
     </div>
 
     <!-- Description -->
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-        {{ form.description|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.description }}
         {{ form.description.errors }}
     </div>
 
