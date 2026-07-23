@@ -20,8 +20,10 @@ def get_category_context(request, per_page=5):
 @user_passes_test(lambda u : u.is_staff)
 def category_list(request):
     context = get_category_context(request)
-    context['form'] = CategoryForm()
-    context['page_title'] = 'Categories'
+    context.update({
+        'page_title' : 'Categories',
+        'form' : CategoryForm(),
+    })
     return render(request, 'dashboard/categories/list.html', context)
 
 
@@ -38,8 +40,8 @@ def category_create(request):
         form = CategoryForm()
     context = get_category_context(request)
     context.update({
-        'form' : form,
-        'page_title' : 'Create Category'
+        'form': form if 'form' in locals() else CategoryForm(),
+        'page_title': 'Create Category',
     })
     return render(request, 'dashboard/categories/list.html', context)
 
@@ -59,7 +61,7 @@ def category_update(request, pk):
         form = CategoryForm(instance=category)
     context = get_category_context(request)
     context.update({
-        'form': form,
+        'form': form if 'form' in locals() else CategoryForm(instance=category),
         'category': category,
         'page_title': 'Edit Category'
     })
