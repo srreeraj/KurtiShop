@@ -1,8 +1,8 @@
 {% load static %}
 
-<form id="{{ form_id|default:'category-form' }}" 
-      method="post" 
-      action="{{ form_action }}" 
+<form id="{{ form_id|default:'category-form' }}"
+      method="post"
+      action="{{ form_action }}"
       enctype="multipart/form-data"
       class="space-y-6">
 
@@ -10,75 +10,149 @@
 
     <!-- Name -->
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
             Category Name <span class="text-red-500">*</span>
         </label>
+
         {{ form.name }}
-        {{ form.name.errors }}
+
+        {% if form.name.errors %}
+            <p class="mt-1 text-sm text-red-600">
+                {{ form.name.errors.0 }}
+            </p>
+        {% endif %}
     </div>
 
     <!-- Parent -->
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
+        <label for="{{ form.parent.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Parent Category
+        </label>
+
         {{ form.parent }}
-        {{ form.parent.errors }}
+
+        {% if form.parent.errors %}
+            <p class="mt-1 text-sm text-red-600">
+                {{ form.parent.errors.0 }}
+            </p>
+        {% endif %}
     </div>
 
     <!-- Image -->
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Image</label>
-        
+        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Image
+        </label>
+
         <div id="image-preview-container" class="mb-4">
-            {% if category and category.image %}
-                <img id="current-image" 
-                     src="{{ category.image.url }}" 
-                     class="w-32 h-32 object-cover rounded-2xl border border-gray-100">
+            {% if form.instance.image %}
+                <img
+                    id="current-image"
+                    src="{{ form.instance.image.url }}"
+                    class="w-32 h-32 object-cover rounded-2xl border border-gray-200"
+                    alt="Category Image">
             {% else %}
-                <div id="image-placeholder" 
-                     class="w-32 h-32 bg-gray-100 rounded-2xl flex items-center justify-center">
+                <div id="image-placeholder"
+                     class="w-32 h-32 bg-gray-100 rounded-2xl flex items-center justify-center border border-dashed border-gray-300">
                     <i data-lucide="image" class="w-8 h-8 text-gray-400"></i>
                 </div>
             {% endif %}
         </div>
 
         {{ form.image }}
-        {{ form.image.errors }}
+
+        {% if form.image.errors %}
+            <p class="mt-1 text-sm text-red-600">
+                {{ form.image.errors.0 }}
+            </p>
+        {% endif %}
     </div>
 
     <!-- Description -->
     <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1.5">
+            Description
+        </label>
+
         {{ form.description }}
-        {{ form.description.errors }}
+
+        {% if form.description.errors %}
+            <p class="mt-1 text-sm text-red-600">
+                {{ form.description.errors.0 }}
+            </p>
+        {% endif %}
     </div>
 
     <!-- Active Toggle -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between border-t pt-4">
         <div>
-            <label class="text-sm font-medium text-gray-700">Active Status</label>
-            <p class="text-xs text-gray-500">Show this category in the store</p>
+            <label class="text-sm font-medium text-gray-700">
+                Active Status
+            </label>
+            <p class="text-xs text-gray-500">
+                Show this category in the store
+            </p>
         </div>
+
         <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" 
-                   name="is_active" 
-                   id="is_active_toggle"
-                   value="true"
-                   {% if form.instance.is_active or not form.instance.pk %}checked{% endif %}
-                   class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+
+            <input
+                type="checkbox"
+                id="{{ form_id }}-is-active"
+                name="is_active"
+                value="true"
+                class="sr-only peer"
+                {% if form.instance.is_active or not form.instance.pk %}checked{% endif %}>
+
+            <div
+                class="relative w-11 h-6 bg-gray-200 rounded-full
+                       peer-focus:ring-4 peer-focus:ring-red-300
+                       peer-checked:bg-red-600
+                       after:absolute
+                       after:top-[2px]
+                       after:left-[2px]
+                       after:h-5
+                       after:w-5
+                       after:rounded-full
+                       after:bg-white
+                       after:border
+                       after:border-gray-300
+                       after:transition-all
+                       peer-checked:after:translate-x-full">
+            </div>
+
         </label>
     </div>
 
+    <!-- Buttons -->
     <div class="flex justify-end gap-3 pt-4 border-t">
-        <button type="button" 
-                onclick="closeModal()"
-                class="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl font-medium transition">
-            Cancel
-        </button>
-        <button type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-2xl font-medium transition flex items-center gap-2">
+
+        {% if form_id == "create-form" %}
+            <button
+                type="button"
+                onclick="closeCreateModal()"
+                class="px-6 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition">
+                Cancel
+            </button>
+        {% else %}
+            <button
+                type="button"
+                onclick="closeEditModal()"
+                class="px-6 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition">
+                Cancel
+            </button>
+        {% endif %}
+
+        <button
+            type="submit"
+            class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-2xl font-medium transition">
+
             <i data-lucide="save" class="w-4 h-4"></i>
-            {{ submit_text|default:'Save Category' }}
+
+            {{ submit_text|default:"Save Category" }}
+
         </button>
+
     </div>
+
 </form>
