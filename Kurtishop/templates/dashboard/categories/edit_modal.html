@@ -1,0 +1,18 @@
+<!-- Edit Modal -->
+<div id="editModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white rounded-3xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="edit-modal-title" class="text-2xl font-semibold text-gray-900">Edit Category</h2>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            {% include "dashboard/categories/_category_form.html" with 
+                form_action="" 
+                form_id="edit-form"
+                submit_text="Update Category" %}
+        </div>
+    </div>
+</div>
