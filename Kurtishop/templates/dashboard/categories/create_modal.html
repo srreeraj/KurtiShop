@@ -9,7 +9,9 @@
                 </button>
             </div>
             
-            {% include "dashboard/categories/_category_form.html" with form_action="{% url 'categories:category_create' %}" form_id="create-form" submit_text="Create Category" %}
+            <div>
+                {% include "dashboard/categories/_category_form.html" with form_action="/dashboard/categories/create/" form_id="create-form" submit_text="Create Category" %}
+            </div>
         </div>
     </div>
 </div>
