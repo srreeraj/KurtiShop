@@ -20,7 +20,7 @@ function openEditModal(pk, name, parentId, description, isActive) {
     const parentSelect = form.querySelector('select[name="parent"]');
     if (parentSelect) parentSelect.value = parentId || '';
 
-    const toggle = form.querySelector('#is_active_toggle');
+    const toggle = form.querySelector('input[name="is_active"]');
     if (toggle) toggle.checked = (isActive === 'true');
 
     modal.classList.remove('hidden');
