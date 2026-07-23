@@ -50,16 +50,17 @@
                 </span>
             </td>
             
+            <!-- Inside the loop -->
             <td class="py-5 px-6 text-right">
                 <div class="flex items-center justify-end gap-4 opacity-0 group-hover:opacity-100 transition-all">
-                    <a href="{% url 'categories:category_update' category.pk %}" 
-                       class="text-blue-600 hover:text-blue-700 transition">
+                    <button onclick="openEditModal({{ category.pk }}, '{{ category.name|escapejs }}', '{{ category.parent.id|default:'' }}', '{{ category.description|escapejs }}', {{ category.is_active|yesno:'true,false' }})"
+                        class="text-blue-600 hover:text-blue-700 transition">
                         <i data-lucide="edit-2" class="w-5 h-5"></i>
-                    </a>
-                    
+                    </button>
+        
                     <a href="{% url 'categories:category_delete' category.pk %}" 
-                       class="text-red-600 hover:text-red-700 transition"
-                       onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone.')">
+                        class="text-red-600 hover:text-red-700 transition"
+                        onclick="return confirm('Delete this category?')">
                         <i data-lucide="trash-2" class="w-5 h-5"></i>
                     </a>
                 </div>
