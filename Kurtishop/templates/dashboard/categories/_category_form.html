@@ -1,0 +1,84 @@
+{% load static %}
+
+<form id="{{ form_id|default:'category-form' }}" 
+      method="post" 
+      action="{{ form_action }}" 
+      enctype="multipart/form-data"
+      class="space-y-6">
+
+    {% csrf_token %}
+
+    <!-- Name -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            Category Name <span class="text-red-500">*</span>
+        </label>
+        {{ form.name|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.name.errors }}
+    </div>
+
+    <!-- Parent -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
+        {{ form.parent|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.parent.errors }}
+    </div>
+
+    <!-- Image -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Image</label>
+        
+        <div id="image-preview-container" class="mb-4">
+            {% if category and category.image %}
+                <img id="current-image" 
+                     src="{{ category.image.url }}" 
+                     class="w-32 h-32 object-cover rounded-2xl border border-gray-100">
+            {% else %}
+                <div id="image-placeholder" 
+                     class="w-32 h-32 bg-gray-100 rounded-2xl flex items-center justify-center">
+                    <i data-lucide="image" class="w-8 h-8 text-gray-400"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        {{ form.image|add_class:"block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100" }}
+        {{ form.image.errors }}
+    </div>
+
+    <!-- Description -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+        {{ form.description|add_class:"block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4" }}
+        {{ form.description.errors }}
+    </div>
+
+    <!-- Active Toggle -->
+    <div class="flex items-center justify-between">
+        <div>
+            <label class="text-sm font-medium text-gray-700">Active Status</label>
+            <p class="text-xs text-gray-500">Show this category in the store</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" 
+                   name="is_active" 
+                   id="is_active_toggle"
+                   value="true"
+                   {% if form.instance.is_active or not form.instance.pk %}checked{% endif %}
+                   class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+        </label>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t">
+        <button type="button" 
+                onclick="closeModal()"
+                class="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-2xl font-medium transition">
+            Cancel
+        </button>
+        <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-2xl font-medium transition flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            {{ submit_text|default:'Save Category' }}
+        </button>
+    </div>
+</form>
