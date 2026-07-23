@@ -57,11 +57,10 @@
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
 <!-- Modals -->
 {% include "dashboard/categories/create_modal.html" %}
 {% include "dashboard/categories/edit_modal.html" %}
+{% endblock %}
 {% block extra_js %}
     <script src="{% static 'js/dashboard/edit-category.js' %}"></script>
     <script src="{% static 'js/dashboard/create-category.js' %}"></script>
