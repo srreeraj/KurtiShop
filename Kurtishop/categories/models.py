@@ -4,7 +4,7 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=False, blank=True)
 
     parent = models.ForeignKey(
         'self',
@@ -32,6 +32,20 @@ class Category(models.Model):
         indexes = [
             models.Index(fields=["is_active", "is_deleted"]),
         ]
+        constraints = [
+            # Allow same name if one is soft deleted
+            UniqueConstraint(
+                fields=['name'],
+                condition=Q(is_deleted=False)
+                name='unique_category_name_active'
+            ),
+            # Same for slug
+            UniqueConstraint(
+                fields=['slug'],
+                condition=Q(is_deleted=False),
+                name='unique_category_slug_active'
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -39,7 +53,7 @@ class Category(models.Model):
             slug = base_slug
             counter = 1
 
-            while Category.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            while Category.objects.filter(slug=slug, is_deleted=False).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             
