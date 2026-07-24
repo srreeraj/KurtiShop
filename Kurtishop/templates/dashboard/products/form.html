@@ -1,0 +1,180 @@
+{% extends "dashboard/layout/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" id="product-form">
+    {% csrf_token %}
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">{{ page_title }}</h1>
+        <div class="flex gap-3">
+            <a href="{% url 'products_dashboard:product_list' %}" class="px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-medium">Cancel</a>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-medium">Save Product</button>
+        </div>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                {{ form.material }}
+            </div>
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                {{ form.description }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Details</h2>
+        <div class="grid grid-cols-3 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Occasion</label>{{ form.occasion }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Pattern</label>{{ form.pattern }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Fit</label>{{ form.fit }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Sleeve</label>{{ form.sleeve }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Neck</label>{{ form.neck }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Length</label>{{ form.length }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Yoke</label>{{ form.yoke }}</div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Back</label>{{ form.back }}</div>
+            <div class="flex items-center gap-2 mt-6">{{ form.lining }}<label class="text-sm text-gray-700">Has Lining</label></div>
+            <div class="col-span-3"><label class="block text-sm font-medium text-gray-700 mb-1">Wash Care</label>{{ form.wash_care }}</div>
+        </div>
+    </div>
+
+    <!-- Marketing -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Marketing</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>{{ form.tags }}</div>
+            <div class="flex items-center gap-6 mt-6">
+                <label class="flex items-center gap-2 text-sm text-gray-700">{{ form.is_featured }} Featured</label>
+                <label class="flex items-center gap-2 text-sm text-gray-700">{{ form.is_new_arrival }} New Arrival</label>
+                <label class="flex items-center gap-2 text-sm text-gray-700">{{ form.is_active }} Active</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variants -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Variants (Size × Color × Price × Stock)</h2>
+            <button type="button" id="add-variant-btn" class="text-red-600 font-medium flex items-center gap-1">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Variant
+            </button>
+        </div>
+
+        {{ variant_formset.management_form }}
+        <div id="variant-rows" class="space-y-3">
+            {% for vform in variant_formset %}
+                <div class="variant-row grid grid-cols-6 gap-3 items-center border-b border-gray-100 pb-3">
+                    {% for hidden in vform.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div>{{ vform.size }}</div>
+                    <div>{{ vform.color }}</div>
+                    <div>{{ vform.price }}</div>
+                    <div>{{ vform.discount_percentage }}</div>
+                    <div>{{ vform.stock }}</div>
+                    <div class="flex items-center gap-2">
+                        {% if vform.instance.pk %}
+                            <label class="text-xs text-gray-500 flex items-center gap-1">
+                                {{ vform.DELETE }} Remove
+                            </label>
+                        {% else %}
+                            <button type="button" class="remove-variant-row text-gray-400 hover:text-red-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    {{ vform.non_field_errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Hidden template row for JS cloning -->
+        <template id="variant-empty-form">
+            <div class="variant-row grid grid-cols-6 gap-3 items-center border-b border-gray-100 pb-3">
+                <div>{{ variant_formset.empty_form.size }}</div>
+                <div>{{ variant_formset.empty_form.color }}</div>
+                <div>{{ variant_formset.empty_form.price }}</div>
+                <div>{{ variant_formset.empty_form.discount_percentage }}</div>
+                <div>{{ variant_formset.empty_form.stock }}</div>
+                <div>
+                    <button type="button" class="remove-variant-row text-gray-400 hover:text-red-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Images -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Images</h2>
+
+        {% if images_by_color %}
+            {% for color, images in images_by_color.items %}
+            <div class="mb-6">
+                <p class="font-medium text-gray-700 mb-2">{{ color.name }}</p>
+                <div class="flex flex-wrap gap-3">
+                    {% for img in images %}
+                    <div class="relative w-24 h-24">
+                        <img src="{{ img.image.url }}" class="w-24 h-24 object-cover rounded-xl">
+                        <span class="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded">{{ img.get_view_display }}</span>
+                        <label class="absolute top-1 right-1 bg-white rounded-full p-1 cursor-pointer">
+                            <input type="checkbox" name="delete_image" value="{{ img.id }}" class="hidden peer">
+                            <i data-lucide="trash-2" class="w-3 h-3 text-red-600 peer-checked:hidden"></i>
+                            <i data-lucide="rotate-ccw" class="w-3 h-3 text-gray-400 hidden peer-checked:block"></i>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div id="image-blocks" class="space-y-4"></div>
+        <button type="button" id="add-image-block-btn" class="text-red-600 font-medium flex items-center gap-1 mt-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Images for a Color
+        </button>
+
+        <template id="image-block-template">
+            <div class="image-block border border-gray-200 rounded-2xl p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <select name="image_block_color" class="rounded-xl border-gray-200 py-2 px-3">
+                        <option value="">— Select Color —</option>
+                        {% for color in colors %}
+                        <option value="{{ color.id }}">{{ color.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="remove-image-block text-gray-400 hover:text-red-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <input type="file" name="image_block_files___INDEX__" multiple accept="image/*"
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                <p class="text-xs text-gray-400 mt-1">Views (front, back, side...) are assigned automatically in upload order.</p>
+                <div class="image-preview flex flex-wrap gap-2 mt-3"></div>
+            </div>
+        </template>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/product-form.js' %}"></script>
+{% endblock %}
