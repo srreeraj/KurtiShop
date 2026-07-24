@@ -47,3 +47,20 @@ class CategoryForm(forms.ModelForm):
             )
 
         self.fields["parent"].empty_label = "— Root Category —"
+
+    def clean_name(self):
+        """Prevent duplicate names among active (non-deleted) categories"""
+        name = self.cleaned_data.get('name')
+        if not name:
+            return name
+
+        qs = Category.objects.filter(name=name, is_deleted=False)
+
+        # Allow updating the same category
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise forms.ValidationError("A category with this name already exists.")
+
+        return name
