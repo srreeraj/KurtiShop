@@ -1,0 +1,56 @@
+{% extends "dashboard/layout/base.html" %}
+{% load static %}
+
+{% block title %}Products{% endblock %}
+{% block page_title %}Products{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-gray-900">Products</h1>
+        <p class="text-gray-500">{{ paginator.count }} total products</p>
+    </div>
+    <a href="{% url 'products_dashboard:product_create' %}"
+       class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl flex items-center gap-2 font-medium">
+        <i data-lucide="plus" class="w-5 h-5"></i>
+        New Product
+    </a>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm mb-6 p-4">
+    <form method="get" class="flex flex-wrap gap-3">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search products, SKU, category..."
+               class="flex-1 min-w-[220px] rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-2 px-4">
+        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-2xl font-medium">
+            Search
+        </button>
+    </form>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm overflow-hidden">
+    {% include "dashboard/products/table.html" %}
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+        <p class="text-sm text-gray-500">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+        </p>
+        <div class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100"><i data-lucide="chevron-left" class="w-4 h-4"></i></a>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                    <span class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-600 text-white text-sm font-medium">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 text-sm">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100"><i data-lucide="chevron-right" class="w-4 h-4"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
