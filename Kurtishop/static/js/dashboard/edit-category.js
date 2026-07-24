@@ -21,7 +21,9 @@ function openEditModal(pk, name, parentId, description, isActive) {
     if (parentSelect) parentSelect.value = parentId || '';
 
     const toggle = form.querySelector('input[name="is_active"]');
-    if (toggle) toggle.checked = (isActive === 'true');
+    if (toggle){
+        toggle.checked = (isActive === 'true' || isActive === true)
+    }
 
     modal.classList.remove('hidden');
     lucide.createIcons();
