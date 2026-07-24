@@ -29,7 +29,6 @@ urlpatterns = [
     path("dashboard/", include("dashboard.urls")),
     path('dashboard/categories/', include('categories.urls')),
     path('categories/', include('categories.urls')),
-    path('dashboard/products/', include('dashboard.products.urls')),
 ]
 
 if settings.DEBUG:
