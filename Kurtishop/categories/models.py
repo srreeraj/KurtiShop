@@ -36,14 +36,14 @@ class Category(models.Model):
             # Allow same name if one is soft deleted
             UniqueConstraint(
                 fields=['name'],
-                condition=Q(is_deleted=False)
-                name='unique_category_name_active'
+                condition=Q(is_deleted=False),
+                name='unique_category_name_active',
             ),
             # Same for slug
             UniqueConstraint(
                 fields=['slug'],
                 condition=Q(is_deleted=False),
-                name='unique_category_slug_active'
+                name='unique_category_slug_active',
             )
         ]
 
