@@ -2,6 +2,8 @@ from django.db import models
 from products.models import ProductVariant
 import uuid
 from django.core.validators import MinValueValidator
+from django.utils import timezone
+from datetime import timedelta
 # Create your models here.
 class Order(models.Model):
 
@@ -21,6 +23,7 @@ class Order(models.Model):
         PROCESSING = "processing", "Processing"
         SHIPPED = "shipped", "Shipped"
         DELIVERED = "delivered", "Delivered"
+        CANCELLATION_REQUESTED = "cancellation_requested", "Cancellation Requested"
         CANCELLED = "cancelled", "Cancelled"
 
     order_number = models.CharField(
@@ -101,6 +104,9 @@ class Order(models.Model):
         decimal_places=2,
     )
 
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    cancellation_reason = models.TextField(blank=True)
+
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
 
@@ -111,6 +117,44 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
+
+    CANCELLATION_WINDOW_DAYS = 7
+
+    def is_cancellable(self):
+        """Whether  a guest currently request cancellation """
+        if self.order_status in [
+            self.OrderStatus.Cancelled,
+            self.OrderStatus.CANCELLATION_REQUESTED,
+        ]:
+            return False
+
+        if self.order_status == self.OrderStatus.SHIPPED:
+            # Already handed to courier — block cancellation until delivered
+            return False
+
+        if self.order_status == self.OrderStatus.DELLIVERED:
+            if not self.delivered_at:
+                return False
+            return timezone.now() <= self.deliverd_at + timedelta(days=self.CANCELLATION_WINDOW_DAYS)
+
+        # pending / confirmed / processing
+        return True
+
+    def cancellation_deadline(self):
+        """Returns the deadline datetime if order is delivered, else None."""
+        if self.order_status == self.OrderStatus.DELIVERED and self.delivered_at:
+            return self.delivered_at + timedelta(days=self.CANCELLATION_WINDOW_DAYS)
+        return None
+
+    def get_pre_cancellation_status(self):
+        """Best-guess status to revert to if admin rejects the cancellation request."""
+        last = (
+            self.status_history
+            .exclude(status=self.OrderStatus.CANCELLATION_REQUESTED)
+            .order_by("-created_at")
+            .first()
+        )
+        return last.status if last else self.OrderStatus.CONFIRMED
 
     class Meta:
         ordering = ["-created_at"]
