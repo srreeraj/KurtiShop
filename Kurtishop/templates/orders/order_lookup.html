@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Cancel Your Order{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-16">
+    <div class="max-w-md mx-auto px-6">
+        <h1 class="text-4xl font-semibold text-center text-gray-900 mb-2"
+            style="font-family: 'Cormorant Garamond', serif;">
+            Cancel an Order
+        </h1>
+        <p class="text-center text-gray-600 mb-8">
+            Enter your order number and email to find your order.
+        </p>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-xl bg-red-50 text-red-700 text-sm">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                {{ form.order_number }}
+                {% if form.order_number.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.order_number.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <div>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <button type="submit"
+                class="w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all">
+                Find My Order
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
