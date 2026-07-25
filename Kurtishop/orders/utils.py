@@ -45,3 +45,47 @@ def send_admin_new_order_notification(order):
         html_message=html_message,
         fail_silently=False,
     )
+
+def send_cancellation_request_email(order):
+    """Notify admin that a customer requested cancellation"""
+    context = {'order': order}
+
+    html_message = render_to_string('orders/email/cancellation_request.html', context)
+
+    send_mail(
+        subject=f"Cancellation Requested - #{order.order_number}",
+        message=(
+            f"Customer {order.full_name} ({order.email}) has requested cancellation "
+            f"for order #{order.order_number}.\nReason: {order.cancellation_reason}"
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[settings.ADMIN_EMAIL],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
+def send_cancellation_decision_email(order, approved):
+    """Notify customer whether their cancellation request was approved or rejected"""
+    context = {'order': order, 'approved': approved}
+
+    html_message = render_to_string('orders/email/cancellation_decision.html', context)
+    subject = (
+        f"Order Cancelled - #{order.order_number}" if approved
+        else f"Cancellation Request Update - #{order.order_number}"
+    )
+    plain = (
+        f"Your order #{order.order_number} has been cancelled."
+        if approved else
+        f"Your cancellation request for order #{order.order_number} was not approved. "
+        f"Your order is being processed as normal."
+    )
+
+    send_mail(
+        subject=subject,
+        message=plain,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
