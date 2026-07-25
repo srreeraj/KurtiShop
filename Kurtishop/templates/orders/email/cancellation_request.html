@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Cancellation Requested</title></head>
+<body style="font-family: Arial, sans-serif;">
+    <h2>Cancellation Requested — #{{ order.order_number }}</h2>
+    <p><strong>{{ order.full_name }}</strong> ({{ order.email }}) has requested cancellation.</p>
+    <p><strong>Reason:</strong> {{ order.cancellation_reason }}</p>
+    <p><strong>Order Total:</strong> ₹{{ order.grand_total }}</p>
+    <p>Review and confirm in the admin dashboard.</p>
+</body>
+</html>
