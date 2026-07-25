@@ -63,7 +63,7 @@ class Order(models.Model):
     )
 
     order_status = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=OrderStatus.choices,
         default=OrderStatus.PENDING
     )
@@ -123,7 +123,7 @@ class Order(models.Model):
     def is_cancellable(self):
         """Whether  a guest currently request cancellation """
         if self.order_status in [
-            self.OrderStatus.Cancelled,
+            self.OrderStatus.CANCELLED,
             self.OrderStatus.CANCELLATION_REQUESTED,
         ]:
             return False
@@ -132,10 +132,10 @@ class Order(models.Model):
             # Already handed to courier — block cancellation until delivered
             return False
 
-        if self.order_status == self.OrderStatus.DELLIVERED:
+        if self.order_status == self.OrderStatus.DELIVERED:
             if not self.delivered_at:
                 return False
-            return timezone.now() <= self.deliverd_at + timedelta(days=self.CANCELLATION_WINDOW_DAYS)
+            return timezone.now() <= self.delivered_at + timedelta(days=self.CANCELLATION_WINDOW_DAYS)
 
         # pending / confirmed / processing
         return True
@@ -238,7 +238,7 @@ class OrderStatusHistory(models.Model):
     )
 
     status = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=Order.OrderStatus.choices
     )
 
