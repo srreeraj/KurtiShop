@@ -41,3 +41,37 @@ class OrderForm(forms.ModelForm):
                     "class": INPUT_CLASSES,
                     "placeholder": field.label,
                 })
+
+
+class OrderLookupForm(forms.Form):
+    order_number = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            "class" : INPUT_CLASS,
+            "placeholder" : "Order number (e.g. ORD-A1B2C3D4)"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "class": INPUT_CLASSES,
+            "placeholder": "Email used at checkout",
+        })
+    )
+
+    def clean_order_number(self):
+        return self.cleaned_data["order_number"].strip().upper()
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip().lower()
+
+class OrderCancellationForm(forms.Form):
+    order_number = forms.CharField(widget=forms.HiddenInput())
+    email = forms.CharField(widget=forms.HiddenInput())
+    reason = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            "class": TEXTAREA_CLASSES,
+            "rows": 4,
+            "placeholder": "Tell us why you'd like to cancel this order...",
+        })
+    )
