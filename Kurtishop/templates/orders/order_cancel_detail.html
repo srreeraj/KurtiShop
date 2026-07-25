@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Order #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-12">
+    <div class="max-w-2xl mx-auto px-6 lg:px-8">
+
+        <h1 class="text-4xl font-semibold text-gray-900 mb-1"
+            style="font-family: 'Cormorant Garamond', serif;">
+            Order #{{ order.order_number }}
+        </h1>
+        <p class="text-gray-600 mb-8">Placed on {{ order.created_at|date:"d M, Y" }}</p>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="mb-6 p-4 rounded-xl {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %} text-sm">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600">Current Status</span>
+                <span class="px-3 py-1 rounded-full text-sm font-medium bg-gray-900 text-white">
+                    {{ order.get_order_status_display }}
+                </span>
+            </div>
+            {% if cancellation_deadline %}
+            <p class="text-sm text-gray-500 mt-3">
+                <i data-lucide="clock" class="w-4 h-4 inline"></i>
+                Cancellation window closes on {{ cancellation_deadline|date:"d M, Y" }}
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Items</h2>
+            {% for item in items %}
+            <div class="flex gap-4 bg-gray-50 rounded-2xl p-4 mb-3">
+                <div class="flex-1">
+                    <p class="font-medium">{{ item.product_name }}</p>
+                    <p class="text-sm text-gray-600">{{ item.color }} • {{ item.size }} × {{ item.quantity }}</p>
+                </div>
+                <p class="font-semibold">₹{{ item.total_price|floatformat:2 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if order.order_status == 'cancellation_requested' %}
+        <div class="bg-yellow-50 text-yellow-800 rounded-2xl p-6 text-center">
+            <i data-lucide="hourglass" class="w-6 h-6 mx-auto mb-2"></i>
+            Your cancellation request is under review. We'll email you once it's processed.
+        </div>
+
+        {% elif order.order_status == 'cancelled' %}
+        <div class="bg-gray-100 text-gray-700 rounded-2xl p-6 text-center">
+            This order has been cancelled.
+        </div>
+
+        {% elif is_cancellable %}
+        <div class="border border-gray-200 rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Request Cancellation</h3>
+            <form method="post" action="{% url 'orders:request_cancellation' order.order_number %}">
+                {% csrf_token %}
+                <input type="hidden" name="order_number" value="{{ order.order_number }}">
+                <input type="hidden" name="email" value="{{ order.email }}">
+                {{ cancel_form.reason }}
+                <button type="submit"
+                    class="mt-4 w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all">
+                    Submit Cancellation Request
+                </button>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="bg-gray-100 text-gray-600 rounded-2xl p-6 text-center">
+            This order is no longer eligible for cancellation
+            {% if order.order_status == 'delivered' %}
+                (the 7-day cancellation window has passed).
+            {% else %}
+                ({{ order.get_order_status_display }}).
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
