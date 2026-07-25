@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Cancellation Update</title></head>
+<body style="font-family: Arial, sans-serif;">
+    {% if approved %}
+    <h2>Order #{{ order.order_number }} Cancelled</h2>
+    <p>Your cancellation request has been approved and your order is now cancelled.</p>
+    {% if order.payment_method == 'online' %}
+    <p>Your refund will be processed within 5-7 business days.</p>
+    {% endif %}
+    {% else %}
+    <h2>Cancellation Request Update — #{{ order.order_number }}</h2>
+    <p>We've reviewed your cancellation request and are unable to process it at this time. Your order will continue as normal.</p>
+    {% endif %}
+</body>
+</html>
