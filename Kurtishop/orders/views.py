@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.http import JsonResponse
 from cart.models import Cart
-from .models import Order
-from .forms import OrderForm
+from .models import Order, OrderStatusHistory
+from .forms import OrderForm, OrderLookupForm, OrderCancellationForm
 from .services import create_order_from_cart
 from payments.utils import create_razorpay_order
 from django.conf import settings
 from payments.models import Payment
+from .utils import send_cancellation_request_email
+from django.contrib import messages
+from django.urls import reverse
+from django.utils import timezone
+from djanog.db import transaction
 
 # Create your views here.
 
@@ -118,3 +123,96 @@ def order_detail(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
     return render(request, 'orders/order_detail.html', {'order': order})
 
+
+def order_lookup(request):
+    """Guest enters Order Number + Email to find their order."""
+    order = None
+    searched = False
+
+    if request.method == "POST":
+        form = OrderLookupForm(request.POST)
+        if form.is_valid():
+            searched = True
+            order_number = form.cleaned_data["order_number"]
+            email = form.cleaned_data["email"]
+            order = Order.objects.filter(
+                order_number=order_number,
+                email__iexact=email,
+            ).first()
+
+            if order:
+                return redirect('orders:order_cancel_detail', order_number=order.order_number)
+            else:
+                messages.error(
+                    request,
+                    "We couldn't find an order matching that Order Number and Email. "
+                    "Please check the details and try again."
+                )
+    else:
+        form = OrderLookupForm()
+
+    return render(request, 'orders/order_lookup.html', {
+        'form': form,
+        'searched': searched,
+    })
+
+
+def order_cancel_detail(request, order_number):
+    """Show order status + cancellation option, guarded by email re-verification."""
+    order = get_object_or_404(Order, order_number=order_number)
+    cancel_form = OrderCancellationForm(initial={
+        'order_number': order.order_number,
+    })
+
+    context = {
+        'order': order,
+        'items': order.items.select_related('variant__product', 'variant__color', 'variant__size'),
+        'is_cancellable': order.is_cancellable(),
+        'cancellation_deadline': order.cancellation_deadline(),
+        'cancel_form': cancel_form,
+    }
+    return render(request, 'orders/order_cancel_detail.html', context)
+
+
+def request_cancellation(request, order_number):
+    """Handle the POST submission of a cancellation request."""
+    if request.method != "POST":
+        return redirect('orders:order_lookup')
+
+    order = get_object_or_404(Order, order_number=order_number)
+    form = OrderCancellationForm(request.POST)
+
+    # Re-verify identity via email submitted in the hidden field
+    submitted_email = request.POST.get("email", "").strip().lower()
+    if submitted_email != order.email.lower():
+        messages.error(request, "Verification failed. Please look up your order again.")
+        return redirect('orders:order_lookup')
+
+    if not order.is_cancellable():
+        messages.error(request, "This order is no longer eligible for cancellation.")
+        return redirect('orders:order_cancel_detail', order_number=order.order_number)
+
+    if form.is_valid():
+        reason = form.cleaned_data["reason"]
+
+        with transaction.atomic():
+            order.cancellation_reason = reason
+            order.order_status = Order.OrderStatus.CANCELLATION_REQUESTED
+            order.save(update_fields=["cancellation_reason", "order_status", "updated_at"])
+
+            OrderStatusHistory.objects.create(
+                order=order,
+                status=Order.OrderStatus.CANCELLATION_REQUESTED,
+                note=f"Customer requested cancellation: {reason}",
+            )
+
+        send_cancellation_request_email(order)
+
+        messages.success(
+            request,
+            "Your cancellation request has been submitted. Our team will review it shortly."
+        )
+        return redirect('orders:order_cancel_detail', order_number=order.order_number)
+
+    messages.error(request, "Please provide a reason for cancellation.")
+    return redirect('orders:order_cancel_detail', order_number=order.order_number)
