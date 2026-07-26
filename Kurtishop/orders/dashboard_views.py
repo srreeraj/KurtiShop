@@ -7,6 +7,8 @@ from django.db import transaction
 
 from .models import Order, OrderStatusHistory
 from .dashboard_forms import OrderStatusUpdateForm
+from django.utils import timezone
+from .utils import send_cancellation_decision_email
 
 
 def get_order_context(request, per_page=15):
@@ -67,6 +69,28 @@ def order_detail(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
 
     if request.method == "POST":
+        action = request.POST.get("action")
+        # NEW: handle cancellation approve/reject
+        if action in ("approve_cancellation", "reject_cancellation"):
+            with transaction.atomic():
+                if action == "approve_cancellation":
+                    order.order_status == Order.OrderStatus.CANCELLED
+                    note = "Cancellation approved by admin"
+                    approved = True
+                else:
+                    order.order_status == order.get_pre_cancellation_status()
+                    note = "Cancellation request rejected by admin."
+                    approved = False
+
+                order.save(update_fields=["order_status", "updated_at"])
+                OrderStatusHistory.objects.create(
+                    order=order, status=order.order_status, note=note,
+                )
+
+            send_cancellation_decision_email(order, approved=approved)
+            messages.success(request, note)
+            return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+            
         form = OrderStatusUpdateForm(request.POST)
         if form.is_valid():
             new_status = form.cleaned_data["order_status"]
