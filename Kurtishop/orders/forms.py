@@ -47,7 +47,7 @@ class OrderLookupForm(forms.Form):
     order_number = forms.CharField(
         max_length=20,
         widget=forms.TextInput(attrs={
-            "class" : INPUT_CLASS,
+            "class" : INPUT_CLASSES,
             "placeholder" : "Order number (e.g. ORD-A1B2C3D4)"
         })
     )
