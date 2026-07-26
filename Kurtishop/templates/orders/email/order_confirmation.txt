@@ -1,14 +1,21 @@
-Thank You for Your Order!
+Order Confirmed - #{{ order.order_number }}
 
 Hi {{ order.full_name }},
 
-Your order #{{ order.order_number }} has been successfully placed and confirmed.
+Thanks for shopping with us! Here's your order summary:
 
-Total Amount: ₹{{ order.grand_total }}
+{% for item in items %}- {{ item.product_name }} ({{ item.color }} / {{ item.size }}) x{{ item.quantity }} - ₹{{ item.total_price|floatformat:2 }}
+{% endfor %}
+Total Paid: ₹{{ order.grand_total|floatformat:2 }}
 
-We will notify you once your order is shipped.
+Shipping Address:
+{{ order.full_name }}
+{{ order.address_line_1 }}{% if order.address_line_2 %}, {{ order.address_line_2 }}{% endif %}
+{{ order.city }}, {{ order.state }} - {{ order.postal_code }}
 
-Thank you for shopping with Liara!
+View your order: {{ site_url }}{% url 'orders:order_detail' order.order_number %}
+Need to cancel? {{ site_url }}{% url 'orders:order_cancel_detail' order.order_number %}
 
-Best regards,
-Liara Team
+You can cancel this order any time up to 7 days after delivery.
+
+Thank you for choosing us!
