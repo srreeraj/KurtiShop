@@ -12,7 +12,7 @@ from .utils import send_cancellation_request_email
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
-from djanog.db import transaction
+from django.db import transaction
 
 # Create your views here.
 
