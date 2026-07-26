@@ -2,51 +2,121 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Order Confirmation</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; }
-        .header { background: #C1121F; color: white; padding: 30px; text-align: center; }
-        .content { padding: 30px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .total { font-weight: bold; font-size: 1.1em; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed</title>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Order Confirmed!</h1>
-        <p style="margin: 10px 0 0;">#{{ order.order_number }}</p>
-    </div>
-    <div class="content">
-        <p>Dear <strong>{{ order.full_name }}</strong>,</p>
-        <p>Thank you for shopping with us! Your order has been successfully placed and confirmed.</p>
+<body style="margin:0; padding:0; background-color:#f4f4f5; font-family: Arial, Helvetica, sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5; padding:32px 16px;">
+<tr>
+<td align="center">
 
-        <h3>Order Summary</h3>
-        <table>
-            <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
-            {% for item in items %}
-            <tr>
-                <td>{{ item.product_name }} ({{ item.color }} / {{ item.size }})</td>
-                <td>{{ item.quantity }}</td>
-                <td>₹{{ item.total_price }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08);">
 
-        <p class="total">Total Paid: <strong>₹{{ order.grand_total }}</strong></p>
+  <!-- Header -->
+  <tr>
+    <td style="background-color:#C1121F; padding:36px 32px; text-align:center;">
+      <div style="width:56px; height:56px; background-color:rgba(255,255,255,0.15); border-radius:50%; margin:0 auto 14px; line-height:56px; font-size:28px; color:#ffffff;">✓</div>
+      <h1 style="margin:0; color:#ffffff; font-size:24px; font-weight:600;">Order Confirmed</h1>
+      <p style="margin:8px 0 0; color:rgba(255,255,255,0.85); font-size:14px;">Order #{{ order.order_number }}</p>
+    </td>
+  </tr>
 
-        <p><strong>Shipping Address:</strong><br>
-        {{ order.full_name }}<br>
-        {{ order.address_line_1 }}, {{ order.address_line_2|default:"" }}<br>
-        {{ order.city }}, {{ order.state }} - {{ order.postal_code }}
+  <!-- Greeting -->
+  <tr>
+    <td style="padding:32px 32px 8px;">
+      <p style="margin:0 0 4px; font-size:16px; color:#111827;">Hi {{ order.full_name }},</p>
+      <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.6;">
+        Thanks for shopping with us! We've received your order and it's now being prepared. Here's a summary of what you ordered.
+      </p>
+    </td>
+  </tr>
+
+  <!-- Order items -->
+  <tr>
+    <td style="padding:24px 32px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>
+          <td style="padding:0 0 10px; font-size:12px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid #e5e7eb;">Item</td>
+          <td style="padding:0 0 10px; font-size:12px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid #e5e7eb; text-align:center;">Qty</td>
+          <td style="padding:0 0 10px; font-size:12px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid #e5e7eb; text-align:right;">Price</td>
+        </tr>
+        {% for item in items %}
+        <tr>
+          <td style="padding:14px 0; border-bottom:1px solid #f3f4f6; font-size:14px; color:#111827;">
+            {{ item.product_name }}
+            <div style="font-size:12px; color:#9ca3af; margin-top:2px;">{{ item.color }} / {{ item.size }}</div>
+          </td>
+          <td style="padding:14px 0; border-bottom:1px solid #f3f4f6; font-size:14px; color:#111827; text-align:center;">{{ item.quantity }}</td>
+          <td style="padding:14px 0; border-bottom:1px solid #f3f4f6; font-size:14px; color:#111827; text-align:right;">₹{{ item.total_price|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
+
+  <!-- Total -->
+  <tr>
+    <td style="padding:16px 32px 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:12px 0; font-size:15px; font-weight:600; color:#111827;">Total Paid</td>
+          <td style="padding:12px 0; font-size:18px; font-weight:700; color:#C1121F; text-align:right;">₹{{ order.grand_total|floatformat:2 }}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Shipping address -->
+  <tr>
+    <td style="padding:20px 32px 0;">
+      <div style="background-color:#f9fafb; border-radius:12px; padding:18px 20px;">
+        <p style="margin:0 0 6px; font-size:12px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em;">Shipping Address</p>
+        <p style="margin:0; font-size:14px; color:#374151; line-height:1.6;">
+          {{ order.full_name }}<br>
+          {{ order.address_line_1 }}{% if order.address_line_2 %}, {{ order.address_line_2 }}{% endif %}<br>
+          {{ order.city }}, {{ order.state }} - {{ order.postal_code }}
         </p>
+      </div>
+    </td>
+  </tr>
 
-        <p>You can track your order status anytime from your account.</p>
-        <p>Thank you for choosing us!</p>
-    </div>
-</div>
+  <!-- CTA buttons -->
+  <tr>
+    <td style="padding:28px 32px 8px;" align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="border-radius:10px; background-color:#111827;">
+            <a href="{{ site_url }}{% url 'orders:order_detail' order.order_number %}"
+               style="display:inline-block; padding:13px 28px; font-size:14px; font-weight:600; color:#ffffff; text-decoration:none;">
+              View Order
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:4px 32px 28px;" align="center">
+      <a href="{{ site_url }}{% url 'orders:order_cancel_detail' order.order_number %}"
+         style="font-size:13px; color:#C1121F; text-decoration:underline;">
+        Need to cancel this order?
+      </a>
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="padding:24px 32px; background-color:#f9fafb; text-align:center; border-top:1px solid #f3f4f6;">
+      <p style="margin:0 0 4px; font-size:12px; color:#9ca3af;">You can cancel this order any time up to 7 days after delivery.</p>
+      <p style="margin:0; font-size:12px; color:#9ca3af;">Thank you for choosing us!</p>
+    </td>
+  </tr>
+
+</table>
+</td>
+</tr>
+</table>
 </body>
 </html>
