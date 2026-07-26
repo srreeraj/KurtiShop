@@ -95,6 +95,11 @@
                     View Order Details
                 </a>
                 
+                <a href="{% url 'orders:order_cancel_detail' order.order_number %}" 
+                    class="text-sm text-gray-500 hover:text-red-600 underline mt-2 inline-block">
+                    Need to cancel this order?
+                </a>
+                
                 <a href="{% url 'product_list' %}" 
                    class="inline-flex items-center justify-center px-8 py-4 border border-gray-300 hover:bg-gray-50 rounded-2xl font-medium transition-all">
                     Continue Shopping
