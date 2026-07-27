@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from products.models import Product, Occassion
+from products.models import Product, Occasion
 from categories.models import Category
 from django.db.models import Count, Q
 from .forms import ContactForm
