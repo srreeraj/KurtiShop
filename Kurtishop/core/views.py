@@ -18,6 +18,8 @@ def home(request):
         product_count=Count('products', filter=Q(products__is_active=True, products__is_deleted=False))
     ).order_by('name')[:6]
 
+    occasions = Occasion.objects.all().order_by('name')[:6]
+
     featured_products = Product.objects.filter(
         is_featured = True,
         is_active = True,
@@ -32,6 +34,7 @@ def home(request):
 
     context = {
         'categories' : categories,
+        'occasions': occasions,
         'featured_products' : featured_products,
         'new_arrivals' : new_arrivals
     }
