@@ -1,0 +1,44 @@
+<!-- Shop By Occasion -->
+<section class="py-10 sm:py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-5">
+
+        <div class="flex items-center justify-between mb-6 sm:mb-10">
+            <div>
+                <h2 class="text-xl sm:text-3xl font-bold text-gray-900">Shop By Occasion</h2>
+                <p class="text-gray-500 text-xs sm:text-sm mt-1">Dress perfectly for every moment</p>
+            </div>
+            <a href="{% url 'product_list' %}"
+               class="text-red-600 text-xs sm:text-sm font-semibold hover:underline whitespace-nowrap">
+                View All →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
+            {% for occasion in occasions %}
+            <a href="{% url 'product_list' %}?occasion={{ occasion.name|urlencode }}"
+               class="group text-center">
+                <div class="relative aspect-square rounded-xl overflow-hidden border border-gray-100 
+                            group-hover:border-red-500 transition-all duration-300 shadow-sm 
+                            group-hover:shadow-md bg-gray-50">
+                    {% if occasion.image %}
+                    <img src="{{ occasion.image.url }}"
+                         alt="{{ occasion.name }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         loading="lazy">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                        <span class="text-3xl sm:text-4xl">🎉</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <p class="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-gray-800 
+                         group-hover:text-red-600 transition-colors line-clamp-1">
+                    {{ occasion.name }}
+                </p>
+            </a>
+            {% empty %}
+            <p class="col-span-full text-center text-gray-400 text-sm">No occasions available</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
