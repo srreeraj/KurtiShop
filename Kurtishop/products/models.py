@@ -43,6 +43,12 @@ class Material(models.Model):
 
 class Occasion(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    image = models.ImageField(
+        upload_to='occasions/',
+        blank=True,
+        null=True,
+        help_text="Recommended size: 400×400 px"
+    )
 
     class Meta:
         ordering = ['name']
