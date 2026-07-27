@@ -223,7 +223,9 @@ class MaterialAdmin(admin.ModelAdmin):
 
 @admin.register(Occasion)
 class OccasionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'has_image')
+    list_display = ('name', 'is_featured', 'has_image')
+    list_filter = ('is_featured',)
+    list_editable = ('is_featured',)
     search_fields = ('name',)
     ordering = ('name',)
 
