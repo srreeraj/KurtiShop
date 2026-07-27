@@ -13,12 +13,15 @@ def home(request):
 
     categories = Category.objects.filter(
         is_active = True,
+        is_featured = True,
         is_deleted = False,
     ).annotate(
         product_count=Count('products', filter=Q(products__is_active=True, products__is_deleted=False))
     ).order_by('name')[:6]
 
-    occasions = Occasion.objects.all().order_by('name')[:6]
+    occasions = Occasion.objects.filter(
+        is_featured = True,
+    ).order_by('name')[:6]
 
     featured_products = Product.objects.filter(
         is_featured = True,
