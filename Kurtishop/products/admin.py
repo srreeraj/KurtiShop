@@ -223,9 +223,14 @@ class MaterialAdmin(admin.ModelAdmin):
 
 @admin.register(Occasion)
 class OccasionAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'has_image')
     search_fields = ('name',)
     ordering = ('name',)
+
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Image"
 
 @admin.register(Sleeve)
 class SleeveAdmin(admin.ModelAdmin):
