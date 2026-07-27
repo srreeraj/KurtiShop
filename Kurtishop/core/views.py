@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from products.models import Product
+from products.models import Product, Occassion
 from categories.models import Category
 from django.db.models import Count, Q
 from .forms import ContactForm
@@ -16,7 +16,7 @@ def home(request):
         is_deleted = False,
     ).annotate(
         product_count=Count('products', filter=Q(products__is_active=True, products__is_deleted=False))
-    ).order_by('name')[:12]
+    ).order_by('name')[:6]
 
     featured_products = Product.objects.filter(
         is_featured = True,
