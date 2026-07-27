@@ -49,6 +49,10 @@ class Occasion(models.Model):
         null=True,
         help_text="Recommended size: 400×400 px"
     )
+    is_featured = models.BooleanField(
+        default=False,
+        help_text="Show this occasion on the homepage (Shop By Occasion)"
+    )
 
     class Meta:
         ordering = ['name']
