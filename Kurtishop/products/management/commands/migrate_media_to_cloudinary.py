@@ -1,10 +1,9 @@
 from django.core.management.base import BaseCommand
-from django.core.files.storage import default_storage
 from django.conf import settings
 from pathlib import Path
 import os
 
-from products.models import ProductImage, Occasion  # adjust if Occasion is in another app
+from products.models import ProductImage, Occasion
 
 
 class Command(BaseCommand):
@@ -58,23 +57,29 @@ class Command(BaseCommand):
         skipped = 0
         errors = 0
 
+        media_root = Path(settings.MEDIA_ROOT)
+
         for obj in qs.iterator():
             field = getattr(obj, field_name)
+            relative_name = field.name  # e.g. products/kurtis/.../front.jpg
 
-            # Already on Cloudinary? (cloudinary storage returns a different kind of name)
-            if not field.name or field.name.startswith("http") or "cloudinary" in str(field.storage):
+            if not relative_name:
                 skipped += 1
                 continue
 
-            local_path = field.path  # absolute path on disk
-            if not os.path.exists(local_path):
-                self.stdout.write(self.style.ERROR(f"  Missing file: {local_path}"))
-                errors += 1
+            # Build the expected local path
+            local_path = media_root / relative_name
+
+            # Already on Cloudinary if the local file no longer exists
+            # (or if the name looks like a full Cloudinary URL)
+            if relative_name.startswith("http") or "res.cloudinary.com" in relative_name:
+                skipped += 1
                 continue
 
-            # Keep the same relative path so Cloudinary public_id looks familiar
-            # e.g. products/category/product/color/front.jpg
-            relative_name = field.name  # this is what was stored in DB
+            if not local_path.exists():
+                # File not on disk → either already migrated or missing
+                skipped += 1
+                continue
 
             self.stdout.write(f"  → {relative_name}")
 
@@ -83,9 +88,8 @@ class Command(BaseCommand):
                 continue
 
             try:
-                # Open the local file and re-save it through the new storage
+                # Open local file and re-save through current storage (Cloudinary)
                 with open(local_path, "rb") as f:
-                    # This will upload to Cloudinary and update the field
                     field.save(relative_name, f, save=False)
 
                 obj.save(update_fields=[field_name])
@@ -100,7 +104,7 @@ class Command(BaseCommand):
                 migrated += 1
 
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f"    ERROR: {e}"))
+                self.stdout.write(self.style.ERROR(f"    ERROR on {relative_name}: {e}"))
                 errors += 1
 
         self.stdout.write(
