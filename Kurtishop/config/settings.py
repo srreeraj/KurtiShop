@@ -174,3 +174,5 @@ CLOUDINARY_STORAGE = {
     'API_KEY' : env('CLOUDINARY_API_KEY'),
     'API_SECRET' : env('CLOUDINARY_API_SECRET'),
 }
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
