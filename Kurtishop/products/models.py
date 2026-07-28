@@ -47,6 +47,7 @@ class Occasion(models.Model):
         upload_to='occasions/',
         blank=True,
         null=True,
+        max_length=500,
         help_text="Recommended size: 400×400 px"
     )
     is_featured = models.BooleanField(
@@ -380,7 +381,8 @@ class ProductImage(models.Model):
     )
 
     image = models.ImageField(
-        upload_to=product_image_upload_path
+        upload_to=product_image_upload_path,
+        max_length=500,
     )
 
     alt_text = models.CharField(
