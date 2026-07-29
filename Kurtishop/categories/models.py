@@ -19,6 +19,7 @@ class Category(models.Model):
         upload_to='categories/',
         blank=True,
         null=True,
+        max_length=500,
     )
 
     description = models.TextField(blank=True)
