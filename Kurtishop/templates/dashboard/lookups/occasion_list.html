@@ -1,0 +1,79 @@
+{% extends "dashboard/layout/base.html" %}
+{% load static %}
+
+{% block title %}Occasions{% endblock %}
+{% block page_title %}Occasions{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-gray-900">Occasions</h1>
+        <p class="text-gray-500">{{ page_obj.paginator.count }} total</p>
+    </div>
+    <a href="{% url 'lookups:occasion_create' %}"
+       class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl flex items-center gap-2 font-medium">
+        <i data-lucide="plus" class="w-5 h-5"></i>
+        New Occasion
+    </a>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm mb-6 p-4">
+    <form method="get" class="flex flex-wrap gap-3">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search occasions..."
+               class="flex-1 min-w-[220px] rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-2 px-4">
+        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-2xl font-medium">
+            Search
+        </button>
+    </form>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm overflow-hidden">
+    <table class="w-full text-left">
+        <thead class="bg-gray-50 text-gray-500 text-sm uppercase">
+            <tr>
+                <th class="px-6 py-4">Image</th>
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Featured</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for occasion in occasions %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                    {% if occasion.image %}
+                        <img src="{{ occasion.image.url }}" class="w-14 h-14 rounded-xl object-cover">
+                    {% else %}
+                        <div class="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
+                            <i data-lucide="image" class="w-5 h-5"></i>
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 font-medium text-gray-900">{{ occasion.name }}</td>
+                <td class="px-6 py-4">
+                    {% if occasion.is_featured %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Yes</span>
+                    {% else %}
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">No</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <a href="{% url 'lookups:occasion_edit' occasion.pk %}" class="text-gray-500 hover:text-red-600 inline-block mr-3">
+                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                    </a>
+                    <a href="{% url 'lookups:occasion_delete' occasion.pk %}"
+                       onclick="return confirm('Delete this occasion?')"
+                       class="text-gray-500 hover:text-red-600 inline-block">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-10 text-center text-gray-400">No occasions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
