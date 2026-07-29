@@ -57,6 +57,54 @@
         </div>
     </div>
 
+        <!-- Custom Attributes (for Jewellery etc.) -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">Custom Attributes</h2>
+                <p class="text-sm text-gray-500">Use for jewellery or any extra details (Metal, Stone, Weight, Purity…)</p>
+            </div>
+            <button type="button" id="add-attribute-btn" class="text-red-600 font-medium flex items-center gap-1">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Attribute
+            </button>
+        </div>
+
+        {{ attribute_formset.management_form }}
+        <div id="attribute-rows" class="space-y-3">
+            {% for aform in attribute_formset %}
+                <div class="attribute-row grid grid-cols-12 gap-3 items-center border-b border-gray-100 pb-3">
+                    {% for hidden in aform.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="col-span-5">{{ aform.name }}</div>
+                    <div class="col-span-5">{{ aform.value }}</div>
+                    <div class="col-span-2 flex items-center gap-2">
+                        {% if aform.instance.pk %}
+                            <label class="text-xs text-gray-500 flex items-center gap-1">
+                                {{ aform.DELETE }} Remove
+                            </label>
+                        {% else %}
+                            <button type="button" class="remove-attribute-row text-gray-400 hover:text-red-600">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    {{ aform.non_field_errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Hidden template for JS -->
+        <template id="attribute-empty-form">
+            <div class="attribute-row grid grid-cols-12 gap-3 items-center border-b border-gray-100 pb-3">
+                <div class="col-span-5">{{ attribute_formset.empty_form.name }}</div>
+                <div class="col-span-5">{{ attribute_formset.empty_form.value }}</div>
+                <div class="col-span-2">
+                    <button type="button" class="remove-attribute-row text-gray-400 hover:text-red-600">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
     <!-- Marketing -->
     <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Marketing</h2>
