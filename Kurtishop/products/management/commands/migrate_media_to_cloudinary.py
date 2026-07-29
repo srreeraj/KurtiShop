@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 
 from products.models import ProductImage, Occasion
+from categories.models import Category
 
 
 class Command(BaseCommand):
@@ -45,6 +46,15 @@ class Command(BaseCommand):
             dry_run=dry_run,
             delete_local=delete_local,
             label="Occasion",
+        )
+
+        # ---------- Category ----------
+        self._migrate_queryset(
+            Category.objects.exclude(image="").exclude(image__isnull=True),
+            field_name="image",
+            dry_run=dry_run,
+            delete_local=delete_local,
+            label="Category",
         )
 
         self.stdout.write(self.style.SUCCESS("Done."))
