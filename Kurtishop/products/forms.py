@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Product, ProductVariant, ProductImage
+from .models import Product, ProductVariant, ProductImage, ProductAttribute
 
 INPUT = "block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4"
 FILE = "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
@@ -57,6 +57,21 @@ class ProductVariantForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": CHECKBOX}),
         }
 
+class ProductAttributeForm(forms.ModelForm):
+    class Meta:
+        model = ProductAttribute
+        fields = ["name", "value"]
+        widgets = {
+            "name": forms.TextInput(attrs={
+                "class": INPUT,
+                "placeholder": "e.g. Metal / Stone / Weight"
+            }),
+            "value": forms.TextInput(attrs={
+                "class": INPUT,
+                "placeholder": "e.g. Gold / Diamond / 12g"
+            }),
+        }
+
 
 # extra=1 gives one blank row by default; JS clones more as needed.
 # empty_permitted on extra forms means a row left fully blank is silently skipped.
@@ -64,6 +79,14 @@ ProductVariantFormSet = inlineformset_factory(
     Product,
     ProductVariant,
     form=ProductVariantForm,
+    extra=1,
+    can_delete=True,
+)
+
+ProductAttributeFormSet = inlineformset_factory(
+    Product,
+    ProductAttribute,
+    form=ProductAttributeForm,
     extra=1,
     can_delete=True,
 )
