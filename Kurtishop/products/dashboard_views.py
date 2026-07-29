@@ -88,11 +88,13 @@ def product_edit(request, pk):
     if request.method == "POST":
         form = ProductForm(request.POST, instance=product)
         variant_formset = ProductVariantFormSet(request.POST, instance=product, prefix="variants")
+        attribute_formset = ProductAttributeFormSet(request.POST, instance=product, prefix="attributes")
 
-        if form.is_valid() and variant_formset.is_valid():
+        if form.is_valid() and variant_formset.is_valid() and attribute_formset.is_valid():
             with transaction.atomic():
                 form.save()
                 variant_formset.save()
+                attribute_formset.save()
                 _save_new_images(request, product)
                 _delete_images(request)
             messages.success(request, "Product updated successfully!")
@@ -100,6 +102,7 @@ def product_edit(request, pk):
     else:
         form = ProductForm(instance=product)
         variant_formset = ProductVariantFormSet(instance=product, prefix="variants")
+        attribute_formset = ProductAttributeFormSet(instance=product, prefix="attributes")
 
     images_by_color = {}
     for img in product.images.select_related("color").order_by("color__name", "display_order"):
@@ -109,6 +112,7 @@ def product_edit(request, pk):
         "form": form,
         "product": product,
         "variant_formset": variant_formset,
+        "attribute_formset": attribute_formset,
         "colors": Color.objects.all(),
         "view_choices": ProductImage.ImageView.choices,
         "images_by_color": images_by_color,
