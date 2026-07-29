@@ -95,6 +95,9 @@
         <!-- Hidden template for JS -->
         <template id="attribute-empty-form">
             <div class="attribute-row grid grid-cols-12 gap-3 items-center border-b border-gray-100 pb-3">
+                {% for hidden in attribute_formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
                 <div class="col-span-5">{{ attribute_formset.empty_form.name }}</div>
                 <div class="col-span-5">{{ attribute_formset.empty_form.value }}</div>
                 <div class="col-span-2">
