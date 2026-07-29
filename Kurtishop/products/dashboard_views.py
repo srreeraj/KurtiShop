@@ -6,7 +6,7 @@ from django.db.models import Q, Min
 from django.db import transaction
 
 from .models import Product, ProductImage, Color
-from .forms import ProductForm, ProductVariantFormSet
+from .forms import ProductForm, ProductVariantFormSet, ProductAttributeFormSet
 
 # Auto-assign order for multi-image upload per color
 VIEW_ORDER = ["front", "back", "left", "right", "three-quarter", "closeup", "detail"]
@@ -52,22 +52,27 @@ def product_create(request):
     if request.method == "POST":
         form = ProductForm(request.POST)
         variant_formset = ProductVariantFormSet(request.POST, prefix="variants")
+        attribute_formset = ProductAttributeFormSet(request.POST, prefix="attributes")
 
-        if form.is_valid() and variant_formset.is_valid():
+        if form.is_valid() and variant_formset.is_valid() and attribute_formset.is_valid():
             with transaction.atomic():
                 product = form.save()
                 variant_formset.instance = product
                 variant_formset.save()
+                attribute_formset.instance = product
+                attribute_formset.save()
                 _save_new_images(request, product)
             messages.success(request, "Product created successfully!")
             return redirect("products_dashboard:product_edit", pk=product.pk)
     else:
         form = ProductForm()
         variant_formset = ProductVariantFormSet(prefix="variants")
+        attribute_formset = ProductAttributeFormSet(prefix="attributes")
 
     return render(request, "dashboard/products/form.html", {
         "form": form,
         "variant_formset": variant_formset,
+        "attribute_formset": attribute_formset,
         "colors": Color.objects.all(),
         "view_choices": ProductImage.ImageView.choices,
         "images_by_color": {},
