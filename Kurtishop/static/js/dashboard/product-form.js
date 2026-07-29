@@ -3,6 +3,33 @@ document.addEventListener('DOMContentLoaded', function () {
     const variantRows = document.getElementById('variant-rows');
     const totalFormsInput = document.querySelector('#id_variants-TOTAL_FORMS');
     const emptyTemplate = document.getElementById('variant-empty-form');
+    const attributeRows = document.getElementById('attribute-rows');
+    const attrTotalFormsInput = document.querySelector('#id_attributes-TOTAL_FORMS');
+    const attrEmptyTemplate = document.getElementById('attribute-empty-form');
+
+    if (document.getElementById('add-attribute-btn')) {
+        document.getElementById('add-attribute-btn').addEventListener('click', function () {
+            const index = parseInt(attrTotalFormsInput.value, 10);
+            const html = attrEmptyTemplate.innerHTML.replace(/__prefix__/g, index);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = html.trim();
+            const row = wrapper.firstElementChild;
+            attributeRows.appendChild(row);
+            attrTotalFormsInput.value = index + 1;
+            if (window.lucide) lucide.createIcons();
+        });
+
+        attributeRows.addEventListener('click', function (e) {
+            const btn = e.target.closest('.remove-attribute-row');
+            if (!btn) return;
+            const row = btn.closest('.attribute-row');
+            row.querySelectorAll('input, select').forEach(function (field) {
+                if (field.type === 'checkbox') field.checked = false;
+                else field.value = '';
+            });
+            row.style.display = 'none';
+        });
+    }
 
     document.getElementById('add-variant-btn').addEventListener('click', function () {
         const index = parseInt(totalFormsInput.value, 10);
