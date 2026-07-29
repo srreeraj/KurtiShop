@@ -1,0 +1,45 @@
+{% extends "dashboard/layout/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">{{ page_title }}</h1>
+        <div class="flex gap-3">
+            <a href="{% url 'lookups:occasion_list' %}" class="px-6 py-3 rounded-2xl border border-gray-200 text-gray-600 font-medium">Cancel</a>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-medium">Save</button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm p-6 max-w-xl">
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+                {% if occasion and occasion.image %}
+                    <div class="mb-3">
+                        <img src="{{ occasion.image.url }}" class="w-28 h-28 rounded-xl object-cover border">
+                    </div>
+                {% endif %}
+                {{ form.image }}
+                {{ form.image.errors }}
+            </div>
+
+            <div class="flex items-center gap-2">
+                {{ form.is_featured }}
+                <label class="text-sm text-gray-700">Show on homepage (Shop by Occasion)</label>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
