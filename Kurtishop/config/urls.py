@@ -31,6 +31,7 @@ urlpatterns = [
     path('categories/', include('categories.urls')),
     path('dashboard/products/', include('products.dashboard_urls')),
     path('dashboard/orders/', include('orders.dashboard_urls')),
+    path("dashboard/lookups/", include("products.lookup_urls")),
 ]
 
 if settings.DEBUG:
