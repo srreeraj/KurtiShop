@@ -32,8 +32,7 @@ def generate_invoice_pdf(order):
 
     # Optional custom CSS
     css = CSS(string="""
-        @page { size: A4; margin: 1.5cm; }
-        body { font-family: Arial, sans-serif; font-size: 12px; color: #111; }
+        @page { size: A4; margin: 1.4cm 1.6cm; }
     """, font_config=font_config)
 
     pdf_bytes = html.write_pdf(stylesheets=[css], font_config=font_config)
