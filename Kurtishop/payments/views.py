@@ -13,7 +13,7 @@ from django.urls import reverse
 import razorpay
 from razorpay.errors import SignatureVerificationError
 from orders.services import deduct_stock_after_payment
-
+from orders.invoice import generate_invoice_pdf
 
 @require_POST
 def verify_payment(request):
@@ -43,6 +43,13 @@ def verify_payment(request):
             payment.razorpay_signature = params['razorpay_signature']
             payment.status = 'success'
             payment.save()
+
+        if not order.invoice:
+        try:
+            pdf_file = generate_invoice_pdf(order)
+            order.invoice.save(pdf_file.name, pdf_file, save=True)
+        except Exception as inv_err:
+            print(f"Invoice generation failed: {inv_err}")
 
         try:
             send_order_confirmation_email(order)
