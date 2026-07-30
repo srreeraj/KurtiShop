@@ -4,7 +4,12 @@ import uuid
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from datetime import timedelta
+import os
 # Create your models here.
+
+def invoice_upload_path(instance, filename):
+    return f"invoices/{instance.order_number}/{filename}"
+
 class Order(models.Model):
 
     class PaymentMethod(models.TextChoices):
@@ -117,6 +122,13 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     updated_at = models.DateTimeField(auto_now=True)
+
+    invoice  = models.FileField(
+        upload_to=invoice_upload_path,
+        blank=True,
+        null=True,
+        help_text="Generated PDF invoice"
+    )
 
     CANCELLATION_WINDOW_DAYS = 7
 
