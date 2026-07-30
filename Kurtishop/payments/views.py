@@ -102,6 +102,15 @@ def razorpay_webhook(request):
                     status='success'
                 )
 
+                # Generate pdf
+                if not order.invoice:
+                    try:
+                        from orders.invoice import generate_invoice_pdf
+                        pdf_file = generate_invoice_pdf(order)
+                        order.invoice.save(pdf_file.name, pdf_file, save=True)
+                    except Exception as inv_err:
+                        print(f"Invoice generation failed: {inv_err}")
+
                 # Send emails (safe to call again)
                 send_order_confirmation_email(order)
                 send_admin_new_order_notification(order)
