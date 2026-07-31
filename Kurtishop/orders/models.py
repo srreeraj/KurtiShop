@@ -5,10 +5,17 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 from datetime import timedelta
 import os
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 # Create your models here.
 
+invoice_storage = FileSystemStorage(
+    location=os.path.join(settings.MEDIA_ROOT, 'invoices'),
+    base_url=settings.MEDIA_URL + 'invoices/'
+)
+
 def invoice_upload_path(instance, filename):
-    return f"invoices/{instance.order_number}/{filename}"
+    return f"{instance.order_number}/{filename}"
 
 class Order(models.Model):
 
@@ -125,6 +132,7 @@ class Order(models.Model):
 
     invoice  = models.FileField(
         upload_to=invoice_upload_path,
+        storage=invoice_storage,
         blank=True,
         null=True,
         help_text="Generated PDF invoice"
