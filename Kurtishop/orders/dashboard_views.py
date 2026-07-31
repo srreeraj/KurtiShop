@@ -9,7 +9,7 @@ from .invoice import generate_invoice_pdf
 from .models import Order, OrderStatusHistory
 from .dashboard_forms import OrderStatusUpdateForm
 from django.utils import timezone
-from .utils import send_cancellation_decision_email,send_order_confirmation_email
+from .utils import send_cancellation_decision_email,send_order_confirmation_email, send_return_decision_email
 
 
 
@@ -72,7 +72,7 @@ def order_detail(request, order_number):
 
     if request.method == "POST":
         action = request.POST.get("action")
-        # NEW: handle cancellation approve/reject
+        # ---------- Cancellation approve / reject ----------
         if action in ("approve_cancellation", "reject_cancellation"):
             with transaction.atomic():
                 if action == "approve_cancellation":
@@ -90,6 +90,35 @@ def order_detail(request, order_number):
                 )
 
             send_cancellation_decision_email(order, approved=approved)
+            messages.success(request, note)
+            return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+        
+        # ---------- Return / Exchange approve / reject ----------
+        if action in ("approve_return", "reject_return"):
+            return_id = request.POST.get("return_id")
+            return_req = get_object_or_404(
+                ReturnRequest,
+                id=return_id,
+                order=order,
+                status=ReturnRequest.Status.PENDING,
+            )
+
+            admin_note = request.POST.get("admin_note", "").strip()
+
+            with transaction.atomic():
+                if action == "approve_return":
+                    return_req.status = ReturnRequest.Status.APPROVED
+                    note = "Return/Exchange approved by admin"
+                    approved = True
+                else:
+                    return_req.status = ReturnRequest.Status.REJECTED
+                    note = "Return/Exchange rejected by admin"
+                    approved = False
+
+                return_req.admin_note = admin_note
+                return_req.save(update_fields=["status", "admin_note", "updated_at"])
+
+            send_return_decision_email(return_req, approved=approved)
             messages.success(request, note)
             return redirect("orders_dashboard:order_detail", order_number=order.order_number)
             
