@@ -176,6 +176,15 @@ class Order(models.Model):
         )
         return last.status if last else self.OrderStatus.CONFIRMED
 
+    def is_returnable(self):
+        """Whether the customer can currently request a return/exchange."""
+        if self.order_status != self.OrderStatus.DELIVERED:
+            return False
+        if not self.delivered_at:
+            return False
+        # 7-day return window (change if you want 14 days)
+        return timezone.now() <= self.delivered_at + timedelta(days=7)
+
     class Meta:
         ordering = ["-created_at"]
         indexes = [
