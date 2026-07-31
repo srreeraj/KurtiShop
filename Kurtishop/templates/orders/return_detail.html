@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Return / Exchange – #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="bg-white min-h-screen py-12">
+    <div class="max-w-3xl mx-auto px-6 lg:px-8">
+
+        <div class="mb-8">
+            <h1 class="text-4xl font-semibold text-gray-900 mb-2"
+                style="font-family: 'Cormorant Garamond', serif;">
+                Return / Exchange
+            </h1>
+            <p class="text-gray-600">
+                Order <span class="font-medium text-gray-900">#{{ order.order_number }}</span>
+                · Delivered {{ order.delivered_at|date:"d M Y" }}
+            </p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-xl text-sm
+                    {% if message.tags == 'error' %}bg-red-50 text-red-700 border border-red-200
+                    {% elif message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200
+                    {% else %}bg-gray-50 text-gray-700 border border-gray-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if not is_returnable %}
+            <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
+                <p class="text-orange-800 font-medium">
+                    This order is no longer eligible for return or exchange.
+                </p>
+                <a href="{% url 'orders:return_lookup' %}"
+                   class="inline-block mt-4 text-sm text-red-600 hover:underline">
+                    ← Try another order
+                </a>
+            </div>
+        {% else %}
+
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+
+            <!-- Items -->
+            <div class="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-sm">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                    <h2 class="font-semibold text-gray-900">Select items to return or exchange</h2>
+                    <p class="text-sm text-gray-500 mt-1">You can select one or more items from this order.</p>
+                </div>
+
+                <div class="divide-y divide-gray-100">
+                    {% for item in items %}
+                    <div class="p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-900">{{ item.product_name }}</p>
+                            <p class="text-sm text-gray-500 mt-1">
+                                {{ item.color }} · {{ item.size }}
+                                · Ordered qty: {{ item.quantity }}
+                            </p>
+                            <p class="text-sm font-medium text-gray-700 mt-1">
+                                ₹{{ item.unit_price|floatformat:2 }} each
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <!-- Quantity -->
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Qty</label>
+                                <select name="qty_{{ item.id }}"
+                                        class="h-10 px-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100">
+                                    <option value="0">0</option>
+                                    {% for i in item.quantity|make_list %}
+                                        {# simple loop alternative below #}
+                                    {% endfor %}
+                                    {% with ''|center:item.quantity as range %}
+                                        {% for _ in range %}
+                                            <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                                        {% endfor %}
+                                    {% endwith %}
+                                </select>
+                            </div>
+
+                            <!-- Type -->
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Type</label>
+                                <select name="type_{{ item.id }}"
+                                        class="h-10 px-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100">
+                                    <option value="return">Return</option>
+                                    <option value="exchange">Exchange</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-8 text-center text-gray-500">
+                        No items found in this order.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Reason -->
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+                <label class="block font-semibold text-gray-900 mb-2">
+                    Reason for return / exchange
+                </label>
+                {{ form.reason }}
+                {% if form.reason.errors %}
+                    <p class="text-red-600 text-sm mt-2">{{ form.reason.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Submit -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit"
+                        class="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all">
+                    Submit Request
+                </button>
+                <a href="{% url 'orders:return_lookup' %}"
+                   class="flex-1 h-12 flex items-center justify-center border border-gray-300 hover:bg-gray-50 rounded-xl font-medium transition-all">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
