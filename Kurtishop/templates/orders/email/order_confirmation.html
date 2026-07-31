@@ -98,6 +98,15 @@
   </tr>
 
   <tr>
+    <td style="padding:8px 32px 28px;" align="center">
+      <a href="{{ site_url }}{% url 'orders:download_invoice' order.order_number %}"
+        style="font-size:13px; color:#C1121F; text-decoration:underline;">
+        Download Invoice (PDF)
+      </a>
+    </td>
+  </tr>
+  
+  <tr>
     <td style="padding:4px 32px 28px;" align="center">
       <a href="{{ site_url }}{% url 'orders:order_cancel_detail' order.order_number %}"
          style="font-size:13px; color:#C1121F; text-decoration:underline;">
