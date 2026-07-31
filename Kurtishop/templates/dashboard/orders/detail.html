@@ -152,6 +152,92 @@
         </div>
         {% endif %}
 
+        {% if return_requests %}
+        <div class="bg-white rounded-3xl shadow-sm p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Return / Exchange Requests</h2>
+
+            {% for req in return_requests %}
+            <div class="border border-gray-200 rounded-2xl p-5 mb-4 last:mb-0
+                {% if req.status == 'pending' %}bg-yellow-50 border-yellow-200{% endif %}">
+
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <p class="font-medium text-gray-900">
+                            Request #{{ req.id }}
+                        <span class="ml-2 px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {% if req.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% elif req.status == 'approved' %}bg-green-100 text-green-800
+                            {% elif req.status == 'rejected' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ req.get_status_display }}
+                        </span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Submitted {{ req.created_at|date:"d M Y, H:i" }}
+                    </p>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-700 mb-3">
+                <span class="font-medium">Reason:</span> {{ req.reason }}
+            </p>
+
+            <ul class="text-sm text-gray-600 space-y-1 mb-4">
+                {% for item in req.items.all %}
+                <li>
+                    • {{ item.order_item.product_name }}
+                    ({{ item.order_item.color }} / {{ item.order_item.size }})
+                    × {{ item.quantity }}
+                    → <strong>{{ item.get_request_type_display }}</strong>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% if req.admin_note %}
+            <p class="text-sm text-gray-600 mb-3">
+                <span class="font-medium">Admin note:</span> {{ req.admin_note }}
+            </p>
+            {% endif %}
+
+            {% if req.status == 'pending' %}
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Admin note (optional)</label>
+                    <input type="text" name="admin_note_{{ req.id }}" form="return-form-{{ req.id }}"
+                           placeholder="e.g. Pickup scheduled for Monday"
+                            class="w-full rounded-xl border-gray-200 text-sm py-2 px-3">
+                </div>
+                <div class="flex gap-3">
+                    <form method="post" id="return-form-{{ req.id }}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve_return">
+                        <input type="hidden" name="return_id" value="{{ req.id }}">
+                        <input type="hidden" name="admin_note" id="admin-note-approve-{{ req.id }}">
+                        <button type="submit"
+                                onclick="document.getElementById('admin-note-approve-{{ req.id }}').value = document.querySelector('[name=admin_note_{{ req.id }}]').value"
+                                class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm">
+                            Approve
+                        </button>
+                    </form>
+                    <form method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject_return">
+                        <input type="hidden" name="return_id" value="{{ req.id }}">
+                        <input type="hidden" name="admin_note" id="admin-note-reject-{{ req.id }}">
+                        <button type="submit"
+                                onclick="document.getElementById('admin-note-reject-{{ req.id }}').value = document.querySelector('[name=admin_note_{{ req.id }}]').value"
+                                class="px-4 py-2 border border-gray-300 hover:bg-gray-50 rounded-lg font-medium text-sm">
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        </div>
+        {% endif %}
+
         <div class="bg-white rounded-3xl shadow-sm p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Update Order Status</h2>
             <form method="post">
