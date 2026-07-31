@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
+from .invoice import generate_invoice_pdf
 from cart.models import Cart
 from .models import Order, OrderStatusHistory
 from .forms import OrderForm, OrderLookupForm, OrderCancellationForm
@@ -216,3 +217,29 @@ def request_cancellation(request, order_number):
 
     messages.error(request, "Please provide a reason for cancellation.")
     return redirect('orders:order_cancel_detail', order_number=order.order_number)
+
+def download_invoice(request, order_number):
+    """
+    Let the customer download the PDF invoice.
+    We generate it on-the-fly if it doesn't exist yet.
+    """
+    order = get_object_or_404(Order, order_number=order_number)
+
+    # Optional extra security: you can require that the user
+    # came from order_lookup / success page, but for now
+    # knowing the order_number is enough (same as order_detail).
+
+    if not order.invoice:
+        try:
+            pdf_file = generate_invoice_pdf(order)
+            order.invoice.save(pdf_file.name, pdf_file, save=True)
+        except Exception as e:
+            print(f"Invoice generation failed: {e}")
+            raise Http404("Invoice could not be generated.")
+
+    return FileResponse(
+        order.invoice.open("rb"),
+        as_attachment=True,
+        filename=f"Invoice_{order.order_number}.pdf",
+        content_type="application/pdf",
+    )
