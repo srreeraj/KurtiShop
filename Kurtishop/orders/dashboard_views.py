@@ -76,11 +76,11 @@ def order_detail(request, order_number):
         if action in ("approve_cancellation", "reject_cancellation"):
             with transaction.atomic():
                 if action == "approve_cancellation":
-                    order.order_status == Order.OrderStatus.CANCELLED
+                    order.order_status = Order.OrderStatus.CANCELLED
                     note = "Cancellation approved by admin"
                     approved = True
                 else:
-                    order.order_status == order.get_pre_cancellation_status()
+                    order.order_status = order.get_pre_cancellation_status()
                     note = "Cancellation request rejected by admin."
                     approved = False
 
