@@ -143,12 +143,14 @@ def order_detail(request, order_number):
 
     items = order.items.select_related("variant__product", "variant__color", "variant__size")
     history = order.status_history.all()
+    return_requests = order.return_requests.prefetch_related("items__order_item").all()
 
     return render(request, "dashboard/orders/detail.html", {
         "order": order,
         "items": items,
         "history": history,
         "form": form,
+        "return_requests": return_requests,
         "page_title": f"Order {order.order_number}",
     })
 
