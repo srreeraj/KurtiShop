@@ -196,4 +196,3 @@ COMPANY_PHONE = "+91 98765 43210"
 COMPANY_EMAIL = "support@liara.store"
 COMPANY_GSTIN = ""          # fill when you have it
 COMPANY_LOGO_URL = None     # later put absolute URL or static path
-SITE_URL = "https://yourdomain.com"
