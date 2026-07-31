@@ -75,3 +75,39 @@ class OrderCancellationForm(forms.Form):
             "placeholder": "Tell us why you'd like to cancel this order...",
         })
     )
+
+class ReturnLookupForm(forms.Form):
+    order_number = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            "class": INPUT_CLASSES,
+            "placeholder": "Order number (e.g. ORD-A1B2C3D4)"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "class": INPUT_CLASSES,
+            "placeholder": "Email used at checkout",
+        })
+    )
+
+    def clean_order_number(self):
+        return self.cleaned_data["order_number"].strip().upper()
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip().lower()
+
+
+class ReturnRequestForm(forms.Form):
+    """
+    Dynamic form – we build the item fields in the view
+    based on the order's items.
+    """
+    reason = forms.CharField(
+        required=True,
+        widget=forms.Textarea(attrs={
+            "class": TEXTAREA_CLASSES,
+            "rows": 4,
+            "placeholder": "Please tell us why you want to return / exchange these items...",
+        })
+    )
