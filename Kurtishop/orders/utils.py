@@ -1,4 +1,4 @@
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.urls import reverse
@@ -16,20 +16,31 @@ def send_order_confirmation_email(order):
         html_message = render_to_string('orders/email/order_confirmation.html', context)
         plain_message = render_to_string('orders/email/order_confirmation.txt', context)
     except Exception as template_error:
-        # Fallback if any template fails
-        print(f"Email template error: {template_error}")  # For debugging
         plain_message = f"Your order #{order.order_number} has been confirmed. Total: ₹{order.grand_total}"
         html_message = f"<h2>Order #{order.order_number} Confirmed</h2><p>Total: ₹{order.grand_total}</p>"
 
-    send_mail(
-        subject=f"Order Confirmed - #{order.order_number}",
-        message=plain_message,
+    mail = EmailMultiAlternatives(
+        subject=f"Order Confirmed – #{order.order_number} | Liara",
+        body=plain_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[order.email],
-        html_message=html_message,
-        fail_silently=False,
+        to=[order.email],
     )
+    email.attach_alternative(html_message, "text/html")
 
+    # Attach the PDF invoice if it exists
+    if order.invoice:
+        try:
+            order.invoice.open('rb')
+            email.attach(
+                filename=f"Invoice_{order.order_number}.pdf",
+                content=order.invoice.read(),
+                mimetype="application/pdf",
+            )
+            order.invoice.close()
+        except Exception as e:
+            print(f"Could not attach invoice PDF: {e}")
+
+    email.send(fail_silently=False)
 
 def send_admin_new_order_notification(order):
     """Notify admin about new order"""
