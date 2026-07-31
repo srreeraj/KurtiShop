@@ -111,3 +111,92 @@ def send_cancellation_decision_email(order, approved):
         html_message=html_message,
         fail_silently=False,
     )
+
+def send_return_request_email(return_request):
+    """Notify admin that a customer submitted a return/exchange request"""
+    order = return_request.order
+    items = return_request.items.select_related("order_item").all()
+
+    context = {
+        "return_request": return_request,
+        "order": order,
+        "items": items,
+    }
+
+    try:
+        html_message = render_to_string("orders/email/return_request.html", context)
+    except Exception:
+        html_message = None
+
+    # Build plain text version
+    item_lines = []
+    for item in items:
+        item_lines.append(
+            f"- {item.order_item.product_name} "
+            f"({item.order_item.color}/{item.order_item.size}) "
+            f"× {item.quantity} → {item.get_request_type_display()}"
+        )
+    items_text = "\n".join(item_lines) if item_lines else "No items"
+
+    plain = (
+        f"Customer {order.full_name} ({order.email}) has submitted a "
+        f"{return_request.get_request_type_display()} request for order #{order.order_number}.\n\n"
+        f"Reason: {return_request.reason}\n\n"
+        f"Items:\n{items_text}"
+    )
+
+    send_mail(
+        subject=f"Return/Exchange Request – #{order.order_number}",
+        message=plain,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[settings.ADMIN_EMAIL],
+        html_message=html_message,
+        fail_silently=False,
+    )
+
+
+def send_return_decision_email(return_request, approved):
+    """Notify customer whether their return/exchange request was approved or rejected"""
+    order = return_request.order
+    items = return_request.items.select_related("order_item").all()
+
+    context = {
+        "return_request": return_request,
+        "order": order,
+        "items": items,
+        "approved": approved,
+    }
+
+    try:
+        html_message = render_to_string("orders/email/return_decision.html", context)
+    except Exception:
+        html_message = None
+
+    if approved:
+        subject = f"Return/Exchange Approved – #{order.order_number}"
+        plain = (
+            f"Hi {order.full_name},\n\n"
+            f"Your return/exchange request for order #{order.order_number} has been approved.\n"
+            f"Our team will contact you shortly with the next steps "
+            f"(pickup / shipping instructions).\n\n"
+            f"Thank you,\nLiara"
+        )
+    else:
+        subject = f"Return/Exchange Update – #{order.order_number}"
+        plain = (
+            f"Hi {order.full_name},\n\n"
+            f"Unfortunately your return/exchange request for order #{order.order_number} "
+            f"could not be approved.\n\n"
+            f"{'Admin note: ' + return_request.admin_note if return_request.admin_note else ''}\n\n"
+            f"If you have any questions, please reply to this email.\n\n"
+            f"Thank you,\nLiara"
+        )
+
+    send_mail(
+        subject=subject,
+        message=plain,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
