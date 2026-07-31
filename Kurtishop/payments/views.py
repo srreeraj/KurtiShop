@@ -45,11 +45,11 @@ def verify_payment(request):
             payment.save()
 
         if not order.invoice:
-        try:
-            pdf_file = generate_invoice_pdf(order)
-            order.invoice.save(pdf_file.name, pdf_file, save=True)
-        except Exception as inv_err:
-            print(f"Invoice generation failed: {inv_err}")
+            try:
+                pdf_file = generate_invoice_pdf(order)
+                order.invoice.save(pdf_file.name, pdf_file, save=True)
+            except Exception as inv_err:
+                print(f"Invoice generation failed: {inv_err}")
 
         try:
             send_order_confirmation_email(order)
