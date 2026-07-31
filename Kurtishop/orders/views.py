@@ -3,8 +3,8 @@ from django.conf import settings
 from django.http import JsonResponse, FileResponse, Http404
 from .invoice import generate_invoice_pdf
 from cart.models import Cart
-from .models import Order, OrderStatusHistory
-from .forms import OrderForm, OrderLookupForm, OrderCancellationForm
+from .models import Order, OrderStatusHistory, ReturnRequest, ReturnRequestItem
+from .forms import OrderForm, OrderLookupForm, OrderCancellationForm, ReturnLookupForm, ReturnRequestForm
 from .services import create_order_from_cart
 from payments.utils import create_razorpay_order
 from django.conf import settings
@@ -243,3 +243,117 @@ def download_invoice(request, order_number):
         filename=f"Invoice_{order.order_number}.pdf",
         content_type="application/pdf",
     )
+
+def return_lookup(request):
+    """Guest enters Order Number + Email to start a return/exchange."""
+    if request.method == "POST":
+        form = ReturnLookupForm(request.POST)
+        if form.is_valid():
+            order_number = form.cleaned_data["order_number"]
+            email = form.cleaned_data["email"]
+
+            order = Order.objects.filter(
+                order_number=order_number,
+                email__iexact=email,
+            ).first()
+
+            if order:
+                return redirect("orders:return_detail", order_number=order.order_number)
+            else:
+                messages.error(
+                    request,
+                    "We couldn't find an order matching that Order Number and Email."
+                )
+    else:
+        form = ReturnLookupForm()
+
+    return render(request, "orders/return_lookup.html", {
+        "form": form,
+    })
+
+
+def return_detail(request, order_number):
+    """
+    Show the order items and let the customer select
+    which ones to return / exchange.
+    """
+    order = get_object_or_404(Order, order_number=order_number)
+
+    if not order.is_returnable():
+        messages.error(
+            request,
+            "This order is not eligible for return or exchange "
+            "(it must be delivered and within the return window)."
+        )
+        return redirect("orders:return_lookup")
+
+    # Items that still have remaining quantity that can be returned
+    items = order.items.all()
+
+    if request.method == "POST":
+        form = ReturnRequestForm(request.POST)
+        if form.is_valid():
+            reason = form.cleaned_data["reason"]
+
+            selected_items = []
+            for item in items:
+                qty_key = f"qty_{item.id}"
+                type_key = f"type_{item.id}"
+
+                qty = request.POST.get(qty_key)
+                req_type = request.POST.get(type_key, "return")
+
+                if qty and int(qty) > 0:
+                    qty = int(qty)
+                    if qty > item.quantity:
+                        messages.error(request, f"Invalid quantity for {item.product_name}.")
+                        return redirect("orders:return_detail", order_number=order.order_number)
+
+                    selected_items.append({
+                        "order_item": item,
+                        "quantity": qty,
+                        "request_type": req_type,
+                    })
+
+            if not selected_items:
+                messages.error(request, "Please select at least one item to return or exchange.")
+                return redirect("orders:return_detail", order_number=order.order_number)
+
+            # Create the return request
+            with transaction.atomic():
+                return_req = ReturnRequest.objects.create(
+                    order=order,
+                    reason=reason,
+                    status=ReturnRequest.Status.PENDING,
+                )
+                for sel in selected_items:
+                    ReturnRequestItem.objects.create(
+                        return_request=return_req,
+                        order_item=sel["order_item"],
+                        quantity=sel["quantity"],
+                        request_type=sel["request_type"],
+                    )
+
+            # Notify admin (we will add the email function next)
+            try:
+                from .utils import send_return_request_email
+                send_return_request_email(return_req)
+            except Exception as e:
+                print(f"Return request email failed: {e}")
+
+            messages.success(
+                request,
+                "Your return / exchange request has been submitted. "
+                "Our team will review it shortly."
+            )
+            return redirect("orders:return_detail", order_number=order.order_number)
+    else:
+        form = ReturnRequestForm()
+
+    context = {
+        "order": order,
+        "items": items,
+        "form": form,
+        "is_returnable": order.is_returnable(),
+    }
+    return render(request, "orders/return_detail.html", context)
