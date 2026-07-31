@@ -219,23 +219,23 @@ def request_cancellation(request, order_number):
     return redirect('orders:order_cancel_detail', order_number=order.order_number)
 
 def download_invoice(request, order_number):
-    """
-    Let the customer download the PDF invoice.
-    We generate it on-the-fly if it doesn't exist yet.
-    """
     order = get_object_or_404(Order, order_number=order_number)
 
-    # Optional extra security: you can require that the user
-    # came from order_lookup / success page, but for now
-    # knowing the order_number is enough (same as order_detail).
-
-    if not order.invoice:
-        try:
+    # Always regenerate if missing or if the stored file is broken
+    try:
+        if not order.invoice or not order.invoice.storage.exists(order.invoice.name):
             pdf_file = generate_invoice_pdf(order)
             order.invoice.save(pdf_file.name, pdf_file, save=True)
-        except Exception as e:
-            print(f"Invoice generation failed: {e}")
-            raise Http404("Invoice could not be generated.")
+    except Exception as e:
+        print(f"Invoice generation failed: {e}")
+        # Fallback: generate in memory and serve directly
+        pdf_file = generate_invoice_pdf(order)
+        return FileResponse(
+            pdf_file,
+            as_attachment=True,
+            filename=f"Invoice_{order.order_number}.pdf",
+            content_type="application/pdf",
+        )
 
     return FileResponse(
         order.invoice.open("rb"),
