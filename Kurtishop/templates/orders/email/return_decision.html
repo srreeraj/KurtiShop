@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>body{font-family:Arial,sans-serif;font-size:14px;color:#111;line-height:1.5;}</style>
+</head>
+<body>
+  <h2>
+    {% if approved %}
+      Your Return / Exchange Request is Approved
+    {% else %}
+      Update on Your Return / Exchange Request
+    {% endif %}
+  </h2>
+
+  <p>Hi {{ order.full_name }},</p>
+
+  {% if approved %}
+    <p>
+      Good news! Your request for order <strong>#{{ order.order_number }}</strong>
+      has been <strong>approved</strong>.
+    </p>
+    <p>Our team will contact you soon with pickup / shipping instructions.</p>
+  {% else %}
+    <p>
+      Unfortunately we were unable to approve your return/exchange request
+      for order <strong>#{{ order.order_number }}</strong>.
+    </p>
+    {% if return_request.admin_note %}
+      <p><strong>Note from our team:</strong> {{ return_request.admin_note }}</p>
+    {% endif %}
+  {% endif %}
+
+  <h3>Requested Items</h3>
+  <ul>
+    {% for item in items %}
+      <li>
+        {{ item.order_item.product_name }}
+        ({{ item.order_item.color }} / {{ item.order_item.size }})
+        × {{ item.quantity }}
+        – {{ item.get_request_type_display }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <p style="margin-top:24px;">Thank you for shopping with Liara.</p>
+</body>
+</html>
