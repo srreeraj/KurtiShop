@@ -4,11 +4,13 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db import transaction
-
+from django.http import FileResponse, Http404
+from .invoice import generate_invoice_pdf
 from .models import Order, OrderStatusHistory
 from .dashboard_forms import OrderStatusUpdateForm
 from django.utils import timezone
-from .utils import send_cancellation_decision_email
+from .utils import send_cancellation_decision_email,send_order_confirmation_email
+
 
 
 def get_order_context(request, per_page=15):
@@ -120,3 +122,23 @@ def order_detail(request, order_number):
         "form": form,
         "page_title": f"Order {order.order_number}",
     })
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def download_invoice(request, order_number):
+    order = get_object_or_404(Order, order_number=order_number)
+
+    if not order.invoice:
+        try:
+            pdf_file = generate_invoice_pdf(order)
+            order.invoice.save(pdf_file.name, pdf_file, save=True)
+        except Exception as e:
+            print(f"Invoice generation failed: {e}")
+            raise Http404("Invoice could not be generated.")
+
+    return FileResponse(
+        order.invoice.open("rb"),
+        as_attachment=True,
+        filename=f"Invoice_{order.order_number}.pdf",
+        content_type="application/pdf",
+    )
