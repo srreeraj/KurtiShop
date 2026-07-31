@@ -90,19 +90,28 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <!-- Primary actions -->
                 <a href="{% url 'orders:order_detail' order.order_number %}" 
-                   class="inline-flex items-center justify-center px-8 py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-medium transition-all">
+                    class="inline-flex items-center justify-center px-8 py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-medium transition-all">
                     View Order Details
                 </a>
-                
-                <a href="{% url 'orders:order_cancel_detail' order.order_number %}" 
-                    class="text-sm text-gray-500 hover:text-red-600 underline mt-2 inline-block">
-                    Need to cancel this order?
+
+                <a href="{% url 'orders:download_invoice' order.order_number %}" 
+                    class="inline-flex items-center justify-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-medium transition-all">
+                    Download Invoice
                 </a>
-                
+    
                 <a href="{% url 'product_list' %}" 
-                   class="inline-flex items-center justify-center px-8 py-4 border border-gray-300 hover:bg-gray-50 rounded-2xl font-medium transition-all">
+                    class="inline-flex items-center justify-center px-8 py-4 border border-gray-300 hover:bg-gray-50 rounded-2xl font-medium transition-all">
                     Continue Shopping
+                </a>
+            </div>
+
+            <!-- Cancel link stays separate and smaller -->
+            <div class="mt-4">
+                <a href="{% url 'orders:order_cancel_detail' order.order_number %}" 
+                    class="text-sm text-gray-500 hover:text-red-600 underline">
+                    Need to cancel this order?
                 </a>
             </div>
         </div>
