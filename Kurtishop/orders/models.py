@@ -271,3 +271,67 @@ class OrderStatusHistory(models.Model):
 
     def __str__(self):
         return f"{self.order.order_number} - {self.status}"
+
+class ReturnRequest(models.Model):
+    class RequestType(models.TextChoices):
+        RETURN = "return", "Return"
+        EXCHANGE = "exchange", "Exchange"
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending Review"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+        COMPLETED = "completed", "Completed"
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="return_requests"
+    )
+    # Overall preference (user can still choose per item)
+    request_type = models.CharField(
+        max_length=20,
+        choices=RequestType.choices,
+        default=RequestType.RETURN
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
+    reason = models.TextField()
+    admin_note = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Return #{self.pk} – {self.order.order_number} ({self.get_status_display()})"
+
+
+class ReturnRequestItem(models.Model):
+    return_request = models.ForeignKey(
+        ReturnRequest,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+    order_item = models.ForeignKey(
+        OrderItem,
+        on_delete=models.CASCADE,
+        related_name="return_items"
+    )
+    quantity = models.PositiveIntegerField(default=1)
+    request_type = models.CharField(
+        max_length=20,
+        choices=ReturnRequest.RequestType.choices,
+        default=ReturnRequest.RequestType.RETURN
+    )
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return f"{self.order_item.product_name} × {self.quantity} ({self.get_request_type_display()})"
