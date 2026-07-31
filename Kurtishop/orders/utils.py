@@ -27,18 +27,29 @@ def send_order_confirmation_email(order):
     )
     email.attach_alternative(html_message, "text/html")
 
-    # Attach the PDF invoice if it exists
+    # Attach PDF invoice
     if order.invoice:
         try:
-            order.invoice.open('rb')
-            email.attach(
-                filename=f"Invoice_{order.order_number}.pdf",
-                content=order.invoice.read(),
-                mimetype="application/pdf",
-            )
-            order.invoice.close()
+            # Prefer reading through storage safely
+            with order.invoice.open('rb') as f:
+                email.attach(
+                    filename=f"Invoice_{order.order_number}.pdf",
+                    content=f.read(),
+                    mimetype="application/pdf",
+                )
         except Exception as e:
             print(f"Could not attach invoice PDF: {e}")
+            # Optional fallback: generate fresh PDF in memory
+            try:
+                from .invoice import generate_invoice_pdf
+                pdf_file = generate_invoice_pdf(order)
+                email.attach(
+                    filename=f"Invoice_{order.order_number}.pdf",
+                    content=pdf_file.read(),
+                    mimetype="application/pdf",
+                )
+            except Exception as e2:
+                print(f"Fallback invoice attach also failed: {e2}")
 
     email.send(fail_silently=False)
 
