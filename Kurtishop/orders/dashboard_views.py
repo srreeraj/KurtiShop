@@ -129,12 +129,33 @@ def order_detail(request, order_number):
 
             if new_status != order.order_status:
                 with transaction.atomic():
+                    old_status = order.order_status
                     order.order_status = new_status
-                    order.save(update_fields=["order_status", "updated_at"])
+
+                    # CRITICAL: set delivered_at when moving to Delivered
+                    update_fields = ["order_status", "updated_at"]
+                    if new_status == Order.OrderStatus.DELIVERED and not order.delivered_at:
+                        order.delivered_at = timezone.now()
+                        update_fields.append("delivered_at")
+
+                    order.save(update_fields=update_fields)
+
                     OrderStatusHistory.objects.create(
-                        order=order, status=new_status, note=note,
+                        order=order,
+                        status=new_status,
+                        note= note or f"Status changed from {old_status} to {new_status} by admin."
                     )
-                messages.success(request, f"Order status updated to {order.get_order_status_display()}.")
+
+                try:
+                    from .utils import send_order_status_update_email
+                    send_order_status_update_email(order, old_status=old_status)
+                except Exception as e:
+                    print(f"Status update email failed: {e}")
+                
+                messages.success(
+                    request,
+                    f"Order status updated to {order.get_order_status_display()}."
+                )
             else:
                 messages.info(request, "Status unchanged — no update made.")
             return redirect("orders_dashboard:order_detail", order_number=order.order_number)
