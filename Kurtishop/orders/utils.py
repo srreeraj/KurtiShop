@@ -200,3 +200,38 @@ def send_return_decision_email(return_request, approved):
         html_message=html_message,
         fail_silently=False,
     )
+
+def send_order_status_update_email(order, old_status=None):
+    """Notify customer when order status is updated by admin"""
+    context = {
+        'order': order,
+        'items': order.items.select_related('variant').all(),
+        'old_status': old_status,
+        'site_url': getattr(settings, 'SITE_URL', 'https://yourdomain.com'),
+    }
+
+    try:
+        html_message = render_to_string(
+            'orders/email/order_status_update.html', context
+        )
+        plain_message = (
+            f"Hi {order.full_name},\n\n"
+            f"Your order #{order.order_number} status has been updated to "
+            f"{order.get_order_status_display()}.\n\n"
+            f"Thank you for shopping with Liara."
+        )
+    except Exception:
+        plain_message = (
+            f"Your order #{order.order_number} is now "
+            f"{order.get_order_status_display()}."
+        )
+        html_message = None
+
+    send_mail(
+        subject=f"Order Update – #{order.order_number} is now {order.get_order_status_display()}",
+        message=plain_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[order.email],
+        html_message=html_message,
+        fail_silently=False,
+    )
