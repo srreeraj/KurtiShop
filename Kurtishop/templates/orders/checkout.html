@@ -74,7 +74,7 @@
                                 </div>
                             </div>
 
-                            <button type="button" onclick="nextStep(2)" 
+                            <button type="button" onclick="nextStep(2)"
                                     class="mt-10 w-full bg-red-600 hover:bg-red-700 text-white font-medium py-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2">
                                 Continue to Shipping
                                 <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -123,11 +123,11 @@
                             </div>
 
                             <div class="flex gap-4 mt-10">
-                                <button type="button" onclick="prevStep(1)" 
+                                <button type="button" onclick="prevStep(1)"
                                         class="flex-1 border border-gray-300 hover:bg-gray-50 py-4 rounded-2xl font-medium transition-all">
                                     Back
                                 </button>
-                                <button type="button" onclick="nextStep(3)" 
+                                <button type="button" onclick="nextStep(3)"
                                         class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-medium transition-all">
                                     Continue to Review
                                 </button>
@@ -165,11 +165,11 @@
                             </div>
 
                             <div class="flex gap-4 mt-10">
-                                <button type="button" onclick="prevStep(2)" 
+                                <button type="button" onclick="prevStep(2)"
                                         class="flex-1 border border-gray-300 hover:bg-gray-50 py-4 rounded-2xl font-medium transition-all">
                                     Back
                                 </button>
-                                <button type="submit" 
+                                <button type="submit"
                                         class="flex-1 bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-semibold text-lg transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="lock" class="w-5 h-5"></i>
                                     Pay Securely Now
@@ -190,24 +190,26 @@
                     <div class="lg:sticky lg:top-24">
                         {% include 'includes/order_summary.html' with items=items subtotal=subtotal discount=discount shipping=shipping tax=tax grand_total=grand_total %}
                     </div>
-
                 </div>
+
+            </div> <!-- closes grid grid-cols-1 lg:grid-cols-5 -->
         </form>
     </div>
 
     <!-- Payment Verification Overlay -->
     <div id="payment-overlay"
-     class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/80 backdrop-blur-sm">
-    <div class="flex flex-col items-center gap-5 text-center px-6">
-        <div class="w-14 h-14 border-[3px] border-red-100 border-t-red-600 rounded-full animate-spin"></div>
-        <div>
-            <p class="text-lg font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
-                Verifying your payment
-            </p>
-            <p class="text-sm text-gray-500 mt-1">Please don't close or refresh this page…</p>
+         class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/80 backdrop-blur-sm">
+        <div class="flex flex-col items-center gap-5 text-center px-6">
+            <div class="w-14 h-14 border-[3px] border-red-100 border-t-red-600 rounded-full animate-spin"></div>
+            <div>
+                <p class="text-lg font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
+                    Verifying your payment
+                </p>
+                <p class="text-sm text-gray-500 mt-1">Please don't close or refresh this page…</p>
+            </div>
         </div>
     </div>
-</div>
+
 </div>
 
 {% endblock %}
@@ -238,7 +240,6 @@ window.checkoutConfig = {
 };
 </script>
 
-
-<script src="{% static 'js/checkout.js' %}"></script>
+<script src="{% static 'js/checkout.js' %}?v={% now 'U' %}"></script>
 
 {% endblock %}
