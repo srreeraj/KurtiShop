@@ -171,7 +171,14 @@ function showPaymentOverlay() {
     document.body.style.overflow = 'hidden';
 }
 
-
+function hidePaymentOverlay() {
+    const overlay = document.getElementById('payment-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.classList.remove('flex');
+    }
+    document.body.style.overflow = '';
+}
 
 function handlePaymentSuccess(response, config) {
     if (isPaymentProcessing) return;
