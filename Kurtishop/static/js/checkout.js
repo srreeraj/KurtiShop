@@ -162,6 +162,17 @@ function handleSubmit(e) {
 
 // ==================== RAZORPAY PAYMENT HANDLER ====================
 
+function showPaymentOverlay() {
+    const overlay = document.getElementById('payment-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+    }
+    document.body.style.overflow = 'hidden';
+}
+
+
+
 function handlePaymentSuccess(response, config) {
     if (isPaymentProcessing) return;
     isPaymentProcessing = true;
