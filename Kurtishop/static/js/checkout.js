@@ -44,7 +44,7 @@ function showError(input, message) {
     errorEl.className = 'mt-1 text-xs text-red-600 error-msg';
     errorEl.textContent = message;
     input.parentElement.appendChild(errorEl);
-    
+
     input.classList.add('border-red-600', 'focus:ring-red-500');
 }
 
@@ -160,7 +160,7 @@ function handleSubmit(e) {
     }
 }
 
-// ==================== RAZORPAY PAYMENT HANDLER ====================
+// ==================== PAYMENT OVERLAY ====================
 
 function showPaymentOverlay() {
     const overlay = document.getElementById('payment-overlay');
@@ -179,6 +179,8 @@ function hidePaymentOverlay() {
     }
     document.body.style.overflow = '';
 }
+
+// ==================== RAZORPAY PAYMENT HANDLER ====================
 
 function handlePaymentSuccess(response, config) {
     if (isPaymentProcessing) return;
@@ -207,17 +209,18 @@ function handlePaymentSuccess(response, config) {
     .then(res => res.json())
     .then(data => {
         if (data.status === "success") {
-            // Small delay for better UX
             setTimeout(() => {
                 window.location.href = data.redirect_url;
-            }, 800);
+            }, 600);
         } else {
+            hidePaymentOverlay();
             alert(data.message || "Payment verification failed. Please contact support.");
             isPaymentProcessing = false;
             if (submitBtn) submitBtn.disabled = false;
         }
     })
     .catch(() => {
+        hidePaymentOverlay();
         alert("Something went wrong during verification. Please contact support.");
         isPaymentProcessing = false;
         if (submitBtn) submitBtn.disabled = false;
@@ -238,7 +241,6 @@ document.addEventListener("DOMContentLoaded", function () {
     allInputs.forEach(input => {
         input.addEventListener('blur', () => validateStep(currentStep));
         input.addEventListener('input', () => {
-            // Optional: clear error on typing
             if (input.parentElement.querySelector('.error-msg')) {
                 clearError(input);
             }
