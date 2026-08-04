@@ -184,13 +184,11 @@ function handlePaymentSuccess(response, config) {
     if (isPaymentProcessing) return;
     isPaymentProcessing = true;
 
+    showPaymentOverlay();
+
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `
-            <span class="inline-block animate-spin mr-2">⟳</span>
-            Verifying Payment...
-        `;
     }
 
     fetch(config.verifyUrl, {
@@ -260,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
             amount: config.amount,
             currency: "INR",
             order_id: config.razorpayOrderId,
-            name: "Liara",
+            name: "Kyla",
             description: `Order #${config.orderNumber}`,
             prefill: config.customer,
             theme: { color: "#C1121F" },
@@ -270,8 +268,9 @@ document.addEventListener("DOMContentLoaded", function () {
             },
 
             modal: {
-                ondismiss: function() {
+                ondismiss: function () {
                     isPaymentProcessing = false;
+                    hidePaymentOverlay();
                 }
             }
         };
