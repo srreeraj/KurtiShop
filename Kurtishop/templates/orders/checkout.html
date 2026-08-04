@@ -194,6 +194,20 @@
                 </div>
         </form>
     </div>
+
+    <!-- Payment Verification Overlay -->
+    <div id="payment-overlay"
+     class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/80 backdrop-blur-sm">
+    <div class="flex flex-col items-center gap-5 text-center px-6">
+        <div class="w-14 h-14 border-[3px] border-red-100 border-t-red-600 rounded-full animate-spin"></div>
+        <div>
+            <p class="text-lg font-semibold text-gray-900" style="font-family: 'Cormorant Garamond', serif;">
+                Verifying your payment
+            </p>
+            <p class="text-sm text-gray-500 mt-1">Please don't close or refresh this page…</p>
+        </div>
+    </div>
+</div>
 </div>
 
 {% endblock %}
