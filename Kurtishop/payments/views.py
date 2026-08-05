@@ -14,6 +14,8 @@ import razorpay
 from razorpay.errors import SignatureVerificationError
 from orders.services import deduct_stock_after_payment
 from orders.invoice import generate_invoice_pdf
+import traceback
+
 
 @require_POST
 def verify_payment(request):
@@ -22,8 +24,8 @@ def verify_payment(request):
         client = get_razorpay_client()
         params = {
             'razorpay_order_id': data.get('razorpay_order_id'),
-            'razorpay_payment_id' : data.get('razorpay_payment_id'),
-            'razorpay_signature' : data.get('razorpay_signature'),
+            'razorpay_payment_id': data.get('razorpay_payment_id'),
+            'razorpay_signature': data.get('razorpay_signature'),
         }
         client.utility.verify_payment_signature(params)
 
@@ -37,13 +39,13 @@ def verify_payment(request):
         deduct_stock_after_payment(order)
 
         payment = Payment.objects.filter(order=order).first()
-
         if payment:
             payment.razorpay_payment_id = params['razorpay_payment_id']
             payment.razorpay_signature = params['razorpay_signature']
             payment.status = 'success'
             payment.save()
 
+        # Generate invoice if missing
         if not order.invoice:
             try:
                 pdf_file = generate_invoice_pdf(order)
@@ -51,20 +53,44 @@ def verify_payment(request):
             except Exception as inv_err:
                 print(f"Invoice generation failed: {inv_err}")
 
+        # ========== EMAILS (separate try/except so one failure does not block the other) ==========
+        print("=" * 60)
+        print(f"PAYMENT SUCCESS → Order: {order.order_number}")
+        print(f"Customer email: {repr(order.email)}")
+        print(f"Invoice exists: {bool(order.invoice)}")
+
+        # 1. Customer confirmation email
         try:
+            print("→ Sending customer confirmation email...")
             send_order_confirmation_email(order)
+            print("→ Customer confirmation email SENT successfully")
+        except Exception as e:
+            print("→ CUSTOMER EMAIL FAILED:")
+            traceback.print_exc()
+
+        # 2. Admin notification email
+        try:
+            print("→ Sending admin notification email...")
             send_admin_new_order_notification(order)
-        except Exception as email_error:
-            print(f"Email sending failed: {email_error}")
-        
+            print("→ Admin notification email SENT successfully")
+        except Exception as e:
+            print("→ ADMIN EMAIL FAILED:")
+            traceback.print_exc()
+
+        print("=" * 60)
+
         return JsonResponse({
             'status': 'success',
             'redirect_url': reverse('orders:order_success', args=[order.order_number])
         })
+
     except razorpay.errors.SignatureVerificationError:
         return JsonResponse({'status': 'error', 'message': 'Signature verification failed'}, status=400)
     except Exception as e:
+        print("verify_payment ERROR:", str(e))
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 @csrf_exempt
 def razorpay_webhook(request):
@@ -102,20 +128,40 @@ def razorpay_webhook(request):
                     status='success'
                 )
 
-                # Generate pdf
+                # Generate PDF
                 if not order.invoice:
                     try:
-                        from orders.invoice import generate_invoice_pdf
                         pdf_file = generate_invoice_pdf(order)
                         order.invoice.save(pdf_file.name, pdf_file, save=True)
                     except Exception as inv_err:
                         print(f"Invoice generation failed: {inv_err}")
 
-                # Send emails (safe to call again)
-                send_order_confirmation_email(order)
-                send_admin_new_order_notification(order)
+                # ========== EMAILS (separate try/except) ==========
+                print("=" * 60)
+                print(f"WEBHOOK payment.captured → Order: {order.order_number}")
+                print(f"Customer email: {repr(order.email)}")
+
+                try:
+                    print("→ Sending customer confirmation email...")
+                    send_order_confirmation_email(order)
+                    print("→ Customer confirmation email SENT successfully")
+                except Exception as e:
+                    print("→ CUSTOMER EMAIL FAILED:")
+                    traceback.print_exc()
+
+                try:
+                    print("→ Sending admin notification email...")
+                    send_admin_new_order_notification(order)
+                    print("→ Admin notification email SENT successfully")
+                except Exception as e:
+                    print("→ ADMIN EMAIL FAILED:")
+                    traceback.print_exc()
+
+                print("=" * 60)
 
         return JsonResponse({'status': 'success'})
 
-    except Exception:
+    except Exception as e:
+        print("Webhook ERROR:", str(e))
+        traceback.print_exc()
         return JsonResponse({'status': 'error'}, status=400)
