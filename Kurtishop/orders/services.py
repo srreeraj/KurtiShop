@@ -63,6 +63,26 @@ def create_order_from_cart(cart, form_data):
     return order
 
 @transaction.atomic
+def clear_cart_after_order(cart):
+    """
+    Safely clear the cart that belongs to this order.
+    Called only after payment is confirmed.
+    Idempotent : safe to call multiple times.
+    """
+
+    if not order.guest_session_key:
+        return
+    
+    deleted_count, _ = Cart.objects.filter(session_key=order.guest_session_key).delete()
+
+    if deleted_count:
+        logger.info(
+            "Cart cleared after order %s (session_key=%s)",
+            order.order_number,
+            order.guest_session_key,
+        )
+
+@transaction.atomic
 def deduct_stock_after_payment(order):
     """
         Deduct stock only after successful payment,
