@@ -13,7 +13,7 @@ from .utils import create_razorpay_order, get_razorpay_client
 from orders.utils import send_order_confirmation_email, send_admin_new_order_notification
 from django.urls import reverse
 from razorpay.errors import SignatureVerificationError
-from orders.services import deduct_stock_after_payment, clear_cart_after_payment
+from orders.services import deduct_stock_after_payment, clear_cart_after_order
 from orders.invoice import generate_invoice_pdf
 
 logger = logging.getLogger(__name__)
