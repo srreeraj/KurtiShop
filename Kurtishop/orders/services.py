@@ -3,6 +3,9 @@ from .models import Order, OrderItem
 from cart.models import Cart
 from django.template.loader import render_to_string
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
@@ -57,11 +60,6 @@ def create_order_from_cart(cart, form_data):
     # Update Order with total discount (recommended)
     order.total_discount = total_discount
     order.save()
-
-    # Clear cart
-    cart.items.all().delete()
-    cart.delete()
-
     return order
 
 @transaction.atomic
