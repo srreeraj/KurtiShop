@@ -88,15 +88,24 @@ def deduct_stock_after_payment(order):
         Deduct stock only after successful payment,
         This is atomic to prevent overselling
     """
-    for item in order.items.select_related('variant').all():
-        if item.variant:
-            if item.variant.stock < item.quantity:
-                # This should rarely happen if you lock stock at cart stage
-                raise ValueError(f"Insufficient stock for {item.variant}")
+    for item in order.items.select_related('variant').select_for_update().all():
 
-            item.variant.stock -= item.quantity
-            item.variant.save(update_fields=['stock'])
+        if not item.variant:
+            continue
+        
+        if item.variant.stock < item.quantity:
+            # This should rarely happen if you lock stock at cart stage
+            raise ValueError(
+                f"Insufficient stock for {item.variant} "
+                f"(needed {item.quantity}, available {item.variant.stock})"
+            )
+        item.variant.stock -= item.quantity
+        item.variant.save(update_fields=['stock'])
 
-    # Optional: Update order status to reflect stock was deducted
-    order.order_status = Order.OrderStatus.CONFIRMED
-    order.save(update_fields=['order_status'])
+    # Only update status if it is still in a pre-confirmation state
+    if order.order_status in (
+        Order.OrderStatus.PENDING,
+        Order.OrderStatus.AWAITING_PAYMENT,   # adjust to your actual status names
+    ):
+        order.order_status = Order.OrderStatus.CONFIRMED
+        order.save(update_fields=['order_status', 'updated_at'])
