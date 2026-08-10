@@ -26,7 +26,7 @@ def checkout(request):
     cart = get_object_or_404(Cart, session_key=session_key)
 
     if not cart.items.exists():
-        return redirect('cart:cart_drawer')
+        return redirect('/')
 
     # Calculate values for order summary
     items = cart.items.select_related(
