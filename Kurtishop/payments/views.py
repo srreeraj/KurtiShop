@@ -116,7 +116,7 @@ def razorpay_webhook(request):
                 order.save()
 
                 deduct_stock_after_payment(order)
-
+                clear_cart_after_order(order)
                 # Update Payment record
                 Payment.objects.filter(order=order).update(
                     razorpay_payment_id=payment_entity['id'],
