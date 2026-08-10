@@ -1,5 +1,6 @@
 from django.db import transaction
 from .models import Order, OrderItem
+from products.models import ProductVariant
 from cart.models import Cart
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -88,24 +89,46 @@ def deduct_stock_after_payment(order):
         Deduct stock only after successful payment,
         This is atomic to prevent overselling
     """
-    for item in order.items.select_related('variant').select_for_update().all():
+    items = list(order.items.select_related('variant').all())
 
-        if not item.variant:
+    # Collect only existing variant IDs
+    variant_ids = [item.variant_id for item in items if item.variant_id]
+
+    if not variant_ids:
+        return
+
+    # Lock the actual ProductVariant rows (this is the correct & safe way)
+    locked_variants = {
+        v.id: v
+        for v in ProductVariant.objects.select_for_update().filter(id__in=variant_ids)
+    }
+    
+    for item in items:
+        if not item.variant_id:
             continue
-        
-        if item.variant.stock < item.quantity:
-            # This should rarely happen if you lock stock at cart stage
-            raise ValueError(
-                f"Insufficient stock for {item.variant} "
-                f"(needed {item.quantity}, available {item.variant.stock})"
-            )
-        item.variant.stock -= item.quantity
-        item.variant.save(update_fields=['stock'])
 
-    # Only update status if it is still in a pre-confirmation state
+        variant = locked_variants.get(item.variant_id)
+        if not variant:
+            logger.warning(
+                "Variant %s not found while deducting stock for order %s",
+                item.variant_id,
+                order.order_number,
+            )
+            continue
+
+        if variant.stock < item.quantity:
+            raise ValueError(
+                f"Insufficient stock for {variant} "
+                f"(needed {item.quantity}, available {variant.stock})"
+            )
+
+        variant.stock -= item.quantity
+        variant.save(update_fields=['stock'])
+
+    # Update order status only if it is still in a pre-confirmation state
     if order.order_status in (
         Order.OrderStatus.PENDING,
-        Order.OrderStatus.AWAITING_PAYMENT,   # adjust to your actual status names
+        getattr(Order.OrderStatus, 'AWAITING_PAYMENT', None),
     ):
         order.order_status = Order.OrderStatus.CONFIRMED
         order.save(update_fields=['order_status', 'updated_at'])
