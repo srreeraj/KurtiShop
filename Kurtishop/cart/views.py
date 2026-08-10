@@ -12,17 +12,8 @@ from .utils import get_or_create_cart, get_cart_item_count
 
 def cart_drawer(request):
     """
-    This view is meant to be loaded inside a drawer (AJAX / HTMX).
     If the user opens it directly in the browser, redirect to home page.
     """
-    # Detect if the request is an AJAX or HTMX request
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    is_htmx = request.headers.get('HX-Request') == 'true'
-
-    if not (is_ajax or is_htmx):
-        # User opened /cart/drawer/ directly → send them home
-        return redirect('/')
-        
     cart = get_or_create_cart(request)
     items = cart.items.select_related(
         'variant__product',
