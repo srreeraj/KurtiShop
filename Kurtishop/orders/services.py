@@ -64,7 +64,7 @@ def create_order_from_cart(cart, form_data):
     return order
 
 @transaction.atomic
-def clear_cart_after_order(cart):
+def clear_cart_after_order(order):
     """
     Safely clear the cart that belongs to this order.
     Called only after payment is confirmed.
