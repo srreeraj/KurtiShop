@@ -5,6 +5,9 @@ from cart.models import Cart
 from django.template.loader import render_to_string
 from django.conf import settings
 import logging
+from django.utils import timezone
+from decimal import Decimal
+from .models import ReturnRequest, ReturnRequestItem, OrderItem, OrderStatusHistory
 
 logger = logging.getLogger(__name__)
 
@@ -132,3 +135,112 @@ def deduct_stock_after_payment(order):
     ):
         order.order_status = Order.OrderStatus.CONFIRMED
         order.save(update_fields=['order_status', 'updated_at'])
+
+@transaction.atomic
+def fulfill_exchange_request(return_req, items_data, admin_user=None):
+    """
+    items_data = [
+        {
+            "return_item_id": 12,
+            "new_variant": <ProductVariant instance>,
+            "new_quantity": 1,
+        },
+        ...
+    ]
+    """
+    order = return_req.order
+    total_price_diff = Decimal("0.00")
+
+    for data in items_data:
+        ritem = ReturnRequestItem.objects.select_for_update().get(
+            id=data["return_item_id"],
+            return_request=return_req,
+            request_type=ReturnRequest.RequestType.EXCHANGE,
+        )
+        old_item = ritem.order_item
+        new_variant = data["new_variant"]
+        new_qty = data["new_quantity"]
+
+        # ---------- Stock adjustments ----------
+        # 1. Restore stock of original variant
+        if old_item.variant_id:
+            old_variant = ProductVariant.objects.select_for_update().get(
+                id=old_item.variant_id
+            )
+            old_variant.stock += ritem.quantity
+            old_variant.save(update_fields=["stock"])
+
+        # 2. Deduct stock of new variant
+        new_variant = ProductVariant.objects.select_for_update().get(id=new_variant.id)
+        if new_variant.stock < new_qty:
+            raise ValueError(
+                f"Insufficient stock for {new_variant} "
+                f"(needed {new_qty}, available {new_variant.stock})"
+            )
+        new_variant.stock -= new_qty
+        new_variant.save(update_fields=["stock"])
+
+        # ---------- Price calculation ----------
+        old_line_total = old_item.unit_price * ritem.quantity
+        new_unit_price = new_variant.discounted_price
+        new_line_total = new_unit_price * new_qty
+        price_diff = new_line_total - old_line_total
+        total_price_diff += price_diff
+
+        # ---------- Update OrderItem in-place (simplest for guest system) ----------
+        old_item.variant = new_variant
+        old_item.product_name = new_variant.product.name
+        old_item.variant_sku = new_variant.variant_sku
+        old_item.size = new_variant.size.name
+        old_item.color = new_variant.color.name
+        old_item.original_unit_price = new_variant.price
+        old_item.unit_price = new_unit_price
+        old_item.discount_percentage = new_variant.discount_percentage
+        old_item.quantity = new_qty
+        old_item.total_price = new_line_total
+        old_item.savings = (new_variant.price - new_unit_price) * new_qty
+        old_item.save()
+
+        # ---------- Snapshot on ReturnRequestItem ----------
+        ritem.exchanged_to_variant = new_variant
+        ritem.new_product_name = new_variant.product.name
+        ritem.new_variant_sku = new_variant.variant_sku
+        ritem.new_size = new_variant.size.name
+        ritem.new_color = new_variant.color.name
+        ritem.new_unit_price = new_unit_price
+        ritem.new_quantity = new_qty
+        ritem.price_difference = price_diff
+        ritem.fulfilled_at = timezone.now()
+        ritem.save()
+
+    # ---------- Recalculate order totals ----------
+    items = order.items.all()
+    subtotal = sum(i.total_price for i in items)
+    total_discount = sum(i.savings for i in items)
+
+    order.subtotal = subtotal
+    order.total_discount = total_discount
+    order.grand_total = (
+        subtotal + order.shipping_charge + order.tax - order.discount
+    )
+    order.save(update_fields=[
+        "subtotal", "total_discount", "grand_total", "updated_at"
+    ])
+
+    # ---------- Mark request as fulfilled ----------
+    return_req.status = getattr(
+        ReturnRequest.Status, "FULFILLED", ReturnRequest.Status.COMPLETED
+    )
+    return_req.save(update_fields=["status", "updated_at"])
+
+    # ---------- History note ----------
+    note = "Exchange fulfilled by admin."
+    if total_price_diff != 0:
+        note += f" Price difference: ₹{total_price_diff}"
+    OrderStatusHistory.objects.create(
+        order=order,
+        status=order.order_status,
+        note=note,
+    )
+
+    return total_price_diff
