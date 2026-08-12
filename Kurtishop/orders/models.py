@@ -339,6 +339,30 @@ class ReturnRequestItem(models.Model):
         default=ReturnRequest.RequestType.RETURN
     )
 
+    # ===== NEW: Exchange fulfillment fields =====
+    exchanged_to_variant = models.ForeignKey(
+        "products.ProductVariant",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    new_product_name = models.CharField(max_length=255, blank=True)
+    new_variant_sku = models.CharField(max_length=100, blank=True)
+    new_size = models.CharField(max_length=50, blank=True)
+    new_color = models.CharField(max_length=100, blank=True)
+    new_unit_price = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    new_quantity = models.PositiveIntegerField(null=True, blank=True)
+
+    # positive = customer pays extra, negative = refund due
+    price_difference = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    fulfilled_at = models.DateTimeField(null=True, blank=True)
+    # ===========================================
+    
     class Meta:
         ordering = ["id"]
 
