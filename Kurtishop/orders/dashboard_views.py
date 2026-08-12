@@ -6,10 +6,12 @@ from django.db.models import Q
 from django.db import transaction
 from django.http import FileResponse, Http404
 from .invoice import generate_invoice_pdf
-from .models import Order, OrderStatusHistory, ReturnRequest
+from .models import Order, OrderStatusHistory, ReturnRequest, ReturnRequestItem
 from .dashboard_forms import OrderStatusUpdateForm
 from django.utils import timezone
 from .utils import send_cancellation_decision_email,send_order_confirmation_email, send_return_decision_email
+from .services import fulfill_exchange_request
+from products.models import ProductVariant
 
 
 
@@ -202,3 +204,80 @@ def download_invoice(request, order_number):
         filename=f"Invoice_{order.order_number}.pdf",
         content_type="application/pdf",
     )
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def fulfill_exchange(request, order_number, return_id):
+    order = get_object_or_404(Order, order_number=order_number)
+    return_req = get_object_or_404(
+        ReturnRequest,
+        id=return_id,
+        order=order,
+    )
+
+    # Only allow if already approved (or still pending – your choice)
+    if return_req.status not in (
+        ReturnRequest.Status.APPROVED,
+        ReturnRequest.Status.PENDING,   # remove if you want strict approve-first
+    ):
+        messages.error(request, "This return request cannot be fulfilled.")
+        return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+
+    exchange_items = return_req.items.filter(
+        request_type=ReturnRequest.RequestType.EXCHANGE
+    ).select_related("order_item__variant__product")
+
+    if not exchange_items.exists():
+        messages.error(request, "No exchange items found in this request.")
+        return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+
+    if request.method == "POST":
+        items_data = []
+        errors = []
+
+        for ritem in exchange_items:
+            variant_id = request.POST.get(f"variant_{ritem.id}")
+            qty_str = request.POST.get(f"qty_{ritem.id}", "1")
+
+            if not variant_id:
+                errors.append(f"Please select a new variant for {ritem.order_item.product_name}")
+                continue
+
+            try:
+                new_variant = ProductVariant.objects.get(id=variant_id)
+                new_qty = int(qty_str)
+                if new_qty < 1:
+                    raise ValueError("Quantity must be ≥ 1")
+            except (ProductVariant.DoesNotExist, ValueError) as e:
+                errors.append(str(e))
+                continue
+
+            items_data.append({
+                "return_item_id": ritem.id,
+                "new_variant": new_variant,
+                "new_quantity": new_qty,
+            })
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+            return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+
+        try:
+            price_diff = fulfill_exchange_request(return_req, items_data)
+            msg = "Exchange fulfilled successfully."
+            if price_diff > 0:
+                msg += f" Customer owes ₹{price_diff} extra."
+            elif price_diff < 0:
+                msg += f" Refund due to customer: ₹{abs(price_diff)}."
+            messages.success(request, msg)
+        except ValueError as e:
+            messages.error(request, str(e))
+        except Exception as e:
+            messages.error(request, f"Failed to fulfill exchange: {e}")
+
+        return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+
+    # GET → just redirect back (modal is on the detail page)
+    return redirect("orders_dashboard:order_detail", order_number=order.order_number)
+A
