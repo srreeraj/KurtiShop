@@ -39,7 +39,26 @@ function initNavbar() {
 
     function setSolid(isSolid) {
         swap(navbar, isSolid ? NAVBAR_SOLID : NAVBAR_TRANSPARENT, isSolid ? NAVBAR_TRANSPARENT : NAVBAR_SOLID);
-        swap(logo, isSolid ? DARK_TEXT : LIGHT_TEXT, isSolid ? LIGHT_TEXT : DARK_TEXT);
+    
+        // Logo switching
+        const whiteLogo = logo.querySelector('.logo-white');
+        const redLogo   = logo.querySelector('.logo-red');
+
+        if (whiteLogo && redLogo) {
+            if (isSolid) {
+                whiteLogo.classList.add('hidden');
+                whiteLogo.classList.remove('block');
+                redLogo.classList.remove('hidden');
+                redLogo.classList.add('block');
+            } else {
+                whiteLogo.classList.remove('hidden');
+                whiteLogo.classList.add('block');
+                redLogo.classList.add('hidden');
+                redLogo.classList.remove('block');
+           }
+        }
+
+        // Keep the rest as-is
         swap(hamburgerBtn, isSolid ? DARK_TEXT : LIGHT_TEXT, isSolid ? LIGHT_TEXT : DARK_TEXT);
         swap(searchBtn, isSolid ? DARK_TEXT : LIGHT_TEXT, isSolid ? LIGHT_TEXT : DARK_TEXT);
         swap(cartBtn, isSolid ? DARK_TEXT : LIGHT_TEXT, isSolid ? LIGHT_TEXT : DARK_TEXT);
