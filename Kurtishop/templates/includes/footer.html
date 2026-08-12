@@ -1,34 +1,46 @@
 <!-- templates/includes/footer.html -->
 {% load static %}
-<footer class="bg-[#141414] text-gray-400">
-    <div class="max-w-screen-2xl mx-auto px-4 sm:px-5 md:px-8 lg:px-16 pt-16 sm:pt-20 pb-8">
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-y-12 gap-x-8 lg:gap-x-10">
+<footer class="bg-white text-gray-600 border-t border-gray-100">
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-5 md:px-8 lg:px-16 pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-14">
 
-            <!-- Brand -->
-            <div class="col-span-2 lg:col-span-4">
-                <a href="{% url 'home' %}"
-                   class="inline-block font-['Cormorant_Garamond',Georgia,serif] text-[28px] font-bold tracking-[3px] uppercase text-white">
-                    Kyla
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 gap-y-14 gap-x-8 lg:gap-x-12">
+
+            <!-- Brand + Logo -->
+            <div class="col-span-2 lg:col-span-5">
+                <a href="{% url 'home' %}" class="inline-block leading-none -ml-1">
+                    <img src="{% static 'icons/logo/kyla-red.png' %}"
+                         alt="Kyla Fashion"
+                         class="block h-20 sm:h-24 lg:h-28 w-auto object-contain object-left">
                 </a>
-                <p class="mt-4 text-sm leading-relaxed max-w-xs text-gray-400">
+
+                <p class="mt-6 text-[15px] leading-relaxed max-w-sm text-gray-500">
                     Timeless elegance for the modern woman — curated fashion that celebrates grace and confidence.
                 </p>
 
-                <div class="flex gap-5 mt-6">
-                    <a href="#" aria-label="Instagram" class="text-gray-500 hover:text-[#C1121F] transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+                <!-- Social Icons -->
+                <div class="flex items-center gap-6 mt-8">
+                    <!-- Instagram -->
+                    <a href="#" aria-label="Instagram"
+                       class="text-gray-400 hover:text-[#C1121F] transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
                         </svg>
                     </a>
-                    <a href="#" aria-label="X" class="text-gray-500 hover:text-[#C1121F] transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M18.244 2.25l-.01-.004L12 12.75 5.766 2.25h-2.51L12 13.5l8.744-11.25h-2.51z"/>
+
+                    <!-- Facebook -->
+                    <a href="#" aria-label="Facebook"
+                       class="text-gray-400 hover:text-[#C1121F] transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                         </svg>
                     </a>
-                    <a href="#" aria-label="Facebook" class="text-gray-500 hover:text-[#C1121F] transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0z"/>
+
+                    <!-- YouTube -->
+                    <a href="#" aria-label="YouTube"
+                       class="text-gray-400 hover:text-[#C1121F] transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                         </svg>
                     </a>
                 </div>
@@ -36,8 +48,8 @@
 
             <!-- Shop -->
             <div class="lg:col-span-2">
-                <h3 class="text-white text-[11px] font-semibold tracking-[2.5px] uppercase mb-5">Shop</h3>
-                <ul class="space-y-3 text-sm">
+                <h3 class="text-gray-900 text-[12px] font-semibold tracking-[2.5px] uppercase mb-6">Shop</h3>
+                <ul class="space-y-3.5 text-[15px]">
                     <li><a href="{% url 'product_list' %}?new-arrivals=true" class="hover:text-[#C1121F] transition-colors">New Arrivals</a></li>
                     <li><a href="{% url 'product_list' %}?occasion=wedding" class="hover:text-[#C1121F] transition-colors">Wedding</a></li>
                     <li><a href="{% url 'product_list' %}?occasion=office-wear" class="hover:text-[#C1121F] transition-colors">Office Wear</a></li>
@@ -48,9 +60,9 @@
             </div>
 
             <!-- Support -->
-            <div class="lg:col-span-3">
-                <h3 class="text-white text-[11px] font-semibold tracking-[2.5px] uppercase mb-5">Support</h3>
-                <ul class="space-y-3 text-sm">
+            <div class="lg:col-span-2">
+                <h3 class="text-gray-900 text-[12px] font-semibold tracking-[2.5px] uppercase mb-6">Support</h3>
+                <ul class="space-y-3.5 text-[15px]">
                     <li><a href="{% url 'contact' %}" class="hover:text-[#C1121F] transition-colors">Contact Us</a></li>
                     <li><a href="{% url 'orders:return_lookup' %}" class="hover:text-[#C1121F] transition-colors">Return / Exchange</a></li>
                     <li><a href="#" class="hover:text-[#C1121F] transition-colors">Shipping Policy</a></li>
@@ -61,35 +73,39 @@
 
             <!-- Newsletter -->
             <div class="col-span-2 lg:col-span-3">
-                <h3 class="text-white text-[11px] font-semibold tracking-[2.5px] uppercase mb-5">Newsletter</h3>
-                <p class="text-sm text-gray-400 mb-4">
+                <h3 class="text-gray-900 text-[12px] font-semibold tracking-[2.5px] uppercase mb-6">Newsletter</h3>
+                <p class="text-[15px] text-gray-500 mb-5">
                     Exclusive offers and new arrivals, straight to your inbox.
                 </p>
 
-                <form class="flex border-b border-gray-700 focus-within:border-[#C1121F] transition-colors">
+                <form class="flex border-b border-gray-300 focus-within:border-[#C1121F] transition-colors duration-300">
                     <input type="email"
                            placeholder="Your email"
-                           class="bg-transparent text-sm text-white placeholder-gray-500 py-2.5 flex-1 outline-none border-none">
+                           required
+                           class="bg-transparent text-[15px] text-gray-900 placeholder-gray-400 py-3 flex-1 outline-none border-none">
                     <button type="submit"
-                            class="text-[11px] font-semibold tracking-widest uppercase text-[#C1121F] hover:text-white transition-colors px-2">
+                            class="text-[12px] font-semibold tracking-widest uppercase text-[#C1121F] hover:text-gray-900 transition-colors px-3">
                         Join
                     </button>
                 </form>
-                <p class="text-xs text-gray-600 mt-3">We respect your inbox. Unsubscribe anytime.</p>
+                <p class="text-xs text-gray-400 mt-3">We respect your inbox. Unsubscribe anytime.</p>
             </div>
         </div>
 
-        <hr class="border-gray-800 my-10">
+        <!-- Divider -->
+        <hr class="border-gray-200 my-12 sm:my-14">
 
-        <!-- Bottom bar -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500 tracking-wide">
+        <!-- Bottom Bar -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-[13px] text-gray-400 tracking-wide">
             <div>&copy; 2026 Kyla. All Rights Reserved.</div>
-            <div class="flex gap-6">
-                <a href="#" class="hover:text-gray-300 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-gray-300 transition-colors">Terms of Service</a>
-                <a href="#" class="hover:text-gray-300 transition-colors">Sitemap</a>
+
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                <a href="#" class="hover:text-gray-700 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-gray-700 transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-gray-700 transition-colors">Sitemap</a>
             </div>
-            <div>Crafted in India</div>
+
+            <div class="text-gray-400">Crafted in India</div>
         </div>
     </div>
 </footer>
