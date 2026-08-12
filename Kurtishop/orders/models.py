@@ -291,6 +291,7 @@ class ReturnRequest(models.Model):
         APPROVED = "approved", "Approved"
         REJECTED = "rejected", "Rejected"
         COMPLETED = "completed", "Completed"
+        FULFILLED = "fulfilled", "Exchange Fulfilled"
 
     order = models.ForeignKey(
         Order,
@@ -362,7 +363,7 @@ class ReturnRequestItem(models.Model):
     )
     fulfilled_at = models.DateTimeField(null=True, blank=True)
     # ===========================================
-    
+
     class Meta:
         ordering = ["id"]
 
