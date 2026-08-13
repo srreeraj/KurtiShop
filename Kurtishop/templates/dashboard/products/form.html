@@ -121,6 +121,17 @@
         </div>
     </div>
 
+    <!-- Delivery Restriction -->
+    <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Delivery Restriction (Pincodes)</h2>
+        <p class="text-sm text-gray-500 mb-4">
+            Leave empty = this product is available in <strong>all</strong> serviceable pincodes.<br>
+            Select specific pincodes if this product can only be delivered to certain areas.
+        </p>
+            {{ form.allowed_pincodes }}
+            {{ form.allowed_pincodes.errors }}
+    </div>
+    
     <!-- Variants -->
     <div class="bg-white rounded-3xl shadow-sm p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
