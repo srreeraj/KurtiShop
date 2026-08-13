@@ -83,6 +83,18 @@ class ProductAttributeForm(forms.ModelForm):
             }),
         }
 
+class ServiceablePincodeForm(forms.ModelForm):
+    class Meta:
+        model = ServiceablePincode
+        fields = ["pincode", "area_name", "district", "state", "is_active"]
+        widgets = {
+            "pincode": forms.TextInput(attrs={"class": INPUT, "placeholder": "670141", "maxlength": "6"}),
+            "area_name": forms.TextInput(attrs={"class": INPUT, "placeholder": "Taliparamba"}),
+            "district": forms.TextInput(attrs={"class": INPUT}),
+            "state": forms.TextInput(attrs={"class": INPUT}),
+            "is_active": forms.CheckboxInput(attrs={"class": "w-5 h-5 rounded border-gray-300 text-red-600"}),
+        }
+
 
 # extra=1 gives one blank row by default; JS clones more as needed.
 # empty_permitted on extra forms means a row left fully blank is silently skipped.
