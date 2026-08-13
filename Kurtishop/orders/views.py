@@ -3,6 +3,7 @@ from django.conf import settings
 from django.http import JsonResponse, FileResponse, Http404
 from .invoice import generate_invoice_pdf
 from cart.models import Cart
+from products.models import ServiceablePincode
 from .models import Order, OrderStatusHistory, ReturnRequest, ReturnRequestItem
 from .forms import OrderForm, OrderLookupForm, OrderCancellationForm, ReturnLookupForm, ReturnRequestForm
 from .services import create_order_from_cart
