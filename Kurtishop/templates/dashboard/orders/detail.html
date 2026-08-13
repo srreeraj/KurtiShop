@@ -252,16 +252,20 @@
 
                 <!-- Fulfill Exchange button -->
                 {% if req.status == 'approved' %}
-                    {% for item in req.items.all %}
-                        {% if item.request_type == 'exchange' and not item.fulfilled_at %}
-                            <button type="button"
-                                    onclick="openExchangeModal({{ req.id }})"
-                                    class="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-sm">
-                                Fulfill Exchange
-                            </button>
-                            {% break %}
-                        {% endif %}
-                    {% endfor %}
+                    {% with show_fulfill=False %}
+                        {% for item in req.items.all %}
+                            {% if item.request_type == 'exchange' and not item.fulfilled_at %}
+                                {% if not show_fulfill %}
+                                    <button type="button"
+                                            onclick="openExchangeModal({{ req.id }})"
+                                            class="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-sm">
+                                        Fulfill Exchange
+                                    </button>
+                                    {% with show_fulfill=True %}{% endwith %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
                 {% endif %}
             </div>
             {% endfor %}
