@@ -13,4 +13,5 @@ urlpatterns = [
         name='product_detail'
     ),
     path('search/suggestions/', views.search_suggestions, name='search_suggestions'),
+    path('check-pincode/', views.check_pincode, name='check_pincode'),
 ]
