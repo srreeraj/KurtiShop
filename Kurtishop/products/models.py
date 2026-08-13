@@ -213,6 +213,16 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
 
+    allowed_pincodes = models.ManyToManyField(
+        ServiceablePincode,
+        blank=True,
+        related_name="products",
+        help_text=(
+            "Leave empty = available in ALL serviceable pincodes. "
+            "Select specific pincodes to restrict delivery of this product."
+        )
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
