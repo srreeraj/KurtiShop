@@ -64,6 +64,30 @@ def checkout(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             order_data = form.cleaned_data
+            postal_code = order_data.get("postal_code", "").strip()
+
+            # ======== PINCODE VALIDATION ========
+            if not ServiceablePincode.objects.filter(pincode=postal_code, is_active=True).exists():
+                messages.error(request, "Sorry, we do not deliver to this pincode")
+                context['form'] = form
+                return render(request, 'orders/checkout.html', context)
+
+            # Check every product in cart
+            unavailable_items = []
+            for cart_item in cart.items.select_related("variant__product").all():
+                product = cart_item.variant.product
+                if not product.is_deliverable_to(postal_code):
+                    unavailable_items.append(product.name)
+
+            if unavailable_items:
+                names = ", ".join(unavailable_items)
+                messages.error(
+                    request,
+                    f"The following items are not available for delivery in your pincode ({postal_code}): {names}"
+                )
+                context['form'] = form
+                return render(request, 'orders/checkout.html', context)
+
             subtotal = sum(item.total_price for item in cart.items.all())
 
             order = create_order_from_cart(cart, {
