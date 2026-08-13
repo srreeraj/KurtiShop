@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_GET
 from django.db.models import Count, Q, Min
-from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern
+from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck, Occasion, Pattern, ServiceablePincode
 from django.http import JsonResponse
 from urllib.parse import urlencode
 from django.urls import reverse
@@ -312,3 +313,44 @@ def search_suggestions(request):
         })
 
     return JsonResponse({'results' : suggestions[:8]})
+
+@require_GET
+def check_pincode(request):
+    pincode = request.GET.get("pincode", "").strip()
+    product_id = request.GET.get("product_id")
+
+    if not pincode or len(pincode) != 6 or not pincode.isdigit():
+        return JsonResponse({
+            "available": False,
+            "message": "Please enter a valid 6-digit pincode."
+        })
+
+    # Is this pincode serviceable at all?
+    serviceable = ServiceablePincode.objects.filter(
+        pincode=pincode, is_active=True
+    ).first()
+
+    if not serviceable:
+        return JsonResponse({
+            "available": False,
+            "message": "Sorry, we currently do not deliver to this pincode."
+        })
+
+    # If product_id is given → check product restriction
+    if product_id:
+        try:
+            product = Product.objects.get(id=product_id, is_active=True, is_deleted=False)
+            if not product.is_deliverable_to(pincode):
+                return JsonResponse({
+                    "available": False,
+                    "message": f"This product is not available for delivery in {serviceable.area_name}."
+                })
+        except Product.DoesNotExist:
+            pass
+
+    return JsonResponse({
+        "available": True,
+        "message": f"Available for delivery in {serviceable.area_name}, {serviceable.district}.",
+        "area": serviceable.area_name,
+        "district": serviceable.district,
+    })
