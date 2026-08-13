@@ -109,6 +109,22 @@ class ProductTag(models.Model):
     def __str__(self):
         return self.name
 
+# ==================== NEW: Serviceable Pincode ====================
+class ServiceablePincode(models.Model):
+    pincode = models.CharField(max_length=6, unique=True)
+    area_name = models.CharField(max_length=100, help_text="e.g. Taliparamba, Kannur City")
+    district = models.CharField(max_length=100, default="Kannur")
+    state = models.CharField(max_length=50, default="Kerala")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["pincode"]
+        verbose_name = "Serviceable Pincode"
+        verbose_name_plural = "Serviceable Pincodes"
+
+    def __str__(self):
+        return f"{self.pincode} – {self.area_name}"
+
 
 class Product(models.Model):
     category = models.ForeignKey(
