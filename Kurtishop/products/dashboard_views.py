@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Min
 from django.db import transaction
 
-from .models import Product, ProductImage, Color
+from .models import Product, ProductImage, Color, ServiceablePincode
 from .forms import ProductForm, ProductVariantFormSet, ProductAttributeFormSet, ServiceablePincodeForm
 
 # Auto-assign order for multi-image upload per color
