@@ -72,7 +72,9 @@
                     <div class="flex gap-3">
                         <input type="text" id="pincode-input" maxlength="6" placeholder="Enter 6-digit pincode"
                             class="flex-1 h-12 px-4 rounded-xl border border-gray-300 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-100">
-                        <button type="button" onclick="checkPincodeAvailability()"
+                        <button type="button" 
+                            id="check-pincode-btn"
+                            data-product-id="{{ product.id }}"
                             class="px-6 h-12 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium">
                             Check
                         </button>
