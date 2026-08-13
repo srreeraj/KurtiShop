@@ -305,10 +305,16 @@ function toggleAccordion(btn) {
     icon.textContent = content.classList.contains('hidden') ? '+' : '-';
 }
 
+// ===================== PINCODE CHECKER =====================
 function checkPincodeAvailability() {
     const input = document.getElementById('pincode-input');
     const result = document.getElementById('pincode-result');
+    const btn = document.getElementById('check-pincode-btn');
+
+    if (!input || !result || !btn) return;
+
     const pincode = input.value.trim();
+    const productId = btn.dataset.productId;   // comes from data-product-id
 
     if (!/^\d{6}$/.test(pincode)) {
         result.textContent = "Please enter a valid 6-digit pincode.";
@@ -318,8 +324,6 @@ function checkPincodeAvailability() {
 
     result.textContent = "Checking...";
     result.className = "text-sm mt-3 text-gray-500";
-
-    const productId = {{ product.id }};   // Django will render this
 
     fetch(`/products/check-pincode/?pincode=${pincode}&product_id=${productId}`)
         .then(res => res.json())
@@ -335,10 +339,21 @@ function checkPincodeAvailability() {
         });
 }
 
-// Allow Enter key
-document.getElementById('pincode-input')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        checkPincodeAvailability();
+// Attach events when the page is ready
+document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('check-pincode-btn');
+    const input = document.getElementById('pincode-input');
+
+    if (btn) {
+        btn.addEventListener('click', checkPincodeAvailability);
+    }
+
+    if (input) {
+        input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                checkPincodeAvailability();
+            }
+        });
     }
 });
