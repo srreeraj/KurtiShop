@@ -304,3 +304,41 @@ function toggleAccordion(btn) {
     content.classList.toggle('hidden');
     icon.textContent = content.classList.contains('hidden') ? '+' : '-';
 }
+
+function checkPincodeAvailability() {
+    const input = document.getElementById('pincode-input');
+    const result = document.getElementById('pincode-result');
+    const pincode = input.value.trim();
+
+    if (!/^\d{6}$/.test(pincode)) {
+        result.textContent = "Please enter a valid 6-digit pincode.";
+        result.className = "text-sm mt-3 text-red-600";
+        return;
+    }
+
+    result.textContent = "Checking...";
+    result.className = "text-sm mt-3 text-gray-500";
+
+    const productId = {{ product.id }};   // Django will render this
+
+    fetch(`/products/check-pincode/?pincode=${pincode}&product_id=${productId}`)
+        .then(res => res.json())
+        .then(data => {
+            result.textContent = data.message;
+            result.className = data.available
+                ? "text-sm mt-3 text-green-600 font-medium"
+                : "text-sm mt-3 text-red-600 font-medium";
+        })
+        .catch(() => {
+            result.textContent = "Something went wrong. Please try again.";
+            result.className = "text-sm mt-3 text-red-600";
+        });
+}
+
+// Allow Enter key
+document.getElementById('pincode-input')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        checkPincodeAvailability();
+    }
+});
