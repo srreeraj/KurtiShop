@@ -6,7 +6,7 @@ from django.db.models import Q, Min
 from django.db import transaction
 
 from .models import Product, ProductImage, Color
-from .forms import ProductForm, ProductVariantFormSet, ProductAttributeFormSet
+from .forms import ProductForm, ProductVariantFormSet, ProductAttributeFormSet, ServiceablePincodeForm
 
 # Auto-assign order for multi-image upload per color
 VIEW_ORDER = ["front", "back", "left", "right", "three-quarter", "closeup", "detail"]
@@ -169,3 +169,74 @@ def _delete_images(request):
     delete_ids = request.POST.getlist("delete_image")
     if delete_ids:
         ProductImage.objects.filter(id__in=delete_ids).delete()
+
+# ---------- Serviceable Pincode Management ----------
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def pincode_list(request):
+    qs = ServiceablePincode.objects.all().order_by("pincode")
+    search = request.GET.get("search", "").strip()
+    if search:
+        qs = qs.filter(
+            Q(pincode__icontains=search) |
+            Q(area_name__icontains=search) |
+            Q(district__icontains=search)
+        )
+
+    paginator = Paginator(qs, 30)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "dashboard/products/pincode_list.html", {
+        "pincodes": page_obj,
+        "page_obj": page_obj,
+        "search": search,
+        "page_title": "Serviceable Pincodes",
+    })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def pincode_create(request):
+    if request.method == "POST":
+        form = ServiceablePincodeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pincode added successfully.")
+            return redirect("products_dashboard:pincode_list")
+    else:
+        form = ServiceablePincodeForm(initial={"district": "Kannur", "state": "Kerala"})
+
+    return render(request, "dashboard/products/pincode_form.html", {
+        "form": form,
+        "page_title": "Add Serviceable Pincode",
+    })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def pincode_edit(request, pk):
+    pincode = get_object_or_404(ServiceablePincode, pk=pk)
+    if request.method == "POST":
+        form = ServiceablePincodeForm(request.POST, instance=pincode)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pincode updated.")
+            return redirect("products_dashboard:pincode_list")
+    else:
+        form = ServiceablePincodeForm(instance=pincode)
+
+    return render(request, "dashboard/products/pincode_form.html", {
+        "form": form,
+        "pincode": pincode,
+        "page_title": f"Edit {pincode.pincode}",
+    })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def pincode_delete(request, pk):
+    pincode = get_object_or_404(ServiceablePincode, pk=pk)
+    pincode.delete()
+    messages.success(request, "Pincode deleted.")
+    return redirect("products_dashboard:pincode_list")
