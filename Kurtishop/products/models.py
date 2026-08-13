@@ -237,6 +237,23 @@ class Product(models.Model):
             models.Index(fields=["is_new_arrival"]),
         ]
 
+    def is_deliverable_to(self, pincode: str) -> bool:
+        """
+        Returns True if this product can be delivered to the given pincode.
+        """
+        pincode = str(pincode).strip()
+
+        # First check if the pincode is serviceable at all
+        if not ServiceablePincode.objects.filter(pincode=pincode, is_active=True).exists():
+            return False
+
+        # If product has no restrictions → available everywhere we deliver
+        if not self.allowed_pincodes.exists():
+            return True
+
+        # Otherwise only allowed pincodes
+        return self.allowed_pincodes.filter(pincode=pincode, is_active=True).exists()
+
     def save(self, *args, **kwargs):
 
         # SKU auto generation
