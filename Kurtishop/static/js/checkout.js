@@ -1,5 +1,6 @@
 let currentStep = 1;
 let isPaymentProcessing = false;
+let isPincodeValid = false;   // NEW
 
 function updateProgress(step) {
     document.querySelectorAll(".step").forEach(stepItem => {
@@ -67,7 +68,49 @@ function validateRequired(value) {
     return value && value.trim().length > 0;
 }
 
-// Main validation for a step
+// ==================== NEW: PINCODE CHECK ====================
+
+async function checkPincodeAvailability(pincode) {
+    const resultEl = document.getElementById('pincode-check-result');
+    if (!resultEl) return false;
+
+    pincode = pincode.trim();
+
+    if (!/^\d{6}$/.test(pincode)) {
+        resultEl.textContent = "Postal code must be 6 digits";
+        resultEl.className = "mt-1.5 text-sm text-red-600";
+        isPincodeValid = false;
+        return false;
+    }
+
+    resultEl.textContent = "Checking delivery availability...";
+    resultEl.className = "mt-1.5 text-sm text-gray-500";
+
+    try {
+        const res = await fetch(`/products/check-pincode/?pincode=${pincode}`);
+        const data = await res.json();
+
+        if (data.available) {
+            resultEl.textContent = data.message;
+            resultEl.className = "mt-1.5 text-sm text-green-600 font-medium";
+            isPincodeValid = true;
+            return true;
+        } else {
+            resultEl.textContent = data.message;
+            resultEl.className = "mt-1.5 text-sm text-red-600 font-medium";
+            isPincodeValid = false;
+            return false;
+        }
+    } catch (err) {
+        resultEl.textContent = "Could not verify pincode. Please try again.";
+        resultEl.className = "mt-1.5 text-sm text-red-600";
+        isPincodeValid = false;
+        return false;
+    }
+}
+
+// ==================== STEP VALIDATION ====================
+
 function validateStep(step) {
     let isValid = true;
 
@@ -142,10 +185,27 @@ function validateStep(step) {
 
 // ==================== STEP NAVIGATION ====================
 
-function nextStep(next) {
-    if (validateStep(currentStep)) {
-        showStep(next);
+async function nextStep(next) {
+    // Basic field validation first
+    if (!validateStep(currentStep)) {
+        return;
     }
+
+    // Special handling for Step 2 → 3 (pincode check)
+    if (currentStep === 2 && next === 3) {
+        const postalInput = document.querySelector('input[name="postal_code"]');
+        const pincode = postalInput?.value.trim() || "";
+
+        const available = await checkPincodeAvailability(pincode);
+
+        if (!available) {
+            // Keep user on Step 2
+            showError(postalInput, "We do not deliver to this pincode");
+            return;
+        }
+    }
+
+    showStep(next);
 }
 
 function prevStep(prev) {
@@ -157,6 +217,15 @@ function handleSubmit(e) {
         e.preventDefault();
         showStep(1);
         alert("Please fix the errors in the form before submitting.");
+        return;
+    }
+
+    // Extra safety: also check pincode again on final submit
+    const postal = document.querySelector('input[name="postal_code"]');
+    if (postal && !isPincodeValid) {
+        e.preventDefault();
+        showStep(2);
+        alert("Please enter a valid serviceable pincode.");
     }
 }
 
@@ -236,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Show correct starting step
     showStep(config.triggerPayment ? 3 : 1);
 
-    // Real-time validation
+    // Real-time validation for normal fields
     const allInputs = document.querySelectorAll('#checkout-form input, #checkout-form select, #checkout-form textarea');
     allInputs.forEach(input => {
         input.addEventListener('blur', () => validateStep(currentStep));
@@ -246,6 +315,32 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // NEW: Live pincode check when user leaves the postal code field
+    const postalInput = document.querySelector('input[name="postal_code"]');
+    if (postalInput) {
+        postalInput.addEventListener('blur', function () {
+            const value = this.value.trim();
+            if (value.length === 6) {
+                checkPincodeAvailability(value);
+            }
+        });
+
+        // Optional: also check while typing (after 6 digits)
+        postalInput.addEventListener('input', function () {
+            const value = this.value.trim();
+            if (value.length === 6) {
+                checkPincodeAvailability(value);
+            } else {
+                const resultEl = document.getElementById('pincode-check-result');
+                if (resultEl) {
+                    resultEl.textContent = "";
+                    resultEl.className = "mt-1.5 text-sm min-h-[20px]";
+                }
+                isPincodeValid = false;
+            }
+        });
+    }
 
     // Form submit handler
     const form = document.getElementById('checkout-form');
