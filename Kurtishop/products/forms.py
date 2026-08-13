@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Product, ProductVariant, ProductImage, ProductAttribute
+from .models import Product, ProductVariant, ProductImage, ProductAttribute, ServiceablePincode
 
 INPUT = "block w-full rounded-2xl border-gray-200 focus:border-red-500 focus:ring-red-500 py-3 px-4"
 FILE = "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
@@ -15,6 +15,7 @@ class ProductForm(forms.ModelForm):
             "material", "occasion", "sleeve", "neck", "pattern", "fit",
             "length", "yoke", "back", "lining", "wash_care",
             "tags", "is_featured", "is_new_arrival", "is_active",
+            "allowed_pincodes"
         ]
         widgets = {
             "category": forms.Select(attrs={"class": INPUT}),
@@ -35,6 +36,9 @@ class ProductForm(forms.ModelForm):
             "is_featured": forms.CheckboxInput(attrs={"class": CHECKBOX}),
             "is_new_arrival": forms.CheckboxInput(attrs={"class": CHECKBOX}),
             "is_active": forms.CheckboxInput(attrs={"class": CHECKBOX}),
+            "allowed_pincodes": forms.SelectMultiple(attrs={
+                "class": INPUT + " h-40",   # taller multi-select
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -42,6 +46,13 @@ class ProductForm(forms.ModelForm):
         for f in ["category", "material", "occasion", "sleeve", "neck", "pattern", "fit"]:
             self.fields[f].empty_label = f"— Select {f.title()} —"
         self.fields["tags"].required = False
+
+        # Only show active pincodes
+        self.fields["allowed_pincodes"].queryset = ServiceablePincode.objects.filter(is_active=True)
+        self.fields["allowed_pincodes"].help_text = (
+            "Leave empty = available in all serviceable areas. "
+            "Select specific pincodes to restrict this product."
+        )
 
 
 class ProductVariantForm(forms.ModelForm):
