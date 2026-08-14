@@ -1,81 +1,63 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Status Update</title>
+<title>Order Update – #{{ order.order_number }}</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f4f5; font-family: Arial, Helvetica, sans-serif;">
+<body style="margin:0; padding:0; background-color:#f4f4f5; font-family:Arial, Helvetica, sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5; padding:32px 16px;">
 <tr>
 <td align="center">
 
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08);">
 
-  <!-- Header -->
   <tr>
-    <td style="background-color:#C1121F; padding:36px 32px; text-align:center;">
-      <div style="width:56px; height:56px; background-color:rgba(255,255,255,0.15); border-radius:50%; margin:0 auto 14px; line-height:56px; font-size:28px; color:#ffffff;">📦</div>
-      <h1 style="margin:0; color:#ffffff; font-size:24px; font-weight:600;">Order Update</h1>
-      <p style="margin:8px 0 0; color:rgba(255,255,255,0.85); font-size:14px;">Order #{{ order.order_number }}</p>
+    <td style="background-color:#C1121F; padding:28px 32px; text-align:center;">
+      {% if site_url %}
+      <img src="{{ site_url }}/static/icons/logo/kyla-white.png" 
+           alt="Kyla Fashions" 
+           width="130" 
+           style="display:block; margin:0 auto 14px; max-width:130px; height:auto;">
+      {% endif %}
+      <h1 style="margin:0; color:#ffffff; font-size:22px; font-weight:600;">Order Status Updated</h1>
+      <p style="margin:6px 0 0; color:rgba(255,255,255,0.9); font-size:14px;">Order #{{ order.order_number }}</p>
     </td>
   </tr>
 
-  <!-- Greeting -->
   <tr>
-    <td style="padding:32px 32px 8px;">
-      <p style="margin:0 0 4px; font-size:16px; color:#111827;">Hi {{ order.full_name }},</p>
-      <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.6;">
-        Good news! The status of your order has been updated.
+    <td style="padding:28px 32px 12px;">
+      <p style="margin:0 0 12px; font-size:16px; color:#111827; font-weight:600;">Hi {{ order.full_name }},</p>
+      <p style="margin:0; font-size:14px; color:#6b7280; line-height:1.65;">
+        The status of your order has been updated.
       </p>
     </td>
   </tr>
 
-  <!-- Status badge -->
   <tr>
-    <td style="padding:24px 32px 0;" align="center">
-      <div style="display:inline-block; background-color:#f0fdf4; border:1px solid #bbf7d0; border-radius:9999px; padding:10px 28px;">
-        <span style="font-size:16px; font-weight:600; color:#15803d;">
+    <td style="padding:8px 32px 0;">
+      <div style="background-color:#f9fafb; border-radius:12px; padding:18px 20px; border:1px solid #f3f4f6; text-align:center;">
+        <p style="margin:0 0 6px; font-size:12px; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em;">Current Status</p>
+        <p style="margin:0; font-size:20px; font-weight:700; color:#C1121F;">
           {{ order.get_order_status_display }}
-        </span>
+        </p>
+        {% if old_status %}
+        <p style="margin:8px 0 0; font-size:13px; color:#9ca3af;">
+          Previously: {{ old_status }}
+        </p>
+        {% endif %}
       </div>
     </td>
   </tr>
 
-  <!-- Extra message based on status -->
   <tr>
-    <td style="padding:24px 32px 0;">
-      {% if order.order_status == 'shipped' %}
-        <p style="margin:0; font-size:14px; color:#374151; line-height:1.6; text-align:center;">
-          Your order is on its way! You will receive it soon.
-        </p>
-      {% elif order.order_status == 'delivered' %}
-        <p style="margin:0; font-size:14px; color:#374151; line-height:1.6; text-align:center;">
-          Your order has been delivered. We hope you love it!<br>
-          You can request a return or exchange within 7 days.
-        </p>
-      {% elif order.order_status == 'processing' %}
-        <p style="margin:0; font-size:14px; color:#374151; line-height:1.6; text-align:center;">
-          We are currently preparing your order for shipment.
-        </p>
-      {% elif order.order_status == 'confirmed' %}
-        <p style="margin:0; font-size:14px; color:#374151; line-height:1.6; text-align:center;">
-          Your order has been confirmed and will be processed shortly.
-        </p>
-      {% endif %}
-    </td>
-  </tr>
-
-  <!-- CTA -->
-  <tr>
-    <td style="padding:28px 32px 8px;" align="center">
+    <td style="padding:28px 32px 28px;" align="center">
       <table role="presentation" cellpadding="0" cellspacing="0">
         <tr>
           <td style="border-radius:10px; background-color:#111827;">
             <a href="{{ site_url }}{% url 'orders:order_detail' order.order_number %}"
                style="display:inline-block; padding:13px 28px; font-size:14px; font-weight:600; color:#ffffff; text-decoration:none;">
-              View Order
+              View Order Details
             </a>
           </td>
         </tr>
@@ -83,25 +65,9 @@
     </td>
   </tr>
 
-  {% if order.order_status == 'delivered' %}
   <tr>
-    <td style="padding:8px 32px 28px;" align="center">
-      <a href="{{ site_url }}{% url 'orders:return_lookup' %}"
-         style="font-size:13px; color:#C1121F; text-decoration:underline;">
-        Need to return or exchange?
-      </a>
-    </td>
-  </tr>
-  {% else %}
-  <tr>
-    <td style="padding:8px 32px 28px;"></td>
-  </tr>
-  {% endif %}
-
-  <!-- Footer -->
-  <tr>
-    <td style="padding:24px 32px; background-color:#f9fafb; text-align:center; border-top:1px solid #f3f4f6;">
-      <p style="margin:0; font-size:12px; color:#9ca3af;">Thank you for choosing Liara!</p>
+    <td style="padding:20px 32px; background-color:#f9fafb; text-align:center; border-top:1px solid #f3f4f6;">
+      <p style="margin:0; font-size:12px; color:#9ca3af;">Thank you for shopping with <strong>Kyla Fashions</strong></p>
     </td>
   </tr>
 
