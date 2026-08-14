@@ -20,7 +20,7 @@ def send_order_confirmation_email(order):
         html_message = f"<h2>Order #{order.order_number} Confirmed</h2><p>Total: ₹{order.grand_total}</p>"
 
     email = EmailMultiAlternatives(
-        subject=f"Order Confirmed – #{order.order_number} | Liara",
+        subject=f"Order Confirmed – #{order.order_number} | Kyla Fashions",
         body=plain_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[order.email],
