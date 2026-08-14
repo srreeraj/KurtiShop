@@ -129,6 +129,8 @@ def generate_invoice_pdf(order):
     logo_path = getattr(settings, "COMPANY_LOGO_PATH", None)
     if logo_path:
         logo_path = Path(logo_path)
+        print(f"Trying to load logo from: {logo_path}")          # debug
+        print(f"File exists: {logo_path.exists()}")
         if logo_path.exists():
             try:
                 logo = Image(str(logo_path), width=48*mm, height=19*mm)
