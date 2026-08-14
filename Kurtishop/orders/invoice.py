@@ -10,20 +10,9 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, Image, KeepTogether
+    HRFlowable, Image
 )
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
-
-
-def _get_logo():
-    """Return a ReportLab Image or None if logo is missing."""
-    logo_path = getattr(settings, "COMPANY_LOGO_PATH", None)
-    if logo_path and Path(logo_path).exists():
-        # Resize logo to a sensible width (keep aspect ratio)
-        img = Image(str(logo_path), width=45*mm, height=18*mm)
-        img.hAlign = "LEFT"
-        return img
-    return None
 
 
 def generate_invoice_pdf(order):
@@ -102,53 +91,68 @@ def generate_invoice_pdf(order):
 
     story = []
 
-    # ========== HEADER (Logo + Company | Invoice meta) ==========
+    # ========== HEADER ==========
     company_name = getattr(settings, "COMPANY_NAME", "Kyla Fashions")
     company_address = getattr(settings, "COMPANY_ADDRESS", "").replace("\n", "<br/>")
     company_phone = getattr(settings, "COMPANY_PHONE", "")
     company_email = getattr(settings, "COMPANY_EMAIL", "")
     company_gstin = getattr(settings, "COMPANY_GSTIN", "")
 
-    # Left side: logo + company details
-    left_content = []
-    logo = _get_logo()
-    if logo:
-        left_content.append(logo)
-        left_content.append(Spacer(1, 4))
+    # ---- Left side (logo + company info) ----
+    left_flowables = []
 
-    left_content.append(Paragraph(company_name, styles["Brand"]))
+    # Safe logo loading
+    logo_path = getattr(settings, "COMPANY_LOGO_PATH", None)
+    if logo_path:
+        logo_path = Path(logo_path)
+        if logo_path.exists():
+            try:
+                logo = Image(str(logo_path), width=40*mm, height=16*mm)
+                logo.hAlign = "LEFT"
+                left_flowables.append(logo)
+                left_flowables.append(Spacer(1, 3*mm))
+            except Exception as e:
+                print(f"Logo load failed: {e}")
 
-    address_lines = company_address
+    left_flowables.append(Paragraph(company_name, styles["Brand"]))
+
+    address_parts = []
+    if company_address:
+        address_parts.append(company_address)
     if company_phone:
-        address_lines += f"<br/>{company_phone}"
+        address_parts.append(company_phone)
     if company_email:
-        address_lines += f"<br/>{company_email}"
+        address_parts.append(company_email)
     if company_gstin:
-        address_lines += f"<br/>GSTIN: {company_gstin}"
+        address_parts.append(f"GSTIN: {company_gstin}")
 
-    left_content.append(Paragraph(address_lines, styles["BrandSub"]))
+    if address_parts:
+        left_flowables.append(Paragraph("<br/>".join(address_parts), styles["BrandSub"]))
 
-    left_cell = KeepTogether(left_content)
-
-    # Right side: INVOICE title + order info
-    right_text = (
-        f"<b>Invoice No:</b> #{order.order_number}<br/>"
-        f"<b>Date:</b> {order.created_at.strftime('%d %b %Y')}<br/>"
-        f"<b>Status:</b> {order.get_order_status_display()}"
-    )
-    right_cell = [
+    # ---- Right side ----
+    right_flowables = [
         Paragraph("INVOICE", styles["InvoiceTitle"]),
-        Spacer(1, 6),
-        Paragraph(right_text, styles["NormalText"]),
+        Spacer(1, 3*mm),
+        Paragraph(
+            f"<b>Invoice No:</b> #{order.order_number}<br/>"
+            f"<b>Date:</b> {order.created_at.strftime('%d %b %Y')}<br/>"
+            f"<b>Status:</b> {order.get_order_status_display()}",
+            styles["NormalText"]
+        ),
     ]
 
-    header_data = [[left_cell, right_cell]]
-    header_table = Table(header_data, colWidths=[105*mm, 65*mm])
+    # Simple 2-column table (NO KeepTogether)
+    header_table = Table(
+        [[left_flowables, right_flowables]],
+        colWidths=[105*mm, 65*mm]
+    )
     header_table.setStyle(TableStyle([
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+        ("ALIGN", (1, 0), (1, 0), "RIGHT"),
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
     ]))
     story.append(header_table)
 
@@ -156,7 +160,7 @@ def generate_invoice_pdf(order):
     story.append(HRFlowable(
         width="100%", thickness=2,
         color=colors.HexColor("#C1121F"),
-        spaceBefore=8, spaceAfter=12
+        spaceBefore=6, spaceAfter=12
     ))
 
     # ========== BILL TO / SHIP TO ==========
