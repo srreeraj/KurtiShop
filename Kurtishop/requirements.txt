@@ -9,7 +9,9 @@ Django==5.2.15
 django-cloudinary-storage==0.3.0
 django-environ==0.14.0
 fonttools==4.63.0
+gunicorn==26.0.0
 idna==3.18
+packaging==26.3
 pillow==12.2.0
 psycopg2-binary==2.9.12
 pycparser==3.0
