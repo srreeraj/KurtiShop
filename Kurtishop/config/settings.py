@@ -195,7 +195,7 @@ COMPANY_ADDRESS = "Your full address here"
 COMPANY_PHONE = "+91 7560889944"
 COMPANY_EMAIL = "kylafashions26@gmail.com"
 COMPANY_GSTIN = ""          # fill when you have it
-COMPANY_LOGO_URL = None     # later put absolute URL or static path
+COMPANY_LOGO_URL = BASE_URL / "static" / "icons" / "kyla_red.png"    # later put absolute URL or static path
 
 LOGIN_URL = 'dashboard:login'          # or '/dashboard/login/'
 LOGIN_REDIRECT_URL = 'dashboard:home'  # optional but useful
