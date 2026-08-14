@@ -15,6 +15,9 @@ from reportlab.platypus import (
     HRFlowable, Image
 )
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # -------------------------------------------------
@@ -129,8 +132,6 @@ def generate_invoice_pdf(order):
     logo_path = getattr(settings, "COMPANY_LOGO_PATH", None)
     if logo_path:
         logo_path = Path(logo_path)
-        print(f"Trying to load logo from: {logo_path}")          # debug
-        print(f"File exists: {logo_path.exists()}")
         if logo_path.exists():
             try:
                 logo = Image(str(logo_path), width=48*mm, height=19*mm)
@@ -138,7 +139,7 @@ def generate_invoice_pdf(order):
                 left_content.append(logo)
                 left_content.append(Spacer(1, 2*mm))
             except Exception as e:
-                print(f"Logo load failed: {e}")
+                logger.exception(f"Error loading logo image: {e}")
 
     left_content.append(Paragraph(company_name, styles["Brand"]))
 

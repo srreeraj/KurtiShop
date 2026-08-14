@@ -246,35 +246,13 @@ def request_cancellation(request, order_number):
 def download_invoice(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
 
-    # Try to serve the already-uploaded file
-    if order.invoice and order.invoice.name:
-        try:
-            return FileResponse(
-                order.invoice.open("rb"),
-                as_attachment=True,
-                filename=f"Invoice_{order.order_number}.pdf",
-                content_type="application/pdf",
-            )
-        except Exception as e:
-            # 401 or any other Cloudinary error → fall through to regenerate
-            print(f"Could not open existing invoice from Cloudinary: {e}")
+    # Optional security (recommended)
+    # if request.user.is_authenticated and not request.user.is_staff:
+    #     if order.email.lower() != request.user.email.lower():
+    #         raise Http404
 
-    # Generate fresh PDF and try to save it (best effort)
-    try:
-        pdf_file = generate_invoice_pdf(order)
-        order.invoice.save(pdf_file.name, pdf_file, save=True)
-        # After successful save, try to serve the newly uploaded one
-        return FileResponse(
-            order.invoice.open("rb"),
-            as_attachment=True,
-            filename=f"Invoice_{order.order_number}.pdf",
-            content_type="application/pdf",
-        )
-    except Exception as e:
-        print(f"Invoice save/open failed: {e}")
-
-    # Ultimate fallback – serve from memory (never fails)
     pdf_file = generate_invoice_pdf(order)
+
     return FileResponse(
         pdf_file,
         as_attachment=True,
@@ -282,7 +260,7 @@ def download_invoice(request, order_number):
         content_type="application/pdf",
     )
 
-    
+
 def return_lookup(request):
     """Guest enters Order Number + Email to start a return/exchange."""
     if request.method == "POST":
