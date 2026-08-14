@@ -2,13 +2,13 @@ services:
 
   web:
     build:
-      context: ./Kurtishop
+      context: .
       dockerfile: Dockerfile
 
     container_name: kyla_web
 
     env_file:
-      - ./Kurtishop/.env
+      - ./.env
 
     environment:
       DB_HOST: db
@@ -32,7 +32,7 @@ services:
     container_name: kyla_db
 
     env_file:
-      - ./Kurtishop/.env
+      - ./.env
 
     environment:
       POSTGRES_DB: ${DB_NAME}
