@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from products.models import Product, Occasion
+from products.models import Product, Occasion, ProductVariant
 from categories.models import Category
 from django.db.models import Count, Q
 from .forms import ContactForm
@@ -23,18 +23,67 @@ def home(request):
         is_featured = True,
     ).order_by('name')[:6]
 
-    featured_products = Product.objects.filter(
-        is_featured = True,
-        is_active = True,
-        is_deleted = False,
-    ).select_related('category')[:8]
+    def get_unique_color_variants(base_qs, limit=8):
+        variants = ProductVariant.objects.filter(
+            product__in=base_qs,
+            product__is_active=True,
+            product__is_deleted=False,
+            is_active=True,
+            is_deleted=False,
+            stock__gt=0,
+        ).select_related(
+            'product', 'product__category', 'product__material', 'color', 'size'
+        ).prefetch_related(
+            'product__images'
+        ).order_by('product__name', 'color__name')
 
-    new_arrivals = Product.objects.filter(
-        is_new_arrival = True,
-        is_active =True,
-        is_deleted = False,
-    ).select_related('category')[:8]
+        # Keep only one variant per product + color
+        seen = {}
+        unique_variants = []
+        for v in variants:
+            key = (v.product_id, v.color_id)
+            if key not in seen:
+                seen[key] = True
+                unique_variants.append(v)
 
+        # Attach display prices + primary image (exact same logic as product_list)
+        for variant in unique_variants:
+            color_images = variant.product.images.filter(color=variant.color).order_by('display_order')
+            variant.color_images = color_images[:4]
+            variant.primary_image = color_images.first() if color_images.exists() else None
+
+            color_variants = list(ProductVariant.objects.filter(
+                product=variant.product,
+                color=variant.color,
+                stock__gt=0,
+                is_active=True,
+                is_deleted=False,
+            ))
+
+            best_variant = min(color_variants, key=lambda v: v.discounted_price) if color_variants else variant
+
+            variant.display_price = best_variant.discounted_price
+            variant.display_original_price = best_variant.price
+            variant.display_discount_percentage = best_variant.discount_percentage
+
+        return unique_variants[:limit]
+
+    # ---------- New Arrivals ----------
+    new_arrival_products = Product.objects.filter(
+        is_new_arrival=True,
+        is_active=True,
+        is_deleted=False,
+    )
+    new_arrivals = get_unique_color_variants(new_arrival_products, limit=8)
+
+    # ---------- Featured / Best Sellers ----------
+    featured_products_qs = Product.objects.filter(
+        is_featured=True,
+        is_active=True,
+        is_deleted=False,
+    )
+    featured_products = get_unique_color_variants(featured_products_qs, limit=8)
+    
     context = {
         'categories' : categories,
         'occasions': occasions,
