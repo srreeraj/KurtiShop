@@ -35,11 +35,11 @@ CSRF_TRUSTED_ORIGINS = env.list(
 # HTTPS / SECURITY
 # ============================================================
 
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", default=True)
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = env.bool("CSRF_COOKIE_SECURE", default=True)
 
 SECURE_HSTS_SECONDS = 31536000
 
