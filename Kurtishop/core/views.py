@@ -74,7 +74,7 @@ def home(request):
         is_active=True,
         is_deleted=False,
     )
-    new_arrivals = get_unique_color_variants(new_arrival_products, limit=8)
+    new_arrivals = get_unique_color_variants(new_arrival_products, limit=4)
 
     # ---------- Featured / Best Sellers ----------
     featured_products_qs = Product.objects.filter(
@@ -82,8 +82,8 @@ def home(request):
         is_active=True,
         is_deleted=False,
     )
-    featured_products = get_unique_color_variants(featured_products_qs, limit=8)
-    
+    featured_products = get_unique_color_variants(featured_products_qs, limit=4)
+
     context = {
         'categories' : categories,
         'occasions': occasions,
