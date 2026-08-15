@@ -9,7 +9,7 @@
 
     <div class="grid grid-cols-2 gap-3 sm:gap-4">
         {% for product in featured_products %}
-            {% include 'includes/product_card.html' with product=product %}
+            {% include 'includes/product_card_home.html' with product=product %}
         {% empty %}
             <p class="text-gray-400 col-span-2 text-sm">No featured products found.</p>
         {% endfor %}
