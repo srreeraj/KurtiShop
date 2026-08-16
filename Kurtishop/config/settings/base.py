@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -231,19 +232,13 @@ CLOUDINARY_STORAGE = {
 
 STORAGES = {
     "default": {
-        "BACKEND": (
-            "cloudinary_storage.storage."
-            "MediaCloudinaryStorage"
-        ),
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-
     "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage."
-            "StaticFilesStorage"
-        ),
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
 
 
 # ============================================================
@@ -252,7 +247,7 @@ STORAGES = {
 
 COMPANY_NAME = "Kyla Fashions"
 
-COMPANY_ADDRESS = "Your full address here"
+COMPANY_ADDRESS = "Taliparmba, Kannur, Kerala"
 
 COMPANY_PHONE = "+91 7560889944"
 

@@ -5,54 +5,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Dynamic title -->
-    <title>{% block title %} Kurti Shop {% endblock %}</title>
+    <!-- Primary SEO -->
+    <title>
+        {% block title %}
+            Kyla Fashions | Women's & Ladies Wear in Taliparamba, Kannur
+        {% endblock %}
+    </title>
+
+    <meta name="description"
+          content="{% block meta_description %}Discover stylish women's and ladies wear at Kyla Fashions, Taliparamba, Kannur, Kerala. Shop kurtis, dresses, ethnic wear, casual wear, festive wear, office wear and party wear.{% endblock %}">
+
+    <meta name="author" content="Kyla Fashions">
+
+    <!-- Search Engine Instructions -->
+    <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+    <meta name="googlebot" content="{% block googlebot %}index, follow{% endblock %}">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'icons/logo/favicon.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'icons/logo/favicon.png' %}">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title"
+          content="{% block og_title %}Kyla Fashions | Women's & Ladies Wear in Taliparamba, Kannur{% endblock %}">
+    <meta property="og:description"
+          content="{% block og_description %}Discover stylish women's and ladies wear at Kyla Fashions, Taliparamba, Kannur, Kerala. Shop kurtis, dresses, ethnic wear, casual wear, festive wear and more.{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="Kyla Fashions">
+    <meta property="og:image"
+          content="{{ request.scheme }}://{{ request.get_host }}{% static 'icons/logo/kyla-red.png' %}">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+          content="{% block twitter_title %}Kyla Fashions | Women's & Ladies Wear in Taliparamba, Kannur{% endblock %}">
+    <meta name="twitter:description"
+          content="{% block twitter_description %}Shop stylish women's and ladies wear from Kyla Fashions in Taliparamba, Kannur, Kerala.{% endblock %}">
+    <meta name="twitter:image"
+          content="{{ request.scheme }}://{{ request.get_host }}{% static 'icons/logo/kyla-red.png' %}">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Custom Css -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
-    <!-- Google fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     {% block extra_css %}
     {% endblock %}
 </head>
+
 <body class="font-[Poppins] bg-gray-50 min-h-screen flex flex-col">
 
     <!-- Navbar -->
     {% url 'home' as home_url %}
-        {% block navbar %}
-            {% include 'includes/navbar.html' %}
-        {% endblock %}
 
+    {% block navbar %}
+        {% include 'includes/navbar.html' %}
+    {% endblock %}
+
+    <!-- Breadcrumb -->
     {% if request.path != home_url %}
         <div style="margin-top: 88px;">
             {% include 'includes/breadcrumb.html' %}
         </div>
     {% endif %}
 
-    <!-- Main content -->
+    <!-- Main Content -->
     <main class="flex-grow">
         {% block content %}
         {% endblock %}
     </main>
 
-    <!-- Footer  -->
+    <!-- Footer -->
     {% include 'includes/footer.html' %}
 
-    <!-- Custom JS -->
+    <!-- Custom JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'js/cart.js' %}"></script>
     <script src="{% static 'js/cart-action.js' %}"></script>
 
+    <!-- Razorpay Checkout -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     {% block extra_js %}
     {% endblock %}
+
 </body>
 </html>
