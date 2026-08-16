@@ -247,7 +247,7 @@ STORAGES = {
 
 COMPANY_NAME = "Kyla Fashions"
 
-COMPANY_ADDRESS = "Your full address here"
+COMPANY_ADDRESS = "Taliparmba, Kannur, Kerala"
 
 COMPANY_PHONE = "+91 7560889944"
 
