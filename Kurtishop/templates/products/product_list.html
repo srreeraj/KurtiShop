@@ -1,35 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}
-Shop | Kurti Shop
-{% endblock %}
+{% block title %}Shop | Kurti Shop{% endblock %}
 
 {% block content %}
+<div class="max-w-7xl mx-auto px-5 py-8 md:py-12">
 
-<!-- ===================== MAIN CONTENT ===================== -->
-<div class="max-w-7xl mx-auto px-5 py-12">
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-10">
 
-    <div class="grid lg:grid-cols-12 gap-10">
-
-        <!-- ===================== SIDEBAR ===================== -->
-        <div class="lg:col-span-3">
+        <!-- ===================== DESKTOP SIDEBAR ===================== -->
+        <div class="hidden lg:block lg:col-span-3">
             {% include 'includes/filter_sidebar.html' %}
         </div>
 
         <!-- ===================== PRODUCTS SECTION ===================== -->
         <div class="lg:col-span-9">
 
-            <!-- Sort & Results -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <!-- Top bar: Results + Sort + Mobile Filter Button -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <p class="text-gray-600">
                     Showing <span class="font-semibold text-gray-900">{{ products|length }}</span> products
                 </p>
 
                 <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-500">Sort by:</span>
-                    <select id="sort-select" 
-                            class="bg-white border border-gray-200 rounded-xl px-5 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <!-- Mobile Filter Button -->
+                    <button id="open-filters"
+                            class="lg:hidden flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filters
+                    </button>
+
+                    <span class="text-sm text-gray-500 hidden sm:inline">Sort by:</span>
+                    <select id="sort-select"
+                            class="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500">
                         <option value="newest">Newest First</option>
                         <option value="price-low">Price: Low to High</option>
                         <option value="price-high">Price: High to Low</option>
@@ -38,10 +44,10 @@ Shop | Kurti Shop
                 </div>
             </div>
 
-            <!-- Active Filter Tags -->
+            <!-- Active Filter Tags (you can expand this later) -->
             {% if request.GET.category and active_category %}
-            <div class="mb-6">
-                <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-5 py-2 rounded-2xl text-sm">
+            <div class="mb-5 flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-2xl text-sm">
                     {{ active_category.name }}
                     <a href="{% url 'product_list' %}" class="font-bold hover:text-red-900">×</a>
                 </span>
@@ -49,7 +55,7 @@ Shop | Kurti Shop
             {% endif %}
 
             <!-- Products Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-8" id="products-grid">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-7" id="products-grid">
                 {% for product in products %}
                     {% include 'includes/product_card.html' with product=product %}
                 {% empty %}
@@ -61,11 +67,68 @@ Shop | Kurti Shop
                 {% endfor %}
             </div>
 
-            <!-- Pagination -->
             {% include 'includes/pagination.html' with page_obj=products %}
-
         </div>
     </div>
 </div>
 
+<!-- ===================== MOBILE FILTER DRAWER ===================== -->
+<div id="filter-drawer"
+     class="fixed inset-0 z-50 hidden lg:hidden">
+    <!-- Backdrop -->
+    <div id="filter-backdrop" class="absolute inset-0 bg-black/40"></div>
+
+    <!-- Drawer panel -->
+    <div class="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-2xl flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b">
+            <h3 class="font-bold text-lg">Filters</h3>
+            <button id="close-filters" class="p-2 -mr-2 text-gray-500 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Scrollable filters -->
+        <div class="flex-1 overflow-y-auto px-5 py-4">
+            {% include 'includes/filter_sidebar.html' with is_mobile=True %}
+        </div>
+
+        <!-- Sticky Apply button (optional) -->
+        <div class="p-4 border-t bg-white">
+            <button id="apply-filters"
+                    class="w-full bg-red-600 hover:bg-red-700 text-white py-3.5 rounded-2xl font-medium">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const openBtn   = document.getElementById('open-filters');
+    const closeBtn  = document.getElementById('close-filters');
+    const backdrop  = document.getElementById('filter-backdrop');
+    const drawer    = document.getElementById('filter-drawer');
+    const applyBtn  = document.getElementById('apply-filters');
+
+    function openDrawer() {
+        drawer.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    openBtn?.addEventListener('click', openDrawer);
+    closeBtn?.addEventListener('click', closeDrawer);
+    backdrop?.addEventListener('click', closeDrawer);
+
+    // Optional: close after applying (if you later make filters JS-driven)
+    applyBtn?.addEventListener('click', closeDrawer);
+});
+</script>
 {% endblock %}
