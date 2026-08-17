@@ -62,12 +62,12 @@ def product_list(request):
     # Sleeve filter
     sleeve_id = request.GET.get('sleeve')
     if sleeve_id:
-        variants = variants.filter(sleeve_id=sleeve_id)
+        variants = variants.filter(product__sleeve_id=sleeve_id)
 
     # Neck filter
     neck_id = request.GET.get('neck')
     if neck_id:
-        variants = variants.filter(neck_id=neck_id)
+        variants = variants.filter(product__neck_id=neck_id)
 
     # Occasion filter
     occasion_slug = request.GET.get('occasion')
@@ -77,7 +77,7 @@ def product_list(request):
     # Pattern filter
     pattern_id = request.GET.get('pattern')
     if pattern_id:
-        variants = variants.filter(pattern_id=pattern_id)
+        variants = variants.filter(product__pattern_id=pattern_id)
 
     # New Arrivals
     if request.GET.get('new_arrivals') == 'true':
