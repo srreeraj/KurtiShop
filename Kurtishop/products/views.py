@@ -131,6 +131,7 @@ def product_list(request):
     categories = Category.objects.filter(
         is_active=True,
         is_deleted=False,
+        parent__isnull=False,
     ).annotate(
         product_count=Count('products',filter=Q(products__is_active=True))
     )
