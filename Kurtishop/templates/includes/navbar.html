@@ -59,7 +59,15 @@
         </a>
       </li>
       <li>
-        <a href="{% url 'product_list' %}?new-arrivals=true" data-nav-link
+        <a href="{% url 'product_list' %}" data-nav-link
+           class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
+                  after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
+                  {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
+          Shop
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'product_list' %}?new_arrivals=true" data-nav-link
            class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
                   after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
                   {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
@@ -112,14 +120,6 @@
                   after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
                   {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
           Contact
-        </a>
-      </li>
-      <li>
-        <a href="{% url 'orders:return_lookup' %}" data-nav-link
-          class="relative pb-[3px] transition-colors duration-[400ms] hover:text-[#C1121F]
-              after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-[#C1121F] after:transition-[width] after:duration-300 hover:after:w-full
-              {% if request.path == home_url %}text-white/90{% else %}text-gray-700{% endif %}">
-            Return / Exchange
         </a>
       </li>
     </ul>
@@ -185,6 +185,7 @@
 
   <nav class="flex flex-col">
     <a href="{% url 'home' %}" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Home</a>
+    <a href="{% url 'product_list' %}" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Shop</a>
     <a href="{% url 'product_list' %}?new_arrivals=true" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">New Arrivals</a>
     <a href="{% url 'product_list' %}?occasion=wedding" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Wedding Collection</a>
     <a href="{% url 'product_list' %}?occasion=office-wear" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Office Wear</a>
@@ -192,10 +193,7 @@
     <a href="{% url 'product_list' %}?occasion=western" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Western Wear</a>
     <a href="{% url 'product_list' %}?sale=true" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Sale</a>
     <a href="{% url 'contact' %}" class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">Contact</a>
-    <a href="{% url 'orders:return_lookup' %}"
-      class="block py-4 text-[11px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] no-underline border-b-[0.5px] border-gray-100">
-        Return / Exchange
-    </a>
+    
   </nav>
 
   <!-- Social Icons -->
