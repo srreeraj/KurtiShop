@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Privacy Policy | Kyla Fashion{% endblock %}
+
+{% block content %}
+<section class="bg-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24 pb-20 sm:pb-24">
+
+        <!-- Page Header -->
+        <div class="mb-14 sm:mb-16">
+            <p class="text-[12px] font-semibold tracking-[2.5px] uppercase text-[#C1121F] mb-4">
+                Legal
+            </p>
+            <h1 class="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
+                Privacy Policy
+            </h1>
+            <p class="mt-5 text-[15px] leading-relaxed text-gray-500 max-w-2xl">
+                This Privacy Policy explains how the online store collects, uses, stores, and protects information provided by customers when placing orders, making payments, requesting cancellations, or requesting returns or exchanges.
+            </p>
+        </div>
+
+        <!-- Content -->
+        <div class="space-y-12 text-[15px] leading-relaxed text-gray-600">
+
+            <!-- 1 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">1. Introduction</h2>
+                <p>
+                    The store currently operates using guest checkout. Customers do not need to create a user account or maintain a customer profile to place an order.
+                </p>
+            </section>
+
+            <!-- 2 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">2. Information We Collect</h2>
+                <p class="mb-4">
+                    When a customer places an order, the store may collect the information required to process and deliver that order, including full name, email address, phone number, delivery address, city, state, country, postal code, and optional order notes.
+                </p>
+                <p class="mb-4">
+                    Order records also contain information about the purchased products and variants, including product name, SKU, size, color, quantity, original price, selling price, discount percentage, total price, and savings.
+                </p>
+                <p>
+                    For online payments, payment-related records may include a Razorpay order ID and payment ID. Payment processing is handled through the payment provider rather than by storing customers’ card or banking credentials in the store’s order model.
+                </p>
+            </section>
+
+            <!-- 3 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">3. How We Use Information</h2>
+                <p class="mb-4">
+                    Information is used to process and fulfill orders, communicate with customers, validate delivery availability by pincode, process online payments, manage cancellations, handle returns and exchanges, generate invoices, and provide order-related support.
+                </p>
+                <p>
+                    The store may use the customer’s order number and email address to allow a guest customer to look up an order and access order-related cancellation or return functionality.
+                </p>
+            </section>
+
+            <!-- 4 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">4. Payment Information</h2>
+                <p>
+                    Online payments are processed through Razorpay. The store records payment status and transaction identifiers necessary to associate a payment with an order. Customers should review Razorpay’s applicable privacy and payment terms for information about data processed directly by the payment provider.
+                </p>
+            </section>
+
+            <!-- 5 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">5. Order, Cancellation and Return Information</h2>
+                <p>
+                    Order information is retained as part of the store’s order records. Cancellation requests may include the customer’s stated cancellation reason. Return or exchange requests may include the selected products, quantities, request type, reason, administrative notes, and exchange-related product and price information.
+                </p>
+            </section>
+
+            <!-- 6 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">6. Invoice and Cloud Storage</h2>
+                <p>
+                    Generated invoice files may be stored using Cloudinary storage. Invoice paths are associated with the relevant order number. Access to stored files should be restricted through the application’s operational and hosting controls.
+                </p>
+            </section>
+
+            <!-- 7 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">7. Data Protection</h2>
+                <p>
+                    Reasonable technical and organizational measures should be used to protect customer information against unauthorized access, alteration, disclosure, or loss. However, no internet-based system can guarantee absolute security.
+                </p>
+            </section>
+
+            <!-- 8 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">8. Third-Party Services</h2>
+                <p>
+                    The store may use third-party services required for payment processing and media or file storage, including Razorpay and Cloudinary. Those services may process information according to their own policies and terms.
+                </p>
+            </section>
+
+            <!-- 9 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">9. Customer Rights and Requests</h2>
+                <p>
+                    Customers may contact the store regarding their order information, correction of inaccurate information, or other privacy-related questions. Requests may be subject to verification to protect customer and order information.
+                </p>
+            </section>
+
+            <!-- 10 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">10. Policy Updates</h2>
+                <p>
+                    This Privacy Policy may be updated when the store’s services, technology, or legal requirements change. The latest version published on the website will apply to information handled under the updated policy.
+                </p>
+            </section>
+
+            <!-- 11 -->
+            <section>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">11. Contact</h2>
+                <p>
+                    For privacy-related questions, customers should contact the store using the official contact details published on the website.
+                </p>
+            </section>
+
+        </div>
+
+        <!-- Back link -->
+        <div class="mt-16 pt-8 border-t border-gray-100">
+            <a href="{% url 'home' %}" class="inline-flex items-center gap-2 text-[14px] text-gray-500 hover:text-[#C1121F] transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Home
+            </a>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
