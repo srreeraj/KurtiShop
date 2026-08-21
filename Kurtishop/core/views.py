@@ -137,3 +137,21 @@ def contact(request):
     }
 
     return render(request, 'core/contact.html', context)
+
+def privacy_policy(request):
+    context = {
+        'title' : "Privacy Policy"
+    }
+    return render(request, 'core/privacy_policy.html', context)
+
+def terms_of_service(request):
+    context = {
+        'title' : 'Terms of Service'
+    }
+    return render(request, 'core/terms_of_service.html', context)
+
+def sitemap(request):
+    context = {
+        'title' : 'Sitemap'
+    }
+    return render(request, 'core/sitemap.html', context)
