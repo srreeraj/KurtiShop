@@ -73,12 +73,18 @@ function initNavbar() {
 
     // Mobile Menu Drawer
     function openDrawer() {
-        drawer.classList.add('!translate-x-0');
+        drawer.classList.remove('translate-x-full');
+        drawer.classList.add('translate-x-0');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
         overlay.classList.add('opacity-100', 'pointer-events-auto');
+        document.body.style.overflow = 'hidden';
     }
     function closeDrawer() {
-        drawer.classList.remove('!translate-x-0');
+        drawer.classList.add('translate-x-full');
+        drawer.classList.remove('translate-x-0');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
         overlay.classList.remove('opacity-100', 'pointer-events-auto');
+        document.body.style.overflow = '';
     }
 
     hamburgerBtn.addEventListener('click', openDrawer);

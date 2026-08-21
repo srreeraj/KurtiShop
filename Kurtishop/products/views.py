@@ -5,6 +5,7 @@ from .models import Product, ProductVariant,Category, Color, Size, Sleeve, Neck,
 from django.http import JsonResponse
 from urllib.parse import urlencode
 from django.urls import reverse
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -119,11 +120,9 @@ def product_list(request):
         variant.display_discount_percentage = best_variant.discount_percentage
 
     # Pagination
-
-    # from django.core.paginator import Paginator
-    # paginator = Paginator(products, 12) #12 products per page
-    # page_number = request.GET.get('page')
-    # products_page = paginator.get_page(page_number)
+    paginator = Paginator(unique_variants, 12) #12 products per page
+    page_number = request.GET.get('page')
+    products_page = paginator.get_page(page_number)
 
     # ====================SIDEBAR DATA===========================================
 
@@ -154,7 +153,8 @@ def product_list(request):
 
 
     context = {
-        'products': unique_variants,
+        'products': products_page,
+        'page_obj': products_page,
         'categories' : categories,
         'colors' : colors,
         'sizes' : sizes,
