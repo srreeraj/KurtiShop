@@ -30,21 +30,23 @@
                     <li>
                         <a href="{% url 'home' %}" class="hover:text-[#C1121F] transition-colors">Home / Store</a>
                     </li>
-                    <li>
-                        <a href="{% url 'product_list' %}" class="hover:text-[#C1121F] transition-colors">Product Listing</a>
-                    </li>
-                    <li>
-                        <span class="text-gray-500">Product Detail</span>
-                    </li>
-                    <li>
-                        <span class="text-gray-500">Category Pages</span>
-                    </li>
-                    <li>
-                        <a href="{% url 'cart' %}" class="hover:text-[#C1121F] transition-colors">Shopping Cart</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'orders:checkout' %}" class="hover:text-[#C1121F] transition-colors">Checkout</a>
-                    </li>
+                <li>
+                    <a href="{% url 'product_list' %}" class="hover:text-[#C1121F] transition-colors">Product Listing</a>
+                </li>
+                <li>
+                    <span class="text-gray-500">Product Detail</span>
+                </li>
+                <li>
+                    <span class="text-gray-500">Category Pages</span>
+                </li>
+                <li>
+                    <a href="#" onclick="openCartDrawer(); return false;" class="hover:text-[#C1121F] transition-colors">
+                        Shopping Cart
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'orders:checkout' %}" class="hover:text-[#C1121F] transition-colors">Checkout</a>
+                </li>
                 </ul>
             </section>
 
